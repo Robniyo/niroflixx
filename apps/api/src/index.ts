@@ -24,20 +24,20 @@ import applicationsRoutes from './routes/applications';
 import attendanceRoutes from './routes/attendance';
 import advertisementsRoutes from './routes/advertisements';
 import enrollmentsRoutes from './routes/enrollments';
-import sessionsRoutes from './routes/sessions';
-import reportsRoutes from './routes/reports';
 import reportsRoutes from './routes/reports';
 import statsRoutes from './routes/stats';
 import contactRoutes from './routes/contact';
 import notificationsRoutes from './routes/notifications';
 
-
-
-
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5000', 'https://niroflixx.vercel.app'], credentials: true }));
+app.use(cors({ 
+  origin: ['http://localhost:5173', 'http://localhost:5000', 'https://niroflixx.vercel.app'], 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+}));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -67,7 +67,6 @@ app.use('/api/v1/applications', applicationsRoutes);
 app.use('/api/v1/attendance', attendanceRoutes);
 app.use('/api/v1/advertisements', advertisementsRoutes);
 app.use('/api/v1/enrollments', enrollmentsRoutes);
-app.use('/api/v1/sessions', sessionsRoutes);
 app.use('/api/v1/reports', reportsRoutes);
 app.use('/api/v1/stats', statsRoutes);
 app.use('/api/v1/contact', contactRoutes);
