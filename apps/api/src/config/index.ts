@@ -8,4 +8,9 @@ export const config = {
   jwtExpiresIn: '24h',
   jwtRefreshExpiresIn: '7d',
   bcryptRounds: 12,
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'dlxiuwv30',
+    apiKey: process.env.CLOUDINARY_API_KEY || '539891243736556',
+    apiSecret: process.env.CLOUDINARY_API_SECRET || '5PLzE4P8DUDH1YnAr-Nggmv5cvQ',
+  },
 };
