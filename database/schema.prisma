@@ -1,0 +1,727 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  username       String   @unique
+  email          String   @unique
+  phone          String?
+  password       String
+  role           String   @default("USER")
+  status         String   @default("REGISTERED")
+  avatar         String?
+  emailVerified  Boolean  @default(false)
+  phoneVerified  Boolean  @default(false)
+  lastLogin      DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  profile        Profile?
+  candidate      Candidate?
+  sessions       Session[]
+  enrollments    Enrollment[]
+  downloadRelations Download[]
+  bookmarks      Bookmark[]
+  notifications  Notification[]
+  messagesSent   Message[]     @relation("MessageSender")
+  messagesReceived Message[]   @relation("MessageReceiver")
+  reviews        Review[]
+  applications   Application[]
+  serviceRequests ServiceRequest[]
+  auditLogs      AuditLog[]
+  supportTickets SupportTicket[]
+  trainer        Trainer?
+  attendances    Attendance[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("sessions")
+}
+
+model Profile {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  gender             String?
+  birthDate          DateTime?
+  nationality        String?
+  province           String?
+  district           String?
+  sector             String?
+  cell               String?
+  village            String?
+  biography          String?
+  occupation         String?
+  university         String?
+  school             String?
+  website            String?
+  linkedin           String?
+  github             String?
+  portfolio          String?
+  cv                 String?
+  photo              String?
+  completionPercentage Int   @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("profiles")
+}
+
+model Candidate {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  headline           String?
+  summary            String?
+  currentEducation   String?
+  currentInstitution String?
+  experienceYears    Int      @default(0)
+  availability       String?
+  completionScore    Int      @default(0)
+  status             String   @default("active")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  education    Education[]
+  experiences  Experience[]
+  skills       CandidateSkill[]
+  certificates CandidateCertificate[]
+  documents    CandidateDocument[]
+  applications Application[]
+  @@map("candidates")
+}
+
+model Education {
+  id          String   @id @default(uuid())
+  candidateId String
+  institution String
+  degree      String
+  field       String
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean  @default(false)
+  description String?
+  createdAt   DateTime @default(now())
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  @@map("education")
+}
+
+model Experience {
+  id          String   @id @default(uuid())
+  candidateId String
+  company     String
+  position    String
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean  @default(false)
+  description String?
+  createdAt   DateTime @default(now())
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  @@map("experiences")
+}
+
+model CandidateSkill {
+  id          String  @id @default(uuid())
+  candidateId String
+  name        String
+  level       String?
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  @@map("candidate_skills")
+}
+
+model CandidateCertificate {
+  id          String   @id @default(uuid())
+  candidateId String
+  name        String
+  issuer      String
+  date        DateTime
+  url         String?
+  createdAt   DateTime @default(now())
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  @@map("candidate_certificates")
+}
+
+model CandidateDocument {
+  id                 String   @id @default(uuid())
+  candidateId        String
+  type               String
+  fileName           String
+  fileUrl            String
+  verificationStatus String   @default("pending")
+  uploadedAt         DateTime @default(now())
+  expiresAt          DateTime?
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  @@map("candidate_documents")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  parentId    String?
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent      Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]    @relation("CategoryHierarchy")
+  courses     Course[]
+  resources   Resource[]
+  news        News[]
+  services    Service[]
+  opportunities Opportunity[]
+  @@map("categories")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  courses      Course[]
+  resources    Resource[]
+  news         News[]
+  opportunities Opportunity[]
+  @@map("tags")
+}
+
+model Course {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  title           String
+  subtitle        String?
+  description     String
+  categoryId      String?
+  level           String   @default("BEGINNER")
+  type            String   @default("ONLINE_LIVE")
+  language        String   @default("en")
+  price           Float    @default(0)
+  discount        Float    @default(0)
+  currency        String   @default("RWF")
+  thumbnail       String?
+  coverImage      String?
+  introVideo      String?
+  duration        String?
+  capacity        Int?
+  enrollmentCount Int      @default(0)
+  status          String   @default("DRAFT")
+  featured        Boolean  @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  tags        Tag[]
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  reviews     Review[]
+  bookmarks   Bookmark[]
+  classes     Class[]
+  @@map("courses")
+}
+
+model Lesson {
+  id          String  @id @default(uuid())
+  courseId    String
+  title       String
+  slug        String
+  description String?
+  videoUrl    String?
+  attachments String?
+  duration    String?
+  orderNumber Int     @default(0)
+  isPreview   Boolean @default(false)
+  status      String  @default("DRAFT")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  @@map("lessons")
+}
+
+model Enrollment {
+  id                String   @id @default(uuid())
+  courseId          String
+  userId            String
+  paymentStatus     String   @default("PENDING")
+  enrollmentDate    DateTime @default(now())
+  completion        Int      @default(0)
+  certificateIssued Boolean  @default(false)
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  @@unique([courseId, userId])
+  @@map("enrollments")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  userId     String
+  courseId   String?
+  resourceId String?
+  serviceId  String?
+  rating     Int
+  comment    String?
+  helpful    Int      @default(0)
+  reported   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  course   Course?   @relation(fields: [courseId], references: [id])
+  resource Resource? @relation(fields: [resourceId], references: [id])
+  service  Service?  @relation(fields: [serviceId], references: [id])
+  @@map("reviews")
+}
+
+model Opportunity {
+  id              String   @id @default(uuid())
+  title           String
+  organization    String?
+  country         String?
+  city            String?
+  categoryId      String?
+  type            String
+  educationLevel  String?
+  deadline        DateTime?
+  description     String
+  requirements    String?
+  benefits        String?
+  officialLink    String?
+  contact         String?
+  featured        Boolean  @default(false)
+  views           Int      @default(0)
+  status          String   @default("DRAFT")
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category     Category?      @relation(fields: [categoryId], references: [id])
+  tags         Tag[]
+  applications Application[]
+  bookmarks    Bookmark[]
+  @@map("opportunities")
+}
+
+model Application {
+  id             String   @id @default(uuid())
+  userId         String?
+  candidateId    String
+  opportunityId  String
+  status         String   @default("DRAFT")
+  submittedAt    DateTime?
+  reviewNotes    String?
+  adminNotes     String?
+  decision       String?
+  documents      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  candidate   Candidate    @relation(fields: [candidateId], references: [id])
+  opportunity Opportunity  @relation(fields: [opportunityId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
+  @@map("applications")
+}
+
+model Resource {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  description   String?
+  categoryId    String?
+  type          String?
+  fileUrl       String?
+  thumbnail     String?
+  price         Float    @default(0)
+  downloadCount Int      @default(0)
+  views         Int      @default(0)
+  rating        Float    @default(0)
+  author        String?
+  version       String?
+  language      String   @default("en")
+  status        String   @default("DRAFT")
+  featured      Boolean  @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category          Category?    @relation(fields: [categoryId], references: [id])
+  tags              Tag[]
+  reviews           Review[]
+  downloadRelations Download[]
+  bookmarks         Bookmark[]
+  @@map("resources")
+}
+
+model Download {
+  id           String   @id @default(uuid())
+  userId       String
+  resourceId   String
+  downloadedAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+  @@map("downloads")
+}
+
+model Bookmark {
+  id            String   @id @default(uuid())
+  userId        String
+  courseId      String?
+  opportunityId String?
+  resourceId    String?
+  newsId        String?
+  serviceId     String?
+  createdAt     DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id])
+  course      Course?      @relation(fields: [courseId], references: [id])
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id])
+  resource    Resource?    @relation(fields: [resourceId], references: [id])
+  news        News?        @relation(fields: [newsId], references: [id])
+  service     Service?     @relation(fields: [serviceId], references: [id])
+  @@map("bookmarks")
+}
+
+model News {
+  id             String   @id @default(uuid())
+  title          String
+  slug           String   @unique
+  summary        String?
+  content        String
+  coverImage     String?
+  author         String?
+  categoryId     String?
+  status         String   @default("DRAFT")
+  featured       Boolean  @default(false)
+  views          Int      @default(0)
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  seoTitle       String?
+  seoDescription String?
+
+  category  Category?   @relation(fields: [categoryId], references: [id])
+  tags      Tag[]
+  bookmarks Bookmark[]
+  @@map("news")
+}
+
+model Service {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  description   String?
+  categoryId    String?
+  startingPrice Float    @default(0)
+  estimatedTime String?
+  icon          String?
+  coverImage    String?
+  portfolio     String?
+  faq           String?
+  status        String   @default("DRAFT")
+  featured      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category  Category?         @relation(fields: [categoryId], references: [id])
+  reviews   Review[]
+  bookmarks Bookmark[]
+  requests  ServiceRequest[]
+  @@map("services")
+}
+
+model ServiceRequest {
+  id          String   @id @default(uuid())
+  serviceId   String
+  userId      String
+  description String?
+  status      String   @default("DRAFT")
+  quotation   Float?
+  notes       String?
+  submittedAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  service Service @relation(fields: [serviceId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  @@map("service_requests")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("notifications")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  subject    String?
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("MessageSender", fields: [senderId], references: [id])
+  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
+  @@map("messages")
+}
+
+model Media {
+  id         String   @id @default(uuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  fileSize   Int
+  folder     String?
+  access     String   @default("PUBLIC")
+  uploadedBy String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@map("media")
+}
+model Advertisement {
+  id          String   @id @default(uuid())
+  title       String
+  imageUrl    String?
+  videoUrl    String?
+  description String?
+  link        String?
+  position    String
+  status      String   @default("DRAFT")
+  startDate   DateTime?
+  endDate     DateTime?
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("advertisements")
+}
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  userId      String
+  subject     String
+  description String
+  status      String   @default("OPEN")
+  priority    String   @default("MEDIUM")
+  assignedTo  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  @@map("support_tickets")
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  group     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("settings")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+  @@map("audit_logs")
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  type      String
+  status    String   @default("DRAFT")
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("announcements")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  verified  Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  @@map("newsletter_subscribers")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  replied   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@map("contact_messages")
+}
+
+model Class {
+  id                    String   @id @default(uuid())
+  name                  String
+  code                  String   @unique
+  courseId              String
+  trainerId             String?
+  assistantTrainer      String?
+  type                  String   @default("ONLINE_LIVE")
+  location              String?
+  meetingLink           String?
+  capacity              Int      @default(30)
+  minStudents           Int      @default(5)
+  registrationDeadline  DateTime?
+  startDate             DateTime?
+  endDate               DateTime?
+  startTime             String?
+  endTime               String?
+  days                  String?
+  status                String   @default("DRAFT")
+  banner                String?
+  thumbnail             String?
+  description           String?
+  requirements          String?
+  fee                   Float    @default(0)
+  discount              Float    @default(0)
+  enrolledCount         Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  course      Course?          @relation(fields: [courseId], references: [id])
+  trainer     Trainer?         @relation(fields: [trainerId], references: [id])
+  sessions    ClassSession[]
+  attendances Attendance[]
+  @@map("classes")
+}
+
+model ClassSession {
+  id                    String   @id @default(uuid())
+  classId               String?
+  name                  String
+  category              String?
+  description           String?
+  trainerId             String?
+  capacity              Int      @default(30)
+  startDate             DateTime?
+  endDate               DateTime?
+  registrationDeadline  DateTime?
+  location              String?
+  meetingLink           String?
+  requirements          String?
+  price                 Float    @default(0)
+  certificate           Boolean  @default(false)
+  status                String   @default("DRAFT")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  class   Class?    @relation(fields: [classId], references: [id])
+  trainer Trainer?  @relation(fields: [trainerId], references: [id])
+  @@map("class_sessions")
+}
+
+model Trainer {
+  id           String   @id @default(uuid())
+  userId       String?  @unique
+  bio          String?
+  skills       String?
+  experience   String?
+  certificates String?
+  rating       Float    @default(0)
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user     User?            @relation(fields: [userId], references: [id])
+  classes  Class[]
+  sessions ClassSession[]
+  @@map("trainers")
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  classId   String
+  userId    String
+  status    String   @default("PRESENT")
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+
+  class Class @relation(fields: [classId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  @@unique([classId, userId, date])
+  @@map("attendance")
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String?
+  quote     String
+  photo     String?
+  rating    Int      @default(5)
+  status    String   @default("DRAFT")
+  createdAt DateTime @default(now())
+  @@map("testimonials")
+}
+
+model Partner {
+  id        String   @id @default(uuid())
+  name      String
+  logo      String?
+  website   String?
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  @@map("partners")
+}

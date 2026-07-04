@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-white text-secondary-900 font-sans;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .dark body {
+    @apply bg-secondary-950 text-white;
+  }
+  ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .container-content {
+    @apply max-w-4xl mx-auto px-4 sm:px-6;
+  }
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-secondary-900 text-center;
+  }
+  .section-subtitle {
+    @apply text-lg text-secondary-500 text-center mt-4 max-w-2xl mx-auto;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .gradient-primary {
+    background-image: linear-gradient(to right, #2563EB, #3B82F6);
+  }
+  .gradient-dark {
+    background-image: linear-gradient(to bottom right, #0F172A, #1E293B);
+  }
+  .gradient-hero {
+    background-image: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #3B82F6 100%);
+  }
+  .text-gradient {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(to right, #2563EB, #F59E0B);
+  }
+}
