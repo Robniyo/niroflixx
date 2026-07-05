@@ -31,7 +31,7 @@ export default function CoursesPage() {
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setShowModal(true); };
   const openEdit = async (id: string) => {
-    try { const res = await api.get(`/courses/id/${id}`); const c = res.data.data; setForm({ title: c.title || '', description: c.description || '', categoryId: c.categoryId || '', level: c.level, type: c.type, language: c.language, price: c.price, discount: c.discount || 0, duration: c.duration || '', capacity: c.capacity || 0, thumbnail: c.thumbnail || '', status: c.status, featured: c.featured }); setEditing(id); setShowModal(true); } catch { toast.error('Failed'); }
+    try { const res = await api.get(`/courses/${id}`); const c = res.data.data; setForm({ title: c.title || '', description: c.description || '', categoryId: c.categoryId || '', level: c.level, type: c.type, language: c.language, price: c.price, discount: c.discount || 0, duration: c.duration || '', capacity: c.capacity || 0, thumbnail: c.thumbnail || '', status: c.status, featured: c.featured }); setEditing(id); setShowModal(true); } catch { toast.error('Failed'); }
   };
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
