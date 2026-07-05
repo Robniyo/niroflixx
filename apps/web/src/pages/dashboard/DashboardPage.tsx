@@ -33,7 +33,7 @@ export default function DashboardPage() {
               </div>
               <span className="text-body-sm font-medium text-secondary-700">{user?.firstName} {user?.lastName}</span>
             </div>
-            <button onClick={() => { logout(); window.location.href = '/'; }} className="flex items-center gap-2 px-4 py-2 text-body-sm text-secondary-500 hover:text-danger hover:bg-danger-light/20 rounded-lg transition-all">
+            <button onClick={() => { logout().catch(()=>{}); window.location.href = '/'; }} className="flex items-center gap-2 px-4 py-2 text-body-sm text-secondary-500 hover:text-danger hover:bg-danger-light/20 rounded-lg transition-all">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
           </div>

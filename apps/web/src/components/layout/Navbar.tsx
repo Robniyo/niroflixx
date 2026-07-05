@@ -47,7 +47,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 {isAdmin ? <Link to="/admin"><Button variant="primary" size="sm">Dashboard</Button></Link> : <Link to="/dashboard"><Button variant="ghost" size="sm">My Account</Button></Link>}
-                <button onClick={() => { logout(); window.location.href = '/'; }} className="text-body-sm text-secondary-500 hover:text-danger transition-colors">Sign Out</button>
+                <button onClick={() => { logout().catch(()=>{}); window.location.href = '/'; }} className="text-body-sm text-secondary-500 hover:text-danger transition-colors">Sign Out</button>
               </div>
             ) : (
               <>
@@ -78,7 +78,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 {isAdmin ? <Link to="/admin"><Button variant="primary" className="w-full mb-2">Dashboard</Button></Link> : <Link to="/dashboard"><Button variant="ghost" className="w-full mb-2">My Account</Button></Link>}
-                <button onClick={() => { logout(); window.location.href = '/'; }} className="w-full text-left px-3 py-2.5 rounded-md text-body font-medium text-danger hover:bg-danger-light/30 transition-colors">Sign Out</button>
+                <button onClick={() => { logout().catch(()=>{}); window.location.href = '/'; }} className="w-full text-left px-3 py-2.5 rounded-md text-body font-medium text-danger hover:bg-danger-light/30 transition-colors">Sign Out</button>
               </>
             ) : (
               <>
