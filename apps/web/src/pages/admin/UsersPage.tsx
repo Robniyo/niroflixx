@@ -54,6 +54,14 @@ export default function UsersPage() {
     catch { toast.error('Failed'); }
     setOpenMenu(null);
   };
+  const deleteUser = async (id: string, email: string) => {
+  if (!confirm(`Permanently delete ${email}? This cannot be undone.`)) return;
+  try {
+    await api.delete(`/admin/users/${id}`);
+    toast.success('User deleted');
+    fetchUsers();
+  } catch { toast.error('Failed'); }
+};
 
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,6 +124,7 @@ export default function UsersPage() {
                   <button onClick={() => toggleStatus(u.id, u.status)} className={`px-2.5 py-1 rounded-full text-caption font-medium cursor-pointer ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
                     {u.status === 'ACTIVE' ? 'Active' : 'Suspended'}
                   </button>
+                  <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline ml-2">Delete</button>
                 </td>
                 <td className="px-5 py-3.5 text-body-sm text-secondary-400">{new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                 <td className="px-3 py-3.5 text-right relative">
