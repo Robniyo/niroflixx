@@ -5,7 +5,6 @@ import { authenticate, authorize } from '../middlewares/auth';
 const router = Router();
 
 router.get('/', coursesController.getAll);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), coursesController.getById);
 router.get('/:slug', coursesController.getBySlug);
 router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), coursesController.create);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), coursesController.update);
