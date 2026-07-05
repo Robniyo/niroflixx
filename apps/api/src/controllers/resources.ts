@@ -67,4 +67,14 @@ export const resourcesController = {
       res.json({ status: 'success', message: 'Archived' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+  download: async (req: Request, res: Response) => {
+    try {
+      await prisma.resource.update({
+        where: { id: req.params.id },
+        data: { downloadCount: { increment: 1 } },
+      });
+      const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
+      res.json({ status: 'success', data: resource });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
 };

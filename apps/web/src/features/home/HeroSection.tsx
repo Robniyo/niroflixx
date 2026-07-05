@@ -32,7 +32,7 @@ export default function HeroSection() {
           <div className="animate-fade-in">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-body-sm mb-6 border border-white/20">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              New: AI Bootcamp Enrolling Now
+              Welcome to Niroflix
             </div>
             <h1 className="text-display-xl text-white mb-6 leading-[1.05]">
               Learn, <span className="text-gradient">Grow,</span><br />Succeed.

@@ -12,7 +12,7 @@ const cleanData = (data: any) => {
 };
 
 export const servicesController = {
-getAll: async (req: Request, res: Response) => {
+  getAll: async (req: Request, res: Response) => {
     try {
       const services = await prisma.service.findMany({ 
         where: { status: 'PUBLISHED' }, 
@@ -38,6 +38,7 @@ getAll: async (req: Request, res: Response) => {
       res.json({ status: 'success', data: service });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   create: async (req: Request, res: Response) => {
     try {
       const data = cleanData(req.body);
@@ -73,16 +74,22 @@ getAll: async (req: Request, res: Response) => {
       res.json({ status: 'success', message: 'Archived' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   requestService: async (req: Request, res: Response) => {
     try {
       const { serviceId, description, name, email, phone } = req.body;
       
-      // Save contact message for admin
+      let serviceName = serviceId;
+      try {
+        const service = await prisma.service.findUnique({ where: { id: serviceId } });
+        if (service) serviceName = service.title;
+      } catch {}
+
       await prisma.contactMessage.create({
         data: {
           name,
           email,
-          subject: `Service Request: ${serviceId}`,
+          subject: `Service Request: ${serviceName}`,
           message: `Phone: ${phone || 'N/A'}\n\n${description || 'No details provided'}`,
         },
       });
