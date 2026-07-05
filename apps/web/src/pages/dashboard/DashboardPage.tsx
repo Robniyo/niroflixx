@@ -112,7 +112,7 @@ export default function DashboardPage() {
         )}
 
         {/* Stats Cards */}
-        <div className="grid sm:grid-cols-3 gap-5 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-10">
           {[
             { label: 'Enrolled Courses', value: stats.enrollments, icon: BookOpen, color: 'from-primary-500 to-primary-600', bg: 'bg-primary-50', text: 'text-primary-600' },
             { label: 'Applications', value: stats.applications, icon: Briefcase, color: 'from-accent-500 to-accent-600', bg: 'bg-accent-50', text: 'text-accent-600' },
@@ -140,7 +140,7 @@ export default function DashboardPage() {
               <TrendingUp className="w-5 h-5 text-primary-600" />
               <h3 className="text-h5 font-semibold text-secondary-900">Quick Actions</h3>
             </div>
-            <div className="grid sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { label: 'Candidate Profile', desc: 'Complete to unlock opportunities', href: '/dashboard/candidate', icon: User, highlight: true },
                 { label: 'Browse Courses', desc: 'Find and enroll in training', href: '/academy', icon: BookOpen },
