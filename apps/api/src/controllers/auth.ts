@@ -3,6 +3,7 @@ import { prisma } from '../models/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
+import { emailService } from '../services/email';
 
 const generateTokens = (userId: string) => {
   const token = jwt.sign({ userId }, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
@@ -26,6 +27,9 @@ export const authController = {
       await prisma.session.create({ data: { userId: user.id, token, refreshToken, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) } });
 
       res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000, path: '/' });
+
+      // Send welcome email
+      emailService.sendWelcome(email, firstName).catch(e => console.error('Email failed:', e));
 
       res.status(201).json({ status: 'success', message: 'Account created', data: { id: user.id, firstName, lastName, email, role: user.role } });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Registration failed', code: 500 }); }
@@ -59,6 +63,10 @@ export const authController = {
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) return res.json({ status: 'success', message: 'If email exists, a reset link has been sent.' });
       const resetToken = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '1h' });
+      
+      // Send password reset email
+      emailService.sendPasswordReset(email, resetToken).catch(e => console.error('Email failed:', e));
+      
       res.json({ status: 'success', message: 'Reset token generated', resetToken });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
