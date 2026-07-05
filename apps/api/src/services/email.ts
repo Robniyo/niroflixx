@@ -85,4 +85,27 @@ export const emailService = {
       });
     } catch (e) { console.error('Enrollment email failed:', e); }
   },
+  sendServiceRequestConfirmation: async (to: string, name: string, serviceName: string, message: string) => {
+    try {
+      await sgMail.send({
+        to,
+        from: { email: 'robertniyonkuru001@gmail.com', name: 'Niroflix Services' },
+        subject: `Service Request Received: ${serviceName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
+            ${branding}
+            <h2 style="color: #1E293B; margin: 0 0 12px;">Request Received!</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 8px;">Hi ${name},</p>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">We've received your request for <strong style="color: #2563EB;">${serviceName}</strong>. Our team will review it and contact you within 24 hours.</p>
+            <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin: 0 0 24px;">
+              <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Your Message:</strong></p>
+              <p style="color: #475569; font-size: 14px; margin: 0;">${message || 'No details provided'}</p>
+            </div>
+            <p style="color: #64748B; font-size: 14px; margin: 0 0 24px;">If you have urgent questions, contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a> or call <strong>+250 795 064 502</strong>.</p>
+            ${footer}
+          </div>
+        `,
+      });
+    } catch (e) { console.error('Service request email failed:', e); }
+  },
 };

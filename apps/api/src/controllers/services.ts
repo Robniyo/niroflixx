@@ -94,6 +94,12 @@ export const servicesController = {
         },
       });
 
+      // Send auto-reply email
+      try {
+        const { emailService } = await import('../services/email');
+        await emailService.sendServiceRequestConfirmation(email, name, serviceName, description);
+      } catch (e) { console.error('Service request email failed:', e); }
+
       res.status(201).json({ status: 'success', message: 'Request sent!' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
