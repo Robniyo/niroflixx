@@ -60,9 +60,23 @@ export const adminController = {
   },
   deleteUser: async (req: Request, res: Response) => {
     try {
-      await prisma.user.delete({ where: { id: req.params.id } });
-      res.json({ status: 'success', message: 'User deleted' });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+      const userId = req.params.id;
+      // Delete related records first
+      await prisma.candidate.deleteMany({ where: { userId } });
+      await prisma.profile.deleteMany({ where: { userId } });
+      await prisma.enrollment.deleteMany({ where: { userId } });
+      await prisma.session.deleteMany({ where: { userId } });
+      await prisma.attendance.deleteMany({ where: { userId } });
+      await prisma.notification.deleteMany({ where: { userId } });
+      await prisma.bookmark.deleteMany({ where: { userId } });
+      await prisma.downloadRelations.deleteMany({ where: { userId } });
+      // Finally delete user
+      await prisma.user.delete({ where: { id: userId } });
+      res.json({ status: 'success', message: 'User and all related data deleted' });
+    } catch (error) { 
+      console.error('DELETE USER ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Failed to delete user', code: 500 }); 
+    }
   },
 
   getSubscribers: async (req: Request, res: Response) => {
