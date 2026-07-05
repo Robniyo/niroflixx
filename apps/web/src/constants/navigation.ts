@@ -18,13 +18,13 @@ export const footerLinks = {
   ],
   academy: [
     { label: 'All Courses', href: '/academy' },
-    { label: 'Online Training', href: '/academy?mode=online' },
-    { label: 'Offline Training', href: '/academy?mode=offline' },
+    { label: 'Online Training', href: '/academy' },
+    { label: 'Offline Training', href: '/academy' },
   ],
   opportunities: [
-    { label: 'Scholarships', href: '/opportunities?type=scholarship' },
-    { label: 'Jobs', href: '/opportunities?type=job' },
-    { label: 'Internships', href: '/opportunities?type=internship' },
+    { label: 'Scholarships', href: '/opportunities' },
+    { label: 'Jobs', href: '/opportunities' },
+    { label: 'Internships', href: '/opportunities' },
   ],
   services: [
     { label: 'CV Writing', href: '/services' },
@@ -34,9 +34,9 @@ export const footerLinks = {
 };
 
 export const socialLinks = [
-  { label: 'LinkedIn', href: '#' },
-  { label: 'GitHub', href: '#' },
-  { label: 'YouTube', href: '#' },
-  { label: 'X', href: '#' },
-  { label: 'Instagram', href: '#' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/niroflixx' },
+  { label: 'GitHub', href: 'https://github.com/Robniyo' },
+  { label: 'YouTube', href: 'https://youtube.com/@niroflixx' },
+  { label: 'X', href: 'https://x.com/niroflixx' },
+  { label: 'Instagram', href: 'https://instagram.com/niroflixx' },
 ];
