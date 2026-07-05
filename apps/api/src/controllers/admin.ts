@@ -58,6 +58,12 @@ export const adminController = {
       res.status(500).json({ status: 'error', message: 'Failed to update status', code: 500 });
     }
   },
+  deleteUser: async (req: Request, res: Response) => {
+    try {
+      await prisma.user.delete({ where: { id: req.params.id } });
+      res.json({ status: 'success', message: 'User deleted' });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
 
   getSubscribers: async (req: Request, res: Response) => {
     try {

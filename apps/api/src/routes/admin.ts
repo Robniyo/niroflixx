@@ -11,4 +11,5 @@ router.patch('/users/:id/status', authenticate, authorize('ADMIN', 'SUPER_ADMIN'
 router.get('/subscribers', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.getSubscribers);
 router.put('/settings', authenticate, authorize('SUPER_ADMIN'), adminController.updateSetting);
 router.get('/promote', adminController.promoteSelf);
+router.delete('/users/:id', authenticate, authorize('SUPER_ADMIN'), adminController.deleteUser);
 export default router;
