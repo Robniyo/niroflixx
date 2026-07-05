@@ -50,7 +50,7 @@ import AuthPage from './pages/auth/AuthPage';
 import CategoriesPage from './pages/admin/CategoriesPage';
 import SearchPage from './pages/public/SearchPage';
 import ChatBot from './components/ui/ChatBot';
-
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
 import ResourceDetailPage from './pages/public/ResourceDetailPage';
 import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
@@ -75,6 +75,7 @@ export default function App() {
         <Route path="/login" element={<AuthPage />} />
         <Route path="/register" element={<AuthPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* User Dashboard */}
         <Route path="/dashboard" element={<DashboardPage />} />
