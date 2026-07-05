@@ -120,8 +120,8 @@ export default function TrainerDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50">
       {/* Top Bar */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-secondary-100 sticky top-0 z-30">
-        <div className="container-page flex items-center justify-between h-16">
+        <div className="bg-white/80 backdrop-blur-md border-b border-secondary-100 sticky top-0 z-30">
+          <div className="px-4 lg:container-page flex items-center justify-between h-14 lg:h-16">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">N</span>
@@ -146,7 +146,7 @@ export default function TrainerDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid sm:grid-cols-3 gap-5 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-10">
           <div className="bg-white rounded-2xl border border-secondary-100 p-6 hover:shadow-lg transition-all">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center"><BookOpen className="w-6 h-6 text-primary-600" /></div>
@@ -176,7 +176,7 @@ export default function TrainerDashboard() {
             <p className="text-secondary-400 text-body-sm mt-1">Contact an administrator to get assigned to a class.</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
             {classes.map((c) => {
               const today = isClassDay(c.days);
               const inTime = isWithinClassTime(c.startTime, c.endTime);
