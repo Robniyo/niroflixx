@@ -51,6 +51,7 @@ import CategoriesPage from './pages/admin/CategoriesPage';
 import SearchPage from './pages/public/SearchPage';
 import ChatBot from './components/ui/ChatBot';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import ScrollToTop from './components/ui/ScrollToTop';
 
 import ResourceDetailPage from './pages/public/ResourceDetailPage';
 import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
