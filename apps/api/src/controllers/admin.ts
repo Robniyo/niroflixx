@@ -58,24 +58,37 @@ export const adminController = {
       res.status(500).json({ status: 'error', message: 'Failed to update status', code: 500 });
     }
   },
-  deleteUser: async (req: Request, res: Response) => {
+ deleteUser: async (req: Request, res: Response) => {
     try {
       const userId = req.params.id;
-      // Delete related records first
-      await prisma.candidate.deleteMany({ where: { userId } });
-      await prisma.profile.deleteMany({ where: { userId } });
-      await prisma.enrollment.deleteMany({ where: { userId } });
-      await prisma.session.deleteMany({ where: { userId } });
+      
+      // Delete related records in order
       await prisma.attendance.deleteMany({ where: { userId } });
-      await prisma.notification.deleteMany({ where: { userId } });
+      await prisma.application.deleteMany({ where: { userId } });
       await prisma.bookmark.deleteMany({ where: { userId } });
       await prisma.downloadRelations.deleteMany({ where: { userId } });
-      // Finally delete user
+      await prisma.enrollment.deleteMany({ where: { userId } });
+      await prisma.notification.deleteMany({ where: { userId } });
+      await prisma.review.deleteMany({ where: { userId } });
+      await prisma.session.deleteMany({ where: { userId } });
+      await prisma.supportTicket.deleteMany({ where: { userId } });
+      await prisma.message.deleteMany({ where: { OR: [{ senderId: userId }, { receiverId: userId }] } });
+      await prisma.serviceRequest.deleteMany({ where: { userId } });
+      await prisma.candidateDocument.deleteMany({ where: { candidate: { userId } } });
+      await prisma.candidateSkill.deleteMany({ where: { candidate: { userId } } });
+      await prisma.candidateCertificate.deleteMany({ where: { candidate: { userId } } });
+      await prisma.experience.deleteMany({ where: { candidate: { userId } } });
+      await prisma.education.deleteMany({ where: { candidate: { userId } } });
+      await prisma.candidate.deleteMany({ where: { userId } });
+      await prisma.profile.deleteMany({ where: { userId } });
+      await prisma.trainer.deleteMany({ where: { userId } });
+      
       await prisma.user.delete({ where: { id: userId } });
-      res.json({ status: 'success', message: 'User and all related data deleted' });
-    } catch (error) { 
-      console.error('DELETE USER ERROR:', error);
-      res.status(500).json({ status: 'error', message: 'Failed to delete user', code: 500 }); 
+      
+      res.json({ status: 'success', message: 'User and all data deleted' });
+    } catch (error: any) { 
+      console.error('DELETE USER ERROR:', error?.message || error);
+      res.status(500).json({ status: 'error', message: error?.message || 'Failed', code: 500 }); 
     }
   },
 
