@@ -61,13 +61,16 @@ export const authController = {
     try {
       const { email } = req.body;
       const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) return res.json({ status: 'success', message: 'If email exists, a reset link has been sent.' });
+      
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'No account found with this email address', code: 404 });
+      }
+
       const resetToken = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '1h' });
       
-      // Send password reset email
       emailService.sendPasswordReset(email, resetToken).catch(e => console.error('Email failed:', e));
       
-      res.json({ status: 'success', message: 'Reset token generated', resetToken });
+      res.json({ status: 'success', message: 'Reset link sent to your email' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
