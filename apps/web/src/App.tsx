@@ -52,6 +52,7 @@ import SearchPage from './pages/public/SearchPage';
 import ChatBot from './components/ui/ChatBot';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ScrollToTop from './components/ui/ScrollToTop';
+import ServiceDetailPage from './pages/public/ServiceDetailPage';
 
 import ResourceDetailPage from './pages/public/ResourceDetailPage';
 import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
@@ -105,6 +106,7 @@ export default function App() {
           <Route path="/resources/:slug" element={<ResourceDetailPage />} />
           <Route path="/opportunities/:id" element={<OpportunityDetailPage />} />
           <Route path="/news/:slug" element={<NewsDetailPage />} />
+          <Route path="/services/:slug" element={<ServiceDetailPage />} />
 
         </Route>
 
