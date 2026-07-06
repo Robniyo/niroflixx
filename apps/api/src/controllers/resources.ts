@@ -91,9 +91,17 @@ export const resourcesController = {
         data: { downloadCount: { increment: 1 } },
       });
 
-      // Add fl_attachment to force download
-      const downloadUrl = resource.fileUrl.replace('/upload/', '/upload/fl_attachment/');
-      res.redirect(downloadUrl);
+      // Fetch the file from Cloudinary and pipe it to the client
+      const response = await fetch(resource.fileUrl);
+      if (!response.ok) return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+      
+      const buffer = await response.arrayBuffer();
+      const contentType = response.headers.get('content-type') || 'application/pdf';
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'inline; filename="' + (resource.title || 'document') + '.pdf"');
+      res.setHeader('Content-Length', buffer.byteLength);
+      res.send(Buffer.from(buffer));
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 };
