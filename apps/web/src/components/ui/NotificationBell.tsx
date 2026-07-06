@@ -2,15 +2,22 @@ import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, GraduationCap, Briefcase, Newspaper } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '@/services/api';
+import { createPortal } from 'react-dom';
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node) && 
+          btnRef.current && !btnRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
@@ -41,8 +48,8 @@ export default function NotificationBell() {
   };
 
   return (
-    <div ref={ref} className="relative">
-      <button onClick={() => setOpen(!open)} className="relative p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-50 rounded-lg transition-colors">
+    <div className="relative">
+      <button ref={btnRef} onClick={() => setOpen(!open)} className="relative p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-50 rounded-lg transition-colors">
         <Bell className="w-5 h-5" />
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-danger text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -51,8 +58,8 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        className="fixed right-4 top-14 w-80 bg-white rounded-xl shadow-2xl border border-secondary-100 overflow-hidden z-[999]"
+      {open && createPortal(
+        <div ref={ref} className="fixed top-14 right-4 sm:right-6 lg:right-10 w-80 bg-white rounded-xl shadow-2xl border border-secondary-100 overflow-hidden z-[9999]" style={{ maxHeight: '80vh' }}>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h3 className="font-semibold text-sm">Notifications</h3>
             {unread > 0 && (
@@ -83,7 +90,8 @@ export default function NotificationBell() {
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
