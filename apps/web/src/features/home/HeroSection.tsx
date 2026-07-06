@@ -11,6 +11,7 @@ const stats = [
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()
 
   const handleSearch = () => {
@@ -40,18 +41,28 @@ export default function HeroSection() {
             <p className="text-body-lg text-white/80 mb-8 max-w-lg leading-relaxed">
               One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for Africa's future.
             </p>
-              <div className="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl w-full mb-8">
-              <Search className="w-5 h-5 text-secondary-400 ml-3 flex-shrink-0" />
+
+            {/* Search Icon on Mobile */}
+            <div className="lg:hidden flex justify-end mb-3">
+              <button onClick={() => setSearchOpen(!searchOpen)} className="w-11 h-11 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center active:bg-white/30 transition-all">
+                <Search className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Search Box — expandable on mobile */}
+            <div className={`${searchOpen ? 'flex' : 'hidden'} lg:flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl w-full mb-8`}>
+              <Search className="w-5 h-5 text-secondary-400 ml-3 flex-shrink-0 hidden sm:block" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder="Search courses, scholarships, jobs..."
-                className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400"
+                className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400 min-w-0"
               />
               <Button size="md" className="flex-shrink-0" onClick={handleSearch}>Search</Button>
             </div>
+
             <div className="flex flex-wrap gap-3 mb-8 md:mb-10">
               <Link to="/register"><Button size="lg" variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />} className="shadow-lg font-semibold">Get Started Free</Button></Link>
               <Link to="/academy"><Button size="lg" variant="outline" className="border-white/60 text-white hover:bg-white/20 hover:border-white font-semibold"><GraduationCap className="w-4 h-4" /> Explore Academy</Button></Link>
@@ -76,6 +87,7 @@ export default function HeroSection() {
                 <span className="w-2 h-2 rounded-full bg-white/30"></span>
               </div>
             </div>
+
             {/* Stats */}
             <div className="flex flex-wrap gap-6 md:gap-8">
               {stats.map((stat) => (
