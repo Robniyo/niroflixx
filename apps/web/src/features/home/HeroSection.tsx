@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, GraduationCap, Briefcase, Wrench, ArrowRight, Users, Star, BookOpen } from 'lucide-react'
 import Button from '@/components/ui/Button'
@@ -8,6 +8,47 @@ const stats = [
   { icon: BookOpen, label: 'Opportunities Hub' },
   { icon: Star, label: 'Professional Services' },
 ]
+
+function MobileBanner() {
+  const banners = [
+    { icon: GraduationCap, title: 'Digital Skills Academy', desc: 'Master in-demand tech skills with expert-led training.', color: 'bg-primary-100', iconColor: 'text-primary-600' },
+    { icon: Briefcase, title: 'Find Opportunities', desc: 'Scholarships, jobs & internships.', color: 'bg-accent-100', iconColor: 'text-accent-600' },
+    { icon: Wrench, title: 'Professional Services', desc: 'CV writing, design & more.', color: 'bg-success-light', iconColor: 'text-success' },
+  ]
+  const [current, setCurrent] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent(prev => (prev + 1) % banners.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const banner = banners[current]
+
+  return (
+    <div className="lg:hidden mb-8 w-full overflow-hidden bg-white/10 backdrop-blur-sm rounded-2xl p-5 min-h-[100px] transition-all duration-500">
+      <div className="flex items-center gap-3 animate-fade-in" key={current}>
+        <div className={`w-12 h-12 ${banner.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
+          <banner.icon className={`w-6 h-6 ${banner.iconColor}`} />
+        </div>
+        <div>
+          <h4 className="text-white font-bold text-base">{banner.title}</h4>
+          <p className="text-white/80 text-sm">{banner.desc}</p>
+        </div>
+      </div>
+      <div className="flex justify-center gap-1.5 mt-3">
+        {banners.map((_, i) => (
+          <span
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`h-2 rounded-full transition-all cursor-pointer ${i === current ? 'bg-white w-6' : 'bg-white/30 w-2'}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -43,7 +84,7 @@ export default function HeroSection() {
               One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for Africa's future.
             </p>
 
-            {/* Search — Mobile: icon visible, click to expand with button below */}
+            {/* Search — Mobile */}
             <div className="lg:hidden w-full mb-4">
               {!searchOpen ? (
                 <button onClick={() => setSearchOpen(true)} className="w-full flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 text-white/80 text-sm active:bg-white/30 transition-all">
@@ -54,15 +95,7 @@ export default function HeroSection() {
                 <div className="bg-white rounded-xl p-3 shadow-xl">
                   <div className="flex items-center gap-2 mb-2">
                     <Search className="w-5 h-5 text-secondary-400 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                      placeholder="Search..."
-                      className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400 min-w-0"
-                      autoFocus
-                    />
+                    <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} placeholder="Search..." className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400 min-w-0" autoFocus />
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setSearchOpen(false)} className="flex-1 py-2 text-sm text-secondary-500 hover:text-secondary-700">Cancel</button>
@@ -72,17 +105,10 @@ export default function HeroSection() {
               )}
             </div>
 
-            {/* Search — Desktop: always visible */}
+            {/* Search — Desktop */}
             <div className="hidden lg:flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl max-w-md mb-8">
               <Search className="w-5 h-5 text-secondary-400 ml-3 flex-shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                placeholder="Search courses, scholarships, jobs..."
-                className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400"
-              />
+              <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} placeholder="Search courses, scholarships, jobs..." className="flex-1 px-2 py-2 text-body border-none outline-none text-secondary-900 placeholder:text-secondary-400" />
               <Button size="md" className="flex-shrink-0" onClick={handleSearch}>Search</Button>
             </div>
 
@@ -92,24 +118,7 @@ export default function HeroSection() {
             </div>
 
             {/* Mobile Rotating Banner */}
-            <div className="lg:hidden mb-8 w-full relative overflow-hidden bg-white/10 backdrop-blur-sm rounded-2xl p-5 min-h-[100px]">
-              <div className="relative h-full">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-6 h-6 text-primary-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-bold text-base">Digital Skills Academy</h4>
-                    <p className="text-white/80 text-sm">Master in-demand tech skills with expert-led training.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-center gap-1.5 mt-3">
-                <span className="w-2 h-2 rounded-full bg-white"></span>
-                <span className="w-2 h-2 rounded-full bg-white/30"></span>
-                <span className="w-2 h-2 rounded-full bg-white/30"></span>
-              </div>
-            </div>
+            <MobileBanner />
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 md:gap-8">
