@@ -96,3 +96,4 @@ export const resourcesController = {
       res.redirect(downloadUrl);
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+};
