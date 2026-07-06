@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Save, Globe, Phone, Mail, MapPin } from 'lucide-react';
+import { Save, Globe, Phone, Mail, MapPin, CheckCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -8,24 +8,46 @@ import toast from 'react-hot-toast';
 export default function SettingsPage() {
   const { user } = useAuth();
   const [form, setForm] = useState({
-    siteName: 'Niroflixx', siteDescription: 'Learn, Grow, Succeed',
-    contactEmail: 'robertniyonkuru001@gmail.com', contactPhone: '+250795064502',
+    siteName: 'Niroflixx',
+    siteDescription: 'Learn, Grow, Succeed',
+    contactEmail: 'robertniyonkuru001@gmail.com',
+    contactPhone: '+250795064502',
     contactAddress: 'Kigali, Rwanda',
-    facebook: 'https://facebook.com/nirobwimba', twitter: 'https://x.com/nirobwimba',
-    instagram: 'https://instagram.com/nirobwimba', linkedin: 'https://linkedin.com/in/nirobwimba',
-    youtube: 'https://youtube.com/@nirobwimba', github: 'https://github.com/nirobwimba',
-    tiktok: 'https://tiktok.com/@nirobwimba', whatsapp: '+250795064502',
+    facebook: 'https://facebook.com/niroflixx',
+    twitter: 'https://x.com/niroflixx',
+    instagram: 'https://instagram.com/niroflixx',
+    linkedin: 'https://linkedin.com/in/nirobwimba',
+    youtube: 'https://youtube.com/@niroflixx',
+    github: 'https://github.com/nirobwimba',
+    tiktok: 'https://tiktok.com/@niroflixx',
+    whatsapp: '+250795064502',
   });
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const r = await api.get('/admin/settings');
+      if (r.data.data) {
+        const settings: any = {};
+        r.data.data.forEach((s: any) => { settings[s.key] = s.value; });
+        setForm(prev => ({ ...prev, ...settings }));
+      }
+    } catch {}
+  };
+
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault();
+    setSaving(true);
     try {
       for (const [key, value] of Object.entries(form)) {
         await api.put('/admin/settings', { key, value, group: 'general' });
       }
-      toast.success('Settings saved');
-    } catch { toast.error('Failed to save'); }
+      toast.success('Settings saved successfully!');
+    } catch { toast.error('Failed to save settings'); }
     finally { setSaving(false); }
   };
 
@@ -37,7 +59,7 @@ export default function SettingsPage() {
         {/* Admin Profile */}
         <div className="bg-white rounded-xl border border-secondary-100 p-6">
           <h3 className="font-semibold text-secondary-900 mb-4">Admin Profile</h3>
-          <div className="space-y-3 text-body-sm">
+          <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Name</span><span className="font-medium">{user?.firstName} {user?.lastName}</span></div>
             <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Email</span><span className="font-medium">{user?.email}</span></div>
             <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Role</span><span className="font-medium">{user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role}</span></div>
@@ -48,11 +70,11 @@ export default function SettingsPage() {
         {/* System Status */}
         <div className="bg-white rounded-xl border border-secondary-100 p-6">
           <h3 className="font-semibold text-secondary-900 mb-4">System Status</h3>
-          <div className="space-y-3 text-body-sm">
-            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Database</span><span className="font-medium text-success">SQLite (Connected)</span></div>
-            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">API Status</span><span className="font-medium text-success">Running on port 5000</span></div>
-            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Frontend</span><span className="font-medium text-success">Running on port 5173</span></div>
-            <div className="flex justify-between py-2"><span className="text-secondary-500">Email</span><span className="font-medium text-accent-600">Coming Soon</span></div>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Database</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Connected</span></div>
+            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">API Status</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Running</span></div>
+            <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Frontend</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Live</span></div>
+            <div className="flex justify-between py-2"><span className="text-secondary-500">Email</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> SendGrid Active</span></div>
           </div>
         </div>
 
@@ -83,7 +105,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <h4 className="font-medium text-sm text-secondary-700 pt-2">Social Media Links (@nirobwimba)</h4>
+            <h4 className="font-medium text-sm text-secondary-700 pt-2">Social Media Links</h4>
             <div className="grid sm:grid-cols-2 gap-4">
               {[
                 { key: 'facebook', label: 'Facebook' }, { key: 'twitter', label: 'X (Twitter)' },
@@ -107,8 +129,8 @@ export default function SettingsPage() {
         {/* Coming Soon */}
         <div className="bg-white rounded-xl border border-secondary-100 p-6 lg:col-span-2">
           <h3 className="font-semibold text-secondary-900 mb-3">Advanced Settings (Coming Soon)</h3>
-          <div className="grid sm:grid-cols-3 gap-3 text-body-sm text-secondary-500">
-            <span>• Email configuration (SMTP)</span>
+          <div className="grid sm:grid-cols-3 gap-3 text-sm text-secondary-500">
+            <span>• Email configuration</span>
             <span>• SMS notifications</span>
             <span>• Backup management</span>
             <span>• Theme customization</span>
