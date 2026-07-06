@@ -46,7 +46,7 @@ export default function ResourceDetailPage() {
           </div>
 
           {resource.fileUrl ? (
-            <a href={`http://localhost:5000${resource.fileUrl}`} target="_blank" download>
+            <a href={resource.fileUrl} target="_blank" download target="_blank" download>
               <Button size="lg" rightIcon={<Download className="w-4 h-4" />}>Download Resource</Button>
             </a>
           ) : (

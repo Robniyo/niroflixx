@@ -43,7 +43,7 @@ export default function ResourcesPage() {
                 <p className="text-body-sm text-secondary-500 mb-4">{r.description?.slice(0, 80)}...</p>
                 <div className="flex items-center justify-center gap-2 text-body-sm text-secondary-400 mb-3"><Download className="w-3.5 h-3.5" /> {r.downloadCount || 0} downloads</div>
                 {r.fileUrl && (
-                  <a href={`http://localhost:5000${r.fileUrl}`} target="_blank" className="text-primary-600 text-sm font-medium hover:underline" download>
+                  <a href={r.fileUrl} target="_blank" download target="_blank" className="text-primary-600 text-sm font-medium hover:underline" download>
                     Download
                   </a>
                 )}
