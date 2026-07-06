@@ -24,7 +24,7 @@ export default function Navbar() {
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'CONTENT_MANAGER';
 
   return (
-    <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
+    <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full max-w-[100vw] overflow-hidden', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
       <div className="container-page">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center gap-2 group">

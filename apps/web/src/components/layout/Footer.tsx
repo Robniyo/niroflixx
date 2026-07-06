@@ -35,7 +35,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-secondary-900 text-secondary-100 pt-16 pb-8">
+    <footer className="bg-secondary-900 text-secondary-100 pt-16 pb-8 w-full overflow-hidden">
       <div className="container-page">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
