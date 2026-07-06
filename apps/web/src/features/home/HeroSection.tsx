@@ -40,7 +40,7 @@ export default function HeroSection() {
             <p className="text-body-lg text-white/80 mb-8 max-w-lg leading-relaxed">
               One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for Africa's future.
             </p>
-            <div className="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl max-w-md mb-8">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl max-w-full sm:max-w-full sm:max-w-md mb-8">
               <Search className="w-5 h-5 text-secondary-400 ml-3 flex-shrink-0" />
               <input
                 type="text"
@@ -58,7 +58,7 @@ export default function HeroSection() {
             </div>
 
               {/* Mobile Cards — matching desktop style exactly */}
-                  <div className="lg:hidden grid grid-cols-2 gap-3 mb-8">
+                  <div className="lg:hidden grid grid-cols-2 gap-2 mb-6 w-full">
                     <div className="bg-white rounded-xl shadow-lg p-4 animate-float col-span-2">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">

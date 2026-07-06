@@ -77,7 +77,7 @@ const handleRequest = async (e: React.FormEvent) => {
       {showRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowRequest(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-scale-in">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto p-6 animate-scale-in">
             {done ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-success-light rounded-full flex items-center justify-center mx-auto mb-4">

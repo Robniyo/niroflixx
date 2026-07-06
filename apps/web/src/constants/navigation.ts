@@ -18,7 +18,6 @@ export const footerLinks = {
   ],
   academy: [
     { label: 'All Courses', href: '/academy' },
-    { label: 'Online Training', href: '/academy' },
     { label: 'Offline Training', href: '/academy' },
   ],
   opportunities: [
