@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, X, Newspaper } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
 const emptyForm = { title:'', summary:'', content:'', categoryId:'', author:'Niroflixx Team', coverImage:'', status:'DRAFT', featured:false };
 
@@ -32,10 +33,22 @@ export default function NewsPage() {
       {items.length===0?(
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200"><Newspaper className="w-12 h-12 text-secondary-300 mx-auto mb-3"/><p className="text-secondary-500">No articles yet.</p></div>
       ):(
-        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
-          <table className="w-full"><thead className="bg-secondary-50 border-b"><tr><th className="text-left px-5 py-3 text-label text-secondary-600">Title</th><th className="text-left px-5 py-3 text-label text-secondary-600">Author</th><th className="text-left px-5 py-3 text-label text-secondary-600">Status</th><th className="text-left px-5 py-3 text-label text-secondary-600">Published</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
-          <tbody>{items.map(a=>(<tr key={a.id} className="border-b border-secondary-50 hover:bg-secondary-50"><td className="px-5 py-3.5 font-medium text-body-sm">{a.title}</td><td className="px-5 py-3.5 text-body-sm text-secondary-600">{a.author||'—'}</td><td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full text-caption font-medium ${a.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{a.status}</span></td><td className="px-5 py-3.5 text-body-sm">{a.publishedAt?new Date(a.publishedAt).toLocaleDateString():'—'}</td><td className="px-5 py-3.5 text-right"><button onClick={()=>openEdit(a.id)} className="p-1.5 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button><button onClick={()=>handleDelete(a.id)} className="p-1.5 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button></td></tr>))}</tbody></table>
-        </div>
+        <ResponsiveTable
+  columns={[
+    { key: 'title', label: 'Title', render: (a) => <span className="font-medium text-sm">{a.title}</span> },
+    { key: 'author', label: 'Author', render: (a) => <span className="text-xs text-secondary-600">{a.author||'—'}</span> },
+    { key: 'status', label: 'Status', render: (a) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{a.status}</span> },
+    { key: 'date', label: 'Published', render: (a) => <span className="text-xs">{a.publishedAt?new Date(a.publishedAt).toLocaleDateString():'—'}</span> },
+    { key: 'actions', label: '', render: (a) => (
+      <div className="flex gap-1">
+        <button onClick={()=>openEdit(a.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+        <button onClick={()=>handleDelete(a.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+      </div>
+    ), hideOnMobile: true },
+  ]}
+  data={items}
+  emptyMessage="No articles yet"
+/>
       )}
 
       {showModal&&(

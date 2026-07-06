@@ -33,7 +33,7 @@ export default function AdminLayout() {
   const visibleLinks = allLinks.filter(link => user && link.roles.includes(user.role));
 
   const handleLogout = async () => {
-    await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
+    try { await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
     window.location.href = '/';
   };
 

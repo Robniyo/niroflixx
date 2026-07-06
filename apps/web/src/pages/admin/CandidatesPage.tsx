@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Eye, UserCheck, UserX } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
 export default function CandidatesPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -30,24 +31,19 @@ export default function CandidatesPage() {
       {items.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200"><UserCheck className="w-12 h-12 text-secondary-300 mx-auto mb-3" /><p className="text-secondary-500">No candidates yet.</p></div>
       ) : (
-        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-secondary-50 border-b"><tr><th className="text-left px-5 py-3 text-label">Candidate</th><th className="text-left px-5 py-3 text-label">Contact</th><th className="text-left px-5 py-3 text-label">Score</th><th className="text-left px-5 py-3 text-label">Status</th><th className="text-left px-5 py-3 text-label">Actions</th></tr></thead>
-            <tbody>
-              {items.map((c) => (
-                <tr key={c.id} className="border-b border-secondary-50 hover:bg-secondary-50">
-                  <td className="px-5 py-3.5 font-medium">{c.user?.firstName} {c.user?.lastName}</td>
-                  <td className="px-5 py-3.5 text-body-sm text-secondary-600">{c.user?.email}</td>
-                  <td className="px-5 py-3.5"><span className="font-semibold">{c.completionScore}%</span></td>
-                  <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full text-caption ${c.status === 'active' ? 'bg-success-light text-success-dark' : 'bg-secondary-100'}`}>{c.status}</span></td>
-                  <td className="px-5 py-3.5">
-                    <button onClick={() => viewCandidate(c.id)} className="text-primary-600 hover:underline text-sm flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+  columns={[
+    { key: 'name', label: 'Candidate', render: (c) => <span className="font-medium text-sm">{c.user?.firstName} {c.user?.lastName}</span> },
+    { key: 'email', label: 'Email', render: (c) => <span className="text-xs text-secondary-600">{c.user?.email}</span> },
+    { key: 'score', label: 'Score', render: (c) => <span className="font-semibold text-sm">{c.completionScore}%</span> },
+    { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs ${c.status==='active'?'bg-success-light text-success-dark':'bg-secondary-100'}`}>{c.status}</span> },
+    { key: 'actions', label: '', render: (c) => (
+      <button onClick={() => viewCandidate(c.id)} className="text-xs text-primary-600 hover:underline"><Eye className="w-3 h-3 inline"/> View</button>
+    ), hideOnMobile: true },
+  ]}
+  data={items}
+  emptyMessage="No candidates yet"
+/>
       )}
 
       {selected && (

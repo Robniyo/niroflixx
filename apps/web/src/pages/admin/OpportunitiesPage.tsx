@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin } from 'lucide-react
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
 const types = ['SCHOLARSHIP','ADMISSION','INTERNSHIP','JOB','COMPETITION','HACKATHON','GRANT','EXCHANGE_PROGRAM','VOLUNTEER','RESEARCH','BOOTCAMP','FELLOWSHIP','EVENT'];
 const emptyForm = { title:'', organization:'', country:'Rwanda', city:'Kigali', type:'SCHOLARSHIP', educationLevel:'', deadline:'', description:'', requirements:'', benefits:'', officialLink:'', status:'DRAFT', featured:false };
@@ -33,10 +34,23 @@ export default function OpportunitiesPage() {
       {items.length===0?(
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200"><Briefcase className="w-12 h-12 text-secondary-300 mx-auto mb-3"/><p className="text-secondary-500">No opportunities yet.</p></div>
       ):(
-        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
-          <table className="w-full"><thead className="bg-secondary-50 border-b"><tr><th className="text-left px-5 py-3 text-label text-secondary-600">Title</th><th className="text-left px-5 py-3 text-label text-secondary-600">Type</th><th className="text-left px-5 py-3 text-label text-secondary-600">Organization</th><th className="text-left px-5 py-3 text-label text-secondary-600">Deadline</th><th className="text-left px-5 py-3 text-label text-secondary-600">Status</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
-          <tbody>{items.map(o=>(<tr key={o.id} className="border-b border-secondary-50 hover:bg-secondary-50"><td className="px-5 py-3.5 font-medium text-body-sm">{o.title}</td><td className="px-5 py-3.5 text-body-sm text-secondary-600">{o.type}</td><td className="px-5 py-3.5 text-body-sm text-secondary-600">{o.organization||'—'}</td><td className="px-5 py-3.5 text-body-sm">{o.deadline?new Date(o.deadline).toLocaleDateString():'—'}</td><td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full text-caption font-medium ${o.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{o.status}</span></td><td className="px-5 py-3.5 text-right"><button onClick={()=>openEdit(o.id)} className="p-1.5 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button><button onClick={()=>handleDelete(o.id)} className="p-1.5 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button></td></tr>))}</tbody></table>
-        </div>
+        <ResponsiveTable
+  columns={[
+    { key: 'title', label: 'Title', render: (o) => <span className="font-medium text-sm">{o.title}</span> },
+    { key: 'type', label: 'Type', render: (o) => <span className="text-xs text-secondary-600">{o.type}</span> },
+    { key: 'org', label: 'Organization', render: (o) => <span className="text-xs text-secondary-600">{o.organization||'—'}</span> },
+    { key: 'deadline', label: 'Deadline', render: (o) => <span className="text-xs">{o.deadline?new Date(o.deadline).toLocaleDateString():'—'}</span> },
+    { key: 'status', label: 'Status', render: (o) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${o.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{o.status}</span> },
+    { key: 'actions', label: '', render: (o) => (
+      <div className="flex gap-1">
+        <button onClick={()=>openEdit(o.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+        <button onClick={()=>handleDelete(o.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+      </div>
+    ), hideOnMobile: true },
+  ]}
+  data={items}
+  emptyMessage="No opportunities yet"
+/>
       )}
 
       {showModal&&(

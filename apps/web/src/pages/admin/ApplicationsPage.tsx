@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Eye } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
-
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 export default function ApplicationsPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,18 +25,19 @@ export default function ApplicationsPage() {
       {items.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200"><p className="text-secondary-500">No applications yet.</p></div>
       ) : (
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full"><thead className="bg-secondary-50 border-b"><tr><th className="text-left px-5 py-3 text-label">Candidate</th><th className="text-left px-5 py-3 text-label">Opportunity</th><th className="text-left px-5 py-3 text-label">Status</th><th className="text-left px-5 py-3 text-label">Date</th><th className="text-left px-5 py-3 text-label">Action</th></tr></thead>
-            <tbody>{items.map((a) => (
-              <tr key={a.id} className="border-b hover:bg-secondary-50">
-                <td className="px-5 py-3.5 font-medium text-sm">{a.candidate?.user?.firstName} {a.candidate?.user?.lastName}</td>
-                <td className="px-5 py-3.5 text-sm text-secondary-600">{a.opportunity?.title}</td>
-                <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full text-caption font-medium ${a.status === 'APPROVED' ? 'bg-success-light text-success-dark' : a.status === 'REJECTED' ? 'bg-danger-light text-danger-dark' : 'bg-secondary-100 text-secondary-600'}`}>{a.status}</span></td>
-                <td className="px-5 py-3.5 text-sm text-secondary-500">{new Date(a.createdAt).toLocaleDateString()}</td>
-                <td className="px-5 py-3.5"><button onClick={() => { setSelected(a); setNotes(''); }} className="text-primary-600 hover:underline text-sm flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> Review</button></td>
-              </tr>
-            ))}</tbody></table>
-        </div>
+        <ResponsiveTable
+  columns={[
+    { key: 'candidate', label: 'Candidate', render: (a) => <span className="font-medium text-sm">{a.candidate?.user?.firstName} {a.candidate?.user?.lastName}</span> },
+    { key: 'opportunity', label: 'Opportunity', render: (a) => <span className="text-xs text-secondary-600">{a.opportunity?.title}</span> },
+    { key: 'status', label: 'Status', render: (a) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.status==='APPROVED'?'bg-success-light text-success-dark':a.status==='REJECTED'?'bg-danger-light text-danger-dark':'bg-secondary-100 text-secondary-600'}`}>{a.status}</span> },
+    { key: 'date', label: 'Date', render: (a) => <span className="text-xs text-secondary-500">{new Date(a.createdAt).toLocaleDateString()}</span> },
+    { key: 'actions', label: '', render: (a) => (
+      <button onClick={() => { setSelected(a); setNotes(''); }} className="text-xs text-primary-600 hover:underline"><Eye className="w-3 h-3 inline"/> Review</button>
+    ), hideOnMobile: true },
+  ]}
+  data={items}
+  emptyMessage="No applications yet"
+/>
       )}
 
       {selected && (

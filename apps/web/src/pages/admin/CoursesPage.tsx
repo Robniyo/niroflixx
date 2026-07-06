@@ -3,7 +3,7 @@ import { Plus, Edit, Trash2, X, BookOpen, Upload } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 interface Course {
   id: string; title: string; level: string; type: string; status: string; price: number; enrollmentCount: number; category?: { name: string }; thumbnail?: string;
 }
@@ -82,26 +82,23 @@ export default function CoursesPage() {
           <BookOpen className="w-12 h-12 text-secondary-300 mx-auto mb-3" /><p className="text-secondary-500">No courses yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-secondary-50 border-b"><tr><th className="text-left px-5 py-3 text-label text-secondary-600">Title</th><th className="text-left px-5 py-3 text-label text-secondary-600">Level</th><th className="text-left px-5 py-3 text-label text-secondary-600">Type</th><th className="text-left px-5 py-3 text-label text-secondary-600">Price</th><th className="text-left px-5 py-3 text-label text-secondary-600">Status</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
-            <tbody>
-              {courses.map((c) => (
-                <tr key={c.id} className="border-b border-secondary-50 hover:bg-secondary-50">
-                  <td className="px-5 py-3.5 font-medium text-body-sm">{c.title}</td>
-                  <td className="px-5 py-3.5 text-body-sm text-secondary-600">{c.level}</td>
-                  <td className="px-5 py-3.5 text-body-sm text-secondary-600">{c.type?.replace('_',' ')}</td>
-                  <td className="px-5 py-3.5 text-body-sm">{c.price.toLocaleString()} RWF</td>
-                  <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded-full text-caption font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span></td>
-                  <td className="px-5 py-3.5 text-right">
-                    <button onClick={()=>openEdit(c.id)} className="p-1.5 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
-                    <button onClick={()=>handleDelete(c.id)} className="p-1.5 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+        columns={[
+          { key: 'title', label: 'Title', render: (c) => <span className="font-medium text-sm">{c.title}</span> },
+          { key: 'level', label: 'Level', render: (c) => <span className="text-xs text-secondary-600">{c.level}</span> },
+          { key: 'type', label: 'Type', render: (c) => <span className="text-xs text-secondary-600">{c.type?.replace('_',' ')}</span> },
+          { key: 'price', label: 'Price', render: (c) => <span className="text-sm font-medium">{c.price.toLocaleString()} RWF</span> },
+          { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span> },
+          { key: 'actions', label: '', render: (c) => (
+            <div className="flex gap-1">
+              <button onClick={()=>openEdit(c.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+              <button onClick={()=>handleDelete(c.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+            </div>
+          ), hideOnMobile: true },
+        ]}
+        data={courses}
+        emptyMessage="No courses yet"
+      />
       )}
 
       {showModal && (
