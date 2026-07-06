@@ -4,6 +4,7 @@ import { Save, Globe, Phone, Mail, MapPin, CheckCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -75,6 +76,10 @@ export default function SettingsPage() {
             <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">API Status</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Running</span></div>
             <div className="flex justify-between py-2 border-b"><span className="text-secondary-500">Frontend</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Live</span></div>
             <div className="flex justify-between py-2"><span className="text-secondary-500">Email</span><span className="font-medium text-success flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> SendGrid Active</span></div>
+            <div className="flex justify-between py-2 border-b">
+            <span className="text-secondary-500">Dark Mode</span>
+            <ThemeToggle />
+          </div>
           </div>
         </div>
 
@@ -128,15 +133,23 @@ export default function SettingsPage() {
 
         {/* Coming Soon */}
         <div className="bg-white rounded-xl border border-secondary-100 p-6 lg:col-span-2">
-          <h3 className="font-semibold text-secondary-900 mb-3">Advanced Settings (Coming Soon)</h3>
-          <div className="grid sm:grid-cols-3 gap-3 text-sm text-secondary-500">
-            <span>• Email configuration</span>
-            <span>• SMS notifications</span>
-            <span>• Backup management</span>
-            <span>• Theme customization</span>
-            <span>• SEO settings</span>
-            <span>• Maintenance mode</span>
+          <h3 className="font-semibold text-secondary-900 mb-3">Advanced Settings</h3>
+        <div className="grid sm:grid-cols-2 gap-3 text-sm">
+          <div className="flex items-center justify-between py-3 border-b">
+            <div>
+              <p className="font-medium text-secondary-900">Maintenance Mode</p>
+              <p className="text-xs text-secondary-400">Show maintenance page to visitors</p>
+            </div>
+            <button onClick={toggleMaintenance} className={`w-12 h-6 rounded-full transition-colors ${maintenance ? 'bg-primary-600' : 'bg-secondary-300'}`}>
+              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${maintenance ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </button>
           </div>
+          <span className="text-secondary-500">• Email configuration</span>
+          <span className="text-secondary-500">• SMS notifications</span>
+          <span className="text-secondary-500">• Backup management</span>
+          <span className="text-secondary-500">• Theme customization</span>
+          <span className="text-secondary-500">• SEO settings</span>
+        </div>
         </div>
       </div>
     </div>

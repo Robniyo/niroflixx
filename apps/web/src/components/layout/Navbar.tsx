@@ -6,6 +6,7 @@ import { navLinks } from '@/constants/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationBell from '@/components/ui/NotificationBell';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +44,7 @@ export default function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            {isAuthenticated && <NotificationBell />}
+            <ThemeToggle />{isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 {isAdmin ? <Link to="/admin"><Button variant="primary" size="sm">Dashboard</Button></Link> : <Link to="/dashboard"><Button variant="ghost" size="sm">My Account</Button></Link>}

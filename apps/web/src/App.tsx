@@ -53,6 +53,7 @@ import ChatBot from './components/ui/ChatBot';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ScrollToTop from './components/ui/ScrollToTop';
 import ServiceDetailPage from './pages/public/ServiceDetailPage';
+import MaintenancePage from './pages/public/MaintenancePage';
 
 import ResourceDetailPage from './pages/public/ResourceDetailPage';
 import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/maintenance" element={<MaintenancePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/academy" element={<AcademyPage />} />
