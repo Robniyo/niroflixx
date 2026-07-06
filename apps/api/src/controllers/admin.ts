@@ -157,4 +157,22 @@ const hashedPassword = await bcrypt.hash(password || 'niroflixx2026', 12);
       res.json({ status: 'success', message: 'Promoted to Super Admin' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+  getMaintenance: async (_req: Request, res: Response) => {
+    try {
+      const setting = await prisma.setting.findUnique({ where: { key: 'maintenance_mode' } });
+      res.json({ status: 'success', data: { enabled: setting?.value === 'true' } });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
+
+  toggleMaintenance: async (req: Request, res: Response) => {
+    try {
+      const { enabled } = req.body;
+      await prisma.setting.upsert({
+        where: { key: 'maintenance_mode' },
+        update: { value: enabled ? 'true' : 'false', group: 'general' },
+        create: { key: 'maintenance_mode', value: enabled ? 'true' : 'false', group: 'general' },
+      });
+      res.json({ status: 'success', data: { enabled } });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
 };

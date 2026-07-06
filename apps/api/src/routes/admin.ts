@@ -12,4 +12,6 @@ router.get('/subscribers', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), admi
 router.put('/settings', authenticate, authorize('SUPER_ADMIN'), adminController.updateSetting);
 router.get('/promote', adminController.promoteSelf);
 router.delete('/users/:id', authenticate, authorize('SUPER_ADMIN'), adminController.deleteUser);
+router.get('/maintenance', adminController.getMaintenance);
+router.put('/maintenance', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.toggleMaintenance);
 export default router;
