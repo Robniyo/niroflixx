@@ -44,7 +44,8 @@ export default function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            <ThemeToggle />{isAuthenticated && <NotificationBell />}
+            <ThemeToggle />
+            {isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 {isAdmin ? <Link to="/admin"><Button variant="primary" size="sm">Dashboard</Button></Link> : <Link to="/dashboard"><Button variant="ghost" size="sm">My Account</Button></Link>}
@@ -59,6 +60,7 @@ export default function Navbar() {
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
+            <ThemeToggle />
             {isAuthenticated && <NotificationBell />}
             <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-secondary-600 hover:text-secondary-900 rounded-md">
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
