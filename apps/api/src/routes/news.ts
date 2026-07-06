@@ -4,7 +4,6 @@ import { authenticate, authorize } from '../middlewares/auth';
 
 const router = Router();
 router.get('/', newsController.getAll);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.getById);
 router.get('/:slug', newsController.getBySlug);
 router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.create);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.update);
