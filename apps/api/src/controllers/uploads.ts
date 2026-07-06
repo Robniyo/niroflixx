@@ -16,10 +16,11 @@ export const uploadsController = {
 
       const b64 = req.file.buffer.toString('base64');
       const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+      const isPdf = req.file.mimetype === 'application/pdf';
 
       const result = await cloudinary.v2.uploader.upload(dataURI, {
         folder: 'niroflixx',
-        resource_type: 'auto',
+        resource_type: isPdf ? 'raw' : 'image',
         access_mode: 'public',
       });
 
