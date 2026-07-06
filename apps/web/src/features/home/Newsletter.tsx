@@ -42,7 +42,7 @@ export default function Newsletter() {
             <CheckCircle className="w-4 h-4" /> You're subscribed!
           </div>
         ) : (
-          <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm mx-auto">
+          <form onSubmit={handleSubscribe} className="flex gap-2 max-w-full sm:max-w-sm mx-auto px-4">
             <input
               type="email"
               required
@@ -51,7 +51,7 @@ export default function Newsletter() {
               placeholder="Enter your email"
               className="flex-1 px-4 py-3 bg-secondary-800 border border-secondary-700 rounded-md text-white placeholder:text-secondary-500 focus:outline-none focus:border-primary-500"
             />
-            <Button type="submit" isLoading={loading} rightIcon={<Send className="w-4 h-4" />}>Subscribe</Button>
+          <Button type="submit" isLoading={loading} rightIcon={<Send className="w-4 h-4" />} className="flex-shrink-0">Subscribe</Button>
           </form>
         )}
         <p className="text-secondary-600 text-caption mt-3">No spam. Unsubscribe anytime.</p>
