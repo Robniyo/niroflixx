@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, GraduationCap, Briefcase, FileText, Newspaper, Settings, LogOut, Wrench, BookOpen, Quote, Building2, UserCheck, Megaphone, Bell, Calendar, Folder, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Briefcase, FileText, Newspaper, Settings, LogOut, Wrench, BookOpen, Quote, Building2, UserCheck, Megaphone, Bell, Calendar, Folder, Menu, X, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -34,23 +34,23 @@ export default function AdminLayout() {
 
   const handleLogout = async () => {
     await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   return (
-    <div className="flex h-screen bg-secondary-50">
+    <div className="flex h-screen bg-secondary-50 overflow-hidden">
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setSidebarOpen(false)} />
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        'fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-secondary-100 flex flex-col transition-transform duration-300',
+        'fixed lg:sticky top-0 left-0 z-50 h-full w-64 bg-white border-r border-secondary-100 flex flex-col transition-transform duration-300 overflow-y-auto',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
-        <div className="p-5 border-b border-secondary-100 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+        <div className="p-4 border-b border-secondary-100 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
             <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">N</span>
             </div>
@@ -60,42 +60,43 @@ export default function AdminLayout() {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {visibleLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               onClick={() => setSidebarOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm font-medium transition-colors',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                 location.pathname === link.href
                   ? 'bg-primary-50 text-primary-600'
                   : 'text-secondary-600 hover:bg-secondary-50 hover:text-secondary-900'
               )}
             >
-              <link.icon className="w-5 h-5" />
-              {link.label}
+              <link.icon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">{link.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="p-3 border-t border-secondary-100">
-          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm font-medium text-secondary-500 hover:text-danger hover:bg-danger-light/30 transition-colors w-full">
-            <LogOut className="w-5 h-5" /> Sign Out
+        <div className="p-2 border-t border-secondary-100">
+          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-500 hover:text-danger hover:bg-danger-light/30 transition-colors w-full">
+            <LogOut className="w-5 h-5 flex-shrink-0" /> <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <div className="lg:hidden bg-white border-b px-4 py-3 flex items-center gap-3">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile Top Bar */}
+        <div className="lg:hidden bg-white border-b border-secondary-100 px-4 py-3 flex items-center gap-3 flex-shrink-0">
           <button onClick={() => setSidebarOpen(true)} className="p-1.5 hover:bg-secondary-50 rounded-lg">
             <Menu className="w-5 h-5" />
           </button>
-          <span className="font-semibold text-secondary-900">Niroflixx Admin</span>
+          <span className="font-semibold text-secondary-900 text-sm truncate">Niroflixx Admin</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
           <Outlet />
         </div>
       </div>
