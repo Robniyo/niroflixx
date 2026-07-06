@@ -9,4 +9,5 @@ router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANA
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), resourcesController.delete);
 router.get('/:id', resourcesController.getById);
 router.post('/:id/download', resourcesController.download);
+router.get('/:id/file', resourcesController.downloadFile);
 export default router;

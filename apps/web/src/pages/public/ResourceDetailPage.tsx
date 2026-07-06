@@ -45,7 +45,7 @@ export default function ResourceDetailPage() {
             <span className="flex items-center gap-1"><Eye className="w-4 h-4" /> {resource.views || 0} Views</span>
           </div>
           {resource.fileUrl ? (
-          <a href={resource.fileUrl} target="_blank" download>
+            <a href={`https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`} download>
             <Button size="lg" rightIcon={<Download className="w-4 h-4" />}>Download Resource</Button>
           </a>
         ) : (

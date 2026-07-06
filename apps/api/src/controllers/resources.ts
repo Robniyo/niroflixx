@@ -32,6 +32,7 @@ export const resourcesController = {
       res.json({ status: 'success', data: resource });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   create: async (req: Request, res: Response) => {
     try {
       const data = cleanData(req.body);
@@ -67,6 +68,7 @@ export const resourcesController = {
       res.json({ status: 'success', message: 'Archived' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   download: async (req: Request, res: Response) => {
     try {
       await prisma.resource.update({
@@ -75,6 +77,23 @@ export const resourcesController = {
       });
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       res.json({ status: 'success', data: resource });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
+
+  downloadFile: async (req: Request, res: Response) => {
+    try {
+      const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
+      if (!resource || !resource.fileUrl) {
+        return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
+      }
+
+      await prisma.resource.update({
+        where: { id: req.params.id },
+        data: { downloadCount: { increment: 1 } },
+      });
+
+      const downloadUrl = resource.fileUrl.replace('/upload/', '/upload/fl_attachment/');
+      res.redirect(downloadUrl);
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 };
