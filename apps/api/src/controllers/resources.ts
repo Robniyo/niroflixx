@@ -79,7 +79,6 @@ export const resourcesController = {
       res.json({ status: 'success', data: resource });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
-
   downloadFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
@@ -92,8 +91,8 @@ export const resourcesController = {
         data: { downloadCount: { increment: 1 } },
       });
 
+      // Add fl_attachment to force download
       const downloadUrl = resource.fileUrl.replace('/upload/', '/upload/fl_attachment/');
       res.redirect(downloadUrl);
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
-};
