@@ -14,8 +14,23 @@
     line-height: 1.6;
   }
   .dark body {
-    @apply bg-secondary-950 text-white;
-  }
+  @apply bg-secondary-950 text-white;
+}
+.dark .bg-white {
+  @apply bg-secondary-900;
+}
+.dark .bg-secondary-50 {
+  @apply bg-secondary-800;
+}
+.dark .text-secondary-900 {
+  @apply text-white;
+}
+.dark .text-secondary-600 {
+  @apply text-secondary-300;
+}
+.dark .border-secondary-100 {
+  @apply border-secondary-700;
+}
   ::selection {
     @apply bg-primary-200 text-primary-900;
   }
