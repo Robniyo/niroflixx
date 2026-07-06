@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { BookOpen, ArrowLeft, Download, Eye } from 'lucide-react';
 import api from '@/services/api';
-import Button from '@/components/ui/Button';
 
 export default function ResourceDetailPage() {
   const { slug } = useParams();
@@ -16,6 +15,18 @@ export default function ResourceDetailPage() {
       setResource(found || null);
     }).catch(() => {}).finally(() => setLoading(false));
   }, [slug]);
+
+  const handleDownload = () => {
+    if (!resource) return;
+    const downloadUrl = `https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = resource.title || 'download';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setResource({ ...resource, downloadCount: (resource.downloadCount || 0) + 1 });
+  };
 
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
   if (!resource) return <div className="pt-32 pb-16 text-center"><h1 className="text-h2">Resource Not Found</h1><Link to="/resources" className="text-primary-600 mt-4 inline-block">Back to Resources</Link></div>;
@@ -44,13 +55,17 @@ export default function ResourceDetailPage() {
             <span className="flex items-center gap-1"><Download className="w-4 h-4" /> {resource.downloadCount || 0} Downloads</span>
             <span className="flex items-center gap-1"><Eye className="w-4 h-4" /> {resource.views || 0} Views</span>
           </div>
+
           {resource.fileUrl ? (
-            <a href={`https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`} download>
-            <Button size="lg" rightIcon={<Download className="w-4 h-4" />}>Download Resource</Button>
-          </a>
-        ) : (
-          <p className="text-secondary-500">No file attached yet.</p>
-        )}
+            <button
+              onClick={handleDownload}
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
+            >
+              <Download className="w-5 h-5" /> Download Resource
+            </button>
+          ) : (
+            <p className="text-secondary-500">No file attached yet.</p>
+          )}
         </div>
       </div>
     </div>
