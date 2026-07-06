@@ -45,7 +45,7 @@ export default function ResponsiveTable({ columns, data, emptyMessage = 'No data
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {data.map((item, i) => (
-          <div key={i} className="bg-white rounded-xl border border-secondary-100 p-4">
+          <div key={i} className="bg-white rounded-xl border border-secondary-100 p-3 w-full">
             {columns.filter(c => !c.hideOnMobile).map((col, j) => (
               <div key={col.key} className={`flex items-center justify-between ${j > 0 ? 'mt-2 pt-2 border-t border-secondary-50' : ''}`}>
                 <span className="text-xs font-medium text-secondary-400">{col.label}</span>

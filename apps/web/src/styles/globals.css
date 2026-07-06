@@ -58,3 +58,16 @@
     background-image: linear-gradient(to right, #2563EB, #F59E0B);
   }
 }
+@layer base {
+  html, body {
+    @apply overflow-x-hidden w-full;
+    -webkit-text-size-adjust: 100%;
+  }
+  img, video, table, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+  input, select, textarea, button {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+}
