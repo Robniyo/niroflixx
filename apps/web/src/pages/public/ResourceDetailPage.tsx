@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, ArrowLeft, Download, Eye } from 'lucide-react';
+import { BookOpen, ArrowLeft, Download, Eye, LinkIcon } from 'lucide-react';
 import api from '@/services/api';
+import toast from 'react-hot-toast';
 
 export default function ResourceDetailPage() {
   const { slug } = useParams();
@@ -21,7 +22,7 @@ export default function ResourceDetailPage() {
     const downloadUrl = `https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`;
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = resource.title || 'download';
+    link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -57,12 +58,23 @@ export default function ResourceDetailPage() {
           </div>
 
           {resource.fileUrl ? (
-            <button
-              onClick={handleDownload}
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
-            >
-              <Download className="w-5 h-5" /> Download Resource
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDownload}
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
+              >
+                <Download className="w-5 h-5" /> Download Resource
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success('Link copied!');
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3.5 bg-secondary-100 text-secondary-700 rounded-xl font-medium hover:bg-secondary-200 transition-colors text-sm"
+              >
+                <LinkIcon className="w-4 h-4" /> Copy Link
+              </button>
+            </div>
           ) : (
             <p className="text-secondary-500">No file attached yet.</p>
           )}
