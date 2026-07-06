@@ -17,9 +17,13 @@ export const uploadsController = {
       const b64 = req.file.buffer.toString('base64');
       const dataURI = `data:${req.file.mimetype};base64,${b64}`;
 
+      // Detect file type
+      const mime = req.file.mimetype;
+      const isRaw = mime === 'application/pdf' || mime.includes('msword') || mime.includes('officedocument') || mime.includes('spreadsheet');
+
       const result = await cloudinary.v2.uploader.upload(dataURI, {
         folder: 'niroflixx',
-        resource_type: 'auto',
+        resource_type: isRaw ? 'raw' : 'image',
         access_mode: 'public',
       });
 
