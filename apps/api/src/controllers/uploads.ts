@@ -15,14 +15,22 @@ export const uploadsController = {
       }
 
       const b64 = req.file.buffer.toString('base64');
-      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-      const isPdf = req.file.mimetype === 'application/pdf';
+      const isPdf = req.file.mimetype === 'application/pdf' || req.file.originalname?.endsWith('.pdf');
 
-      const result = await cloudinary.v2.uploader.upload(dataURI, {
+      const uploadOptions: any = {
         folder: 'niroflixx',
-        resource_type: isPdf ? 'raw' : 'image',
         access_mode: 'public',
-      });
+      };
+
+      if (isPdf) {
+        uploadOptions.resource_type = 'raw';
+        uploadOptions.format = 'pdf';
+      }
+
+      const result = await cloudinary.v2.uploader.upload(
+        `data:${req.file.mimetype};base64,${b64}`,
+        uploadOptions
+      );
 
       res.status(201).json({
         status: 'success',
