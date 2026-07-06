@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
+import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
 interface User {
   id: string;
@@ -83,75 +84,63 @@ export default function UsersPage() {
         {isSuperAdmin && <Button leftIcon={<Plus className="w-4 h-4" />} onClick={() => setShowAddModal(true)}>Add Admin</Button>}
       </div>
 
-      <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-secondary-50 border-b border-secondary-100">
-            <tr>
-              <th className="text-left px-5 py-3 text-label text-secondary-600">User</th>
-              <th className="text-left px-5 py-3 text-label text-secondary-600">Contact</th>
-              <th className="text-left px-5 py-3 text-label text-secondary-600">Role</th>
-              <th className="text-left px-5 py-3 text-label text-secondary-600">Status</th>
-              <th className="text-left px-5 py-3 text-label text-secondary-600">Joined</th>
-              <th className="w-10"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b border-secondary-50 hover:bg-secondary-50 transition-colors">
-                <td className="px-5 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-primary-600 font-bold text-xs">{u.firstName?.[0]}{u.lastName?.[0]}</span>
-                    </div>
-                    <span className="font-medium text-secondary-900 text-body-sm">{u.firstName} {u.lastName}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-3.5 text-body-sm text-secondary-600">
-                  <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-secondary-400" />{u.email}</div>
-                  {u.phone && <div className="flex items-center gap-1.5 mt-0.5"><Phone className="w-3.5 h-3.5 text-secondary-400" />{u.phone}</div>}
-                </td>
-                <td className="px-5 py-3.5">
-                  <span className={`px-2.5 py-1 rounded-full text-caption font-semibold ${
-                    u.role === 'SUPER_ADMIN' ? 'bg-purple-100 text-purple-700' :
-                    u.role === 'ADMIN' ? 'bg-danger-light text-danger-dark' :
-                    u.role === 'CONTENT_MANAGER' ? 'bg-primary-50 text-primary-600' :
-                    'bg-secondary-100 text-secondary-600'
-                  }`}>
-                    {u.role === 'SUPER_ADMIN' ? 'Super Admin' : u.role === 'ADMIN' ? 'Admin' : u.role === 'CONTENT_MANAGER' ? 'Content Mgr' : u.role === 'INSTRUCTOR' ? 'Instructor' : 'User'}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <button onClick={() => toggleStatus(u.id, u.status)} className={`px-2.5 py-1 rounded-full text-caption font-medium cursor-pointer ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
-                    {u.status === 'ACTIVE' ? 'Active' : 'Suspended'}
+         <ResponsiveTable
+          columns={[
+            { key: 'user', label: 'User', render: (u) => (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-primary-600 font-bold text-xs">{u.firstName?.[0]}{u.lastName?.[0]}</span>
+                </div>
+                <span className="font-medium text-sm">{u.firstName} {u.lastName}</span>
+              </div>
+            )},
+            { key: 'contact', label: 'Contact', render: (u) => (
+              <div className="text-xs text-secondary-600">
+                <div>{u.email}</div>
+                {u.phone && <div>{u.phone}</div>}
+              </div>
+            )},
+            { key: 'role', label: 'Role', render: (u) => (
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                u.role === 'SUPER_ADMIN' ? 'bg-purple-100 text-purple-700' :
+                u.role === 'ADMIN' ? 'bg-danger-light text-danger-dark' :
+                u.role === 'CONTENT_MANAGER' ? 'bg-primary-50 text-primary-600' :
+                'bg-secondary-100 text-secondary-600'
+              }`}>{u.role === 'SUPER_ADMIN' ? 'Super Admin' : u.role === 'ADMIN' ? 'Admin' : u.role === 'CONTENT_MANAGER' ? 'Content Mgr' : u.role === 'INSTRUCTOR' ? 'Instructor' : 'User'}</span>
+            )},
+            { key: 'status', label: 'Status', render: (u) => (
+              <div className="flex items-center gap-2">
+                <button onClick={() => toggleStatus(u.id, u.status)} className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
+                  {u.status === 'ACTIVE' ? 'Active' : 'Suspended'}
+                </button>
+                <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline">Delete</button>
+              </div>
+            )},
+            { key: 'date', label: 'Joined', render: (u) => (
+              <span className="text-xs text-secondary-400">{new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            ), hideOnMobile: true },
+            { key: 'actions', label: '', render: (u) => (
+              u.role !== 'SUPER_ADMIN' && isSuperAdmin ? (
+                <div className="relative">
+                  <button onClick={() => setOpenMenu(openMenu === u.id ? null : u.id)} className="p-1 text-secondary-400 hover:text-secondary-600 rounded">
+                    <MoreVertical className="w-4 h-4" />
                   </button>
-                  <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline ml-2">Delete</button>
-                </td>
-                <td className="px-5 py-3.5 text-body-sm text-secondary-400">{new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                <td className="px-3 py-3.5 text-right relative">
-                  {u.role !== 'SUPER_ADMIN' && isSuperAdmin && (
-                    <>
-                      <button onClick={() => setOpenMenu(openMenu === u.id ? null : u.id)} className="p-1.5 text-secondary-400 hover:text-secondary-600 rounded-lg hover:bg-secondary-100">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      {openMenu === u.id && (
-                        <div className="absolute right-2 top-10 bg-white border border-secondary-100 rounded-lg shadow-lg z-20 py-1.5 w-44">
-                          <p className="px-4 py-1 text-caption text-secondary-400">Change role to:</p>
-                          {roleOptions.map((r) => (
-                            <button key={r.value} onClick={() => changeRole(u.id, r.value)} className={`w-full text-left px-4 py-1.5 text-body-sm hover:bg-secondary-50 ${u.role === r.value ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700'}`}>
-                              {r.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
+                  {openMenu === u.id && (
+                    <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-20 py-1 w-36">
+                      {roleOptions.map((r) => (
+                        <button key={r.value} onClick={() => changeRole(u.id, r.value)} className={`w-full text-left px-3 py-1.5 text-xs hover:bg-secondary-50 ${u.role === r.value ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700'}`}>
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
+                </div>
+              ) : null
+            ), hideOnMobile: true },
+          ]}
+          data={users}
+          emptyMessage="No users found"
+        />
       {/* Add Admin Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] p-4">
