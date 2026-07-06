@@ -44,14 +44,13 @@ export default function ResourceDetailPage() {
             <span className="flex items-center gap-1"><Download className="w-4 h-4" /> {resource.downloadCount || 0} Downloads</span>
             <span className="flex items-center gap-1"><Eye className="w-4 h-4" /> {resource.views || 0} Views</span>
           </div>
-
           {resource.fileUrl ? (
-            <a href={resource.fileUrl} target="_blank" download target="_blank" download>
-              <Button size="lg" rightIcon={<Download className="w-4 h-4" />}>Download Resource</Button>
-            </a>
-          ) : (
-            <p className="text-secondary-500">No file attached yet.</p>
-          )}
+          <a href={resource.fileUrl} target="_blank" download>
+            <Button size="lg" rightIcon={<Download className="w-4 h-4" />}>Download Resource</Button>
+          </a>
+        ) : (
+          <p className="text-secondary-500">No file attached yet.</p>
+        )}
         </div>
       </div>
     </div>
