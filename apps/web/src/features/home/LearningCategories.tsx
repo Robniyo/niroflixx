@@ -37,15 +37,17 @@ export default function LearningCategories() {
       setRequestForm({ category: '', email: '' });
     } catch { toast.error('Failed'); }
   };
-
   const handleNotify = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/subscribers', { name: selectedCat?.name, email: notifyForm.email, interests: `Notify: ${selectedCat?.name}` });
-      toast.success("We'll notify you!");
+      await api.post('/subscribers', { 
+        email: notifyForm.email, 
+        interests: `Notify: ${selectedCat?.name}` 
+      });
+      toast.success("We'll notify you when courses are available!");
       setShowNotify(false);
       setNotifyForm({ email: '' });
-    } catch { toast.error('Failed'); }
+    } catch { toast.error('Failed. Try again.'); }
   };
 
   const displayedCategories = expanded ? categories : categories.slice(0, 6);
