@@ -29,9 +29,9 @@ export const candidatesController = {
         where: { userId },
         include: { education: true, experiences: true, skills: true, certificates: true, documents: true },
       });
-if (!candidate) {
-  return res.json({ status: 'success', data: null, message: 'Candidate profile not created yet' });
-}
+      if (!candidate) {
+        return res.json({ status: 'success', data: null, message: 'Candidate profile not created yet' });
+      }
       res.json({ status: 'success', data: candidate });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
@@ -45,11 +45,36 @@ if (!candidate) {
         update: data,
         create: { userId, ...data },
       });
+      await candidatesController.calculateScore(userId);
       res.json({ status: 'success', data: candidate });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-addEducation: async (req: Request, res: Response) => {
+  calculateScore: async (userId: string) => {
+    const candidate = await prisma.candidate.findUnique({
+      where: { userId },
+      include: { education: true, experiences: true, skills: true, documents: true },
+    });
+    if (!candidate) return 0;
+
+    let score = 0;
+    if (candidate.headline) score += 15;
+    if (candidate.summary) score += 15;
+    if (candidate.currentEducation) score += 10;
+    if (candidate.currentInstitution) score += 10;
+    if (candidate.education.length > 0) score += 15;
+    if (candidate.experiences.length > 0) score += 10;
+    if (candidate.skills.length > 0) score += 15;
+    if (candidate.documents.length > 0) score += 10;
+
+    await prisma.candidate.update({
+      where: { userId },
+      data: { completionScore: score },
+    });
+    return score;
+  },
+
+  addEducation: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       let candidate = await prisma.candidate.findUnique({ where: { userId } });
@@ -57,14 +82,15 @@ addEducation: async (req: Request, res: Response) => {
         candidate = await prisma.candidate.create({ data: { userId, status: 'active' } });
       }
       const data = { ...req.body };
-if (data.startDate && data.startDate !== '') {
-  data.startDate = new Date(data.startDate);
-} else {
-  data.startDate = new Date();
-}
+      if (data.startDate && data.startDate !== '') {
+        data.startDate = new Date(data.startDate);
+      } else {
+        data.startDate = new Date();
+      }
       if (data.endDate && data.endDate !== '') data.endDate = new Date(data.endDate);
       else delete data.endDate;
       const edu = await prisma.education.create({ data: { ...data, candidateId: candidate.id } });
+      await candidatesController.calculateScore(userId);
       res.status(201).json({ status: 'success', data: edu });
     } catch (error) {
       console.error('ADD EDUCATION ERROR:', error);
@@ -80,20 +106,35 @@ if (data.startDate && data.startDate !== '') {
         candidate = await prisma.candidate.create({ data: { userId, status: 'active' } });
       }
       const data = { ...req.body };
-if (data.startDate && data.startDate !== '') {
-  data.startDate = new Date(data.startDate);
-} else {
-  data.startDate = new Date();
-}
+      if (data.startDate && data.startDate !== '') {
+        data.startDate = new Date(data.startDate);
+      } else {
+        data.startDate = new Date();
+      }
       if (data.endDate && data.endDate !== '') data.endDate = new Date(data.endDate);
       else delete data.endDate;
       const exp = await prisma.experience.create({ data: { ...data, candidateId: candidate.id } });
+      await candidatesController.calculateScore(userId);
       res.status(201).json({ status: 'success', data: exp });
     } catch (error) {
       console.error('ADD EXPERIENCE ERROR:', error);
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
+
+  addSkill: async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      let candidate = await prisma.candidate.findUnique({ where: { userId } });
+      if (!candidate) {
+        candidate = await prisma.candidate.create({ data: { userId, status: 'active' } });
+      }
+      const skill = await prisma.candidateSkill.create({ data: { ...req.body, candidateId: candidate.id } });
+      await candidatesController.calculateScore(userId);
+      res.status(201).json({ status: 'success', data: skill });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
+
   addDocument: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
@@ -101,20 +142,9 @@ if (data.startDate && data.startDate !== '') {
       if (!candidate) {
         candidate = await prisma.candidate.create({ data: { userId, status: 'active' } });
       }
-      const doc = await prisma.candidateDocument.create({
-        data: { ...req.body, candidateId: candidate.id },
-      });
+      const doc = await prisma.candidateDocument.create({ data: { ...req.body, candidateId: candidate.id } });
+      await candidatesController.calculateScore(userId);
       res.status(201).json({ status: 'success', data: doc });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
-  },
-
-  addSkill: async (req: Request, res: Response) => {
-    try {
-      const userId = (req as any).userId;
-      const candidate = await prisma.candidate.findUnique({ where: { userId } });
-      if (!candidate) return res.status(404).json({ status: 'error', message: 'Candidate not found', code: 404 });
-      const skill = await prisma.candidateSkill.create({ data: { ...req.body, candidateId: candidate.id } });
-      res.status(201).json({ status: 'success', data: skill });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
@@ -136,6 +166,7 @@ if (data.startDate && data.startDate !== '') {
       res.json({ status: 'success', data: candidate });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   checkStatus: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
