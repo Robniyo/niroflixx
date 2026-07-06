@@ -40,7 +40,7 @@ export default function HeroSection() {
             <p className="text-body-lg text-white/80 mb-8 max-w-lg leading-relaxed">
               One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for Africa's future.
             </p>
-            <div className="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl max-w-full sm:max-w-full sm:max-w-md mb-8">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-xl max-w-full sm:max-w-full sm:max-w-full sm:max-w-md mb-8 w-full">
               <Search className="w-5 h-5 text-secondary-400 ml-3 flex-shrink-0" />
               <input
                 type="text"
@@ -57,35 +57,42 @@ export default function HeroSection() {
               <Link to="/academy"><Button size="lg" variant="outline" className="border-white/60 text-white hover:bg-white/20 hover:border-white font-semibold"><GraduationCap className="w-4 h-4" /> Explore Academy</Button></Link>
             </div>
 
-              {/* Mobile Cards — matching desktop style exactly */}
-                  <div className="lg:hidden grid grid-cols-2 gap-2 mb-6 w-full">
-                    <div className="bg-white rounded-xl shadow-lg p-4 animate-float col-span-2">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <GraduationCap className="w-5 h-5 text-primary-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-secondary-900 text-sm">Digital Skills Academy</h4>
-                          <p className="text-secondary-500 text-xs mt-0.5">Master in-demand tech skills with expert-led training.</p>
-                          <p className="text-primary-600 text-xs font-medium mt-2 flex items-center gap-1">Browse Courses</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-4 animate-float" style={{ animationDelay: '0.5s' }}>
-                      <div className="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center mb-3">
-                        <Briefcase className="w-5 h-5 text-accent-600" />
-                      </div>
-                      <h4 className="font-semibold text-secondary-900 text-sm">Find Opportunities</h4>
-                      <p className="text-secondary-500 text-xs mt-0.5">Scholarships, jobs & internships.</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-4 animate-float" style={{ animationDelay: '1s' }}>
-                      <div className="w-10 h-10 bg-success-light rounded-lg flex items-center justify-center mb-3">
-                        <Wrench className="w-5 h-5 text-success" />
-                      </div>
-                      <h4 className="font-semibold text-secondary-900 text-sm">Professional Services</h4>
-                      <p className="text-secondary-500 text-xs mt-0.5">CV writing, design & more.</p>
-                    </div>
-                  </div>
+            {/* Mobile Cards */}
+<div className="lg:hidden grid grid-cols-1 gap-3 mb-8 w-full">
+  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+        <GraduationCap className="w-5 h-5 text-primary-600" />
+      </div>
+      <div>
+        <h4 className="text-white font-semibold text-sm">Digital Skills Academy</h4>
+        <p className="text-white/70 text-xs">Master in-demand tech skills with expert-led training.</p>
+      </div>
+    </div>
+  </div>
+  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Briefcase className="w-5 h-5 text-accent-600" />
+      </div>
+      <div>
+        <h4 className="text-white font-semibold text-sm">Find Opportunities</h4>
+        <p className="text-white/70 text-xs">Scholarships, jobs & internships.</p>
+      </div>
+    </div>
+  </div>
+  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 bg-success-light rounded-lg flex items-center justify-center flex-shrink-0">
+        <Wrench className="w-5 h-5 text-success" />
+      </div>
+      <div>
+        <h4 className="text-white font-semibold text-sm">Professional Services</h4>
+        <p className="text-white/70 text-xs">CV writing, design & more.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 md:gap-8">

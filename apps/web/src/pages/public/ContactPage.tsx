@@ -47,7 +47,7 @@ export default function ContactPage() {
                 <div className="w-12 h-12 bg-success rounded-lg flex items-center justify-center flex-shrink-0"><Mail className="w-5 h-5 text-white" /></div>
                 <div>
                   <h4 className="font-semibold text-secondary-900 mb-1">Email</h4>
-                  <a href="mailto:robertniyonkuru001@gmail.com" className="text-body-sm text-primary-600 hover:underline">robertniyonkuru001@gmail.com</a>
+                  <a href="mailto:robertniyonkuru001@gmail.com" className="text-body-sm text-primary-600 hover:underline break-all">robertniyonkuru001@gmail.com</a>
                   <p className="text-body-sm text-secondary-500 mt-0.5">Response within 24 hours</p>
                 </div>
               </div>

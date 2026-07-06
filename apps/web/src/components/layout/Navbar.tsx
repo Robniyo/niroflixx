@@ -68,7 +68,7 @@ export default function Navbar() {
 
       {isOpen && (
         <div className="lg:hidden bg-white border-t border-secondary-100 animate-slide-down">
-          <div className="container-page py-4 space-y-1 pb-20">
+          <div className="container-page py-4 space-y-1 pb-28">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} className={cn('block px-3 py-2.5 rounded-md text-body font-medium transition-colors', location.pathname === link.href ? 'text-primary-600 bg-primary-50' : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50')}>
                 {link.label}
