@@ -62,36 +62,28 @@ export const adminController = {
     try {
       const userId = req.params.id;
       
-      await prisma.$transaction([
-        prisma.attendance.deleteMany({ where: { userId } }),
-        prisma.application.deleteMany({ where: { userId } }),
-        prisma.bookmark.deleteMany({ where: { userId } }),
-        prisma.downloadRelations.deleteMany({ where: { userId } }),
-        prisma.enrollment.deleteMany({ where: { userId } }),
-        prisma.notification.deleteMany({ where: { userId } }),
-        prisma.review.deleteMany({ where: { userId } }),
-        prisma.session.deleteMany({ where: { userId } }),
-        prisma.supportTicket.deleteMany({ where: { userId } }),
-        prisma.serviceRequest.deleteMany({ where: { userId } }),
-        prisma.auditLog.deleteMany({ where: { userId } }),
-        prisma.message.deleteMany({ where: { OR: [{ senderId: userId }, { receiverId: userId }] } }),
-      ]);
-      
-      await prisma.$transaction([
-        prisma.candidateDocument.deleteMany({ where: { candidate: { userId } } }),
-        prisma.candidateSkill.deleteMany({ where: { candidate: { userId } } }),
-        prisma.candidateCertificate.deleteMany({ where: { candidate: { userId } } }),
-        prisma.experience.deleteMany({ where: { candidate: { userId } } }),
-        prisma.education.deleteMany({ where: { candidate: { userId } } }),
-      ]);
-      
-      await prisma.$transaction([
-        prisma.candidate.deleteMany({ where: { userId } }),
-        prisma.profile.deleteMany({ where: { userId } }),
-        prisma.trainer.deleteMany({ where: { userId } }),
-      ]);
-      
-      await prisma.user.delete({ where: { id: userId } });
+      // Use raw SQL to delete everything related to this user
+      await prisma.$executeRawUnsafe(`DELETE FROM "attendance" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "applications" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "bookmarks" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "downloads" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "enrollments" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "notifications" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "reviews" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "sessions" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "messages" WHERE "senderId" = $1 OR "receiverId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "service_requests" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "support_tickets" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "audit_logs" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "candidate_documents" WHERE "candidateId" IN (SELECT id FROM "candidates" WHERE "userId" = $1)`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "candidate_skills" WHERE "candidateId" IN (SELECT id FROM "candidates" WHERE "userId" = $1)`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "candidate_certificates" WHERE "candidateId" IN (SELECT id FROM "candidates" WHERE "userId" = $1)`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "education" WHERE "candidateId" IN (SELECT id FROM "candidates" WHERE "userId" = $1)`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "experiences" WHERE "candidateId" IN (SELECT id FROM "candidates" WHERE "userId" = $1)`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "candidates" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "profiles" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "trainers" WHERE "userId" = $1`, userId);
+      await prisma.$executeRawUnsafe(`DELETE FROM "users" WHERE "id" = $1`, userId);
       
       res.json({ status: 'success', message: 'User and all data deleted' });
     } catch (error: any) {
