@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Send, User, Mail, Phone, FileText } from 'lucide-react';
 import api from '@/services/api';
 import Button from './Button';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
 
 interface ApplyModalProps {
   isOpen: boolean;
@@ -14,21 +13,21 @@ interface ApplyModalProps {
 }
 
 export default function ApplyModal({ isOpen, onClose, opportunityTitle, opportunityId }: ApplyModalProps) {
+  const { user, isAuthenticated } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const { user, isAuthenticated } = useAuth();
 
-useEffect(() => {
-  if (isAuthenticated && user) {
-    setForm({
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email || '',
-      phone: user.phone || '',
-      message: '',
-    });
-  }
-}, [isAuthenticated, user]);
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setForm({
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        email: user.email || '',
+        phone: user.phone || '',
+        message: '',
+      });
+    }
+  }, [isAuthenticated, user, isOpen]);
 
   if (!isOpen) return null;
 
@@ -36,7 +35,6 @@ useEffect(() => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Create application directly — no account required
       await api.post('/applications', {
         name: form.name,
         email: form.email,
@@ -45,7 +43,6 @@ useEffect(() => {
         opportunityId,
         status: 'SUBMITTED',
       });
-
       setSuccess(true);
       setTimeout(() => { onClose(); setSuccess(false); setForm({ name: '', email: '', phone: '', message: '' }); }, 4000);
     } catch (err: any) {
@@ -87,7 +84,7 @@ useEffect(() => {
                 <label className="block text-sm font-medium mb-1">Full Name *</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border rounded-lg text-sm" placeholder="ROBERT NIYONKURU" />
+                  <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border rounded-lg text-sm" placeholder="Niro Bwimba" />
                 </div>
               </div>
               <div>
@@ -106,9 +103,9 @@ useEffect(() => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Message</label>
-                <textarea rows={3} value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full px-4 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none" placeholder="Tell us anything specific..." />
+                <textarea rows={3} value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full px-4 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none" placeholder="Tell us anything specific..."/>
               </div>
-              <Button type="submit" className="w-full" size="lg" isLoading={loading} rightIcon={<Send className="w-4 h-4" />}>Submit Application</Button>
+              <Button type="submit" className="w-full" size="lg" isLoading={loading} rightIcon={<Send className="w-4 h-4"/>}>Submit Application</Button>
             </form>
           </>
         )}
