@@ -96,7 +96,7 @@ export default function AboutPage() {
                 </div>
                 <div className="border-t border-white/20 pt-6">
                   <div className="text-display-lg font-bold">the world</div>
-                  <div className="text-white/80">Headquarters in Kigali</div>
+                  <div className="text-white/80">Headquarters in Kigali, Rwanda</div>
                 </div>
                 <div className="border-t border-white/20 pt-6">
                   <div className="text-display-lg font-bold">24/7</div>
@@ -159,7 +159,7 @@ export default function AboutPage() {
           <div className="flex flex-wrap justify-center gap-8 text-secondary-600">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary-600" />
-              <span>Kigali, the world</span>
+              <span>Kigali, Rwanda</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary-600" />

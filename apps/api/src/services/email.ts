@@ -11,7 +11,7 @@ const branding = `
 const footer = `
   <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #E2E8F0; text-align: center;">
     <p style="color: #94A3B8; font-size: 12px; margin: 0 0 4px;">Niroflix — Learn, Grow, Succeed</p>
-    <p style="color: #94A3B8; font-size: 12px; margin: 0 0 4px;">KG 11 Ave, Kigali, the world</p>
+    <p style="color: #94A3B8; font-size: 12px; margin: 0 0 4px;">KG 11 Ave, Kigali, Rwanda</p>
     <p style="color: #94A3B8; font-size: 12px; margin: 0;">This email was sent because you have an account with Niroflix.</p>
   </div>
 `;

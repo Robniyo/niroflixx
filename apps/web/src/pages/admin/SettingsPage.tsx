@@ -14,7 +14,7 @@ export default function SettingsPage() {
     siteDescription: 'Learn, Grow, Succeed',
     contactEmail: 'robertniyonkuru001@gmail.com',
     contactPhone: '+250795064502',
-    contactAddress: 'Kigali, the world',
+    contactAddress: 'Kigali, Rwanda',
     facebook: 'https://facebook.com/niroflixx',
     twitter: 'https://x.com/niroflixx',
     instagram: 'https://instagram.com/niroflixx',

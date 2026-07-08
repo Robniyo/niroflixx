@@ -52,7 +52,7 @@ useEffect(() => {
                 <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0"><MapPin className="w-5 h-5 text-white" /></div>
                 <div>
                   <h4 className="font-semibold text-secondary-900 mb-1">Location</h4>
-                  <p className="text-body-sm text-secondary-600">Kigali, the world</p>
+                  <p className="text-body-sm text-secondary-600">Kigali, Rwanda</p>
                   <p className="text-body-sm text-secondary-600">Available for remote work worldwide</p>
                 </div>
               </div>
