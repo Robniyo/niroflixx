@@ -4,6 +4,8 @@ import { MessageCircle, X, Send, Bot } from 'lucide-react';
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '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';
 
+const SYSTEM_PROMPT = 'You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Be friendly, helpful, and concise.';
+
 export default function ChatBot() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
@@ -27,7 +29,7 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,18 +38,26 @@ export default function ChatBot() {
           'X-Title': 'Niroflixx',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.0-flash-exp:free',
+          model: 'mistralai/mistral-7b-instruct:free',
           messages: [
-            { role: 'system', content: 'You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Be friendly, helpful, and concise.' },
+            { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: userMsg }
           ],
         }),
       });
-      const data = await response.json();
-      const reply = data?.choices?.[0]?.message?.content || 'Sorry, I had trouble connecting. Try again.';
-      setMessages(prev => [...prev, { text: reply, from: 'bot' }]);
-    } catch {
-      setMessages(prev => [...prev, { text: 'Sorry, I had trouble connecting.', from: 'bot' }]);
+
+      const data = await res.json();
+      console.log('API Response:', data);
+
+      if (data?.error) {
+        setMessages(prev => [...prev, { text: `Error: ${data.error.message || 'API error'}`, from: 'bot' }]);
+      } else {
+        const reply = data?.choices?.[0]?.message?.content || 'Sorry, no response.';
+        setMessages(prev => [...prev, { text: reply, from: 'bot' }]);
+      }
+    } catch (err: any) {
+      console.error('Chat error:', err);
+      setMessages(prev => [...prev, { text: 'Connection failed. Try again.', from: 'bot' }]);
     } finally { setLoading(false); }
   };
 
@@ -61,7 +71,7 @@ export default function ChatBot() {
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-secondary-200 overflow-hidden animate-slide-up">
           <div className="bg-primary-600 text-white px-5 py-4 flex items-center gap-3">
-            <Bot className="w-6 h-6" /><div><h3 className="font-semibold text-sm">Niroflixx AI Assistant</h3><p className="text-white/70 text-xs">Powered by AI</p></div>
+            <Bot className="w-6 h-6" /><div><h3 className="font-semibold text-sm">Niroflixx AI</h3><p className="text-white/70 text-xs">Ask me anything</p></div>
           </div>
           <div className="h-80 overflow-y-auto p-4 space-y-3">
             {messages.map((m, i) => (
