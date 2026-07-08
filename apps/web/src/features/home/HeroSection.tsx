@@ -140,18 +140,18 @@ export default function HeroSection() {
           {/* Desktop Floating Cards */}
           <div className="hidden lg:block relative">
             <div className="relative w-full h-[500px]">
-              <div className="absolute top-10 right-10 w-72 bg-white rounded-xl shadow-2xl p-6 animate-float">
+              <Link to="/academy" className="absolute top-10 right-10 w-72 bg-white rounded-xl shadow-2xl p-6 animate-float hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer block">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4"><GraduationCap className="w-6 h-6 text-primary-600" /></div>
                 <h4 className="font-semibold text-secondary-900 mb-2">Digital Skills Academy</h4>
                 <p className="text-body-sm text-secondary-500 mb-3">Master in-demand tech skills with expert-led training.</p>
                 <div className="flex items-center gap-2 text-primary-600 text-body-sm font-medium">Browse Courses <ArrowRight className="w-4 h-4" /></div>
               </div>
-              <div className="absolute bottom-20 left-5 w-64 bg-white rounded-xl shadow-xl p-5 animate-float" style={{ animationDelay: '2s' }}>
+              <Link to="/opportunities" className="absolute bottom-20 left-5 w-64 bg-white rounded-xl shadow-xl p-5 animate-float hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer block" style={{ animationDelay: '2s' }}>
                 <div className="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center mb-3"><Briefcase className="w-5 h-5 text-accent-600" /></div>
                 <h4 className="font-semibold text-secondary-900 mb-1">Find Opportunities</h4>
                 <p className="text-body-sm text-secondary-500">Scholarships, jobs & internships.</p>
               </div>
-              <div className="absolute top-40 left-0 w-56 bg-white rounded-xl shadow-lg p-4 animate-float" style={{ animationDelay: '4s' }}>
+              <Link to="/services" className="absolute top-40 left-0 w-56 bg-white rounded-xl shadow-lg p-4 animate-float hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer block" style={{ animationDelay: '4s' }}>
                 <div className="w-10 h-10 bg-success-light rounded-lg flex items-center justify-center mb-3"><Wrench className="w-5 h-5 text-success" /></div>
                 <h4 className="font-semibold text-secondary-900 mb-1">Professional Services</h4>
                 <p className="text-body-sm text-secondary-500">CV writing, design & more.</p>
