@@ -14,4 +14,6 @@ router.get('/promote', adminController.promoteSelf);
 router.delete('/users/:id', authenticate, authorize('SUPER_ADMIN'), adminController.deleteUser);
 router.get('/maintenance', adminController.getMaintenance);
 router.put('/maintenance', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.toggleMaintenance);
+router.delete('/subscribers/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.deleteSubscriber);
+router.delete('/messages/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.deleteMessage);
 export default router;
