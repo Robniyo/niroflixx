@@ -81,7 +81,7 @@ export default function AboutPage() {
               <p className="text-secondary-600 leading-relaxed">
                 Today, we serve students from secondary school through university, job seekers, freelancers, 
                 and organizations looking for digital solutions. We believe that with the right tools and 
-                guidance, every the worldn can build a successful career in technology.
+                guidance, every the world can build a successful career in technology.
               </p>
             </div>
             <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-10 text-white">
@@ -95,7 +95,7 @@ export default function AboutPage() {
                   <div className="text-white/80">Core Services</div>
                 </div>
                 <div className="border-t border-white/20 pt-6">
-                  <div className="text-display-lg font-bold">the world</div>
+                  <div className="text-display-lg font-bold">Rwanda</div>
                   <div className="text-white/80">Headquarters in Kigali, Rwanda</div>
                 </div>
                 <div className="border-t border-white/20 pt-6">
