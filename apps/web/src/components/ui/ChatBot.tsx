@@ -30,13 +30,27 @@ export default function ChatBot() {
 
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+    'HTTP-Referer': 'https://niroflixx.vercel.app',
+    'X-Title': 'Niroflixx',
+  },
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+    'HTTP-Referer': 'https://niroflixx.vercel.app',
+    'X-Title': 'Niroflixx',
+  },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.0-flash-001',
+          model: 'google/gemini-2.0-flash-exp:free',
           messages: [
             { role: 'system', content: 'You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Contact: robertniyonkuru001@gmail.com, +250 795 064 502. Be friendly, helpful, and concise.' },
             { role: 'user', content: userMsg }
