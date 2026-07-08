@@ -138,11 +138,32 @@ export const candidatesController = {
   addDocument: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
+      const { type, fileName, fileUrl } = req.body;
+      
       let candidate = await prisma.candidate.findUnique({ where: { userId } });
       if (!candidate) {
         candidate = await prisma.candidate.create({ data: { userId, status: 'active' } });
       }
-      const doc = await prisma.candidateDocument.create({ data: { ...req.body, candidateId: candidate.id } });
+
+      // Check if document of this type already exists — replace it
+      const existing = await prisma.candidateDocument.findFirst({
+        where: { candidateId: candidate.id, type },
+      });
+
+      if (existing) {
+        // Update existing document
+        const doc = await prisma.candidateDocument.update({
+          where: { id: existing.id },
+          data: { fileName, fileUrl, verificationStatus: 'pending' },
+        });
+        await candidatesController.calculateScore(userId);
+        return res.json({ status: 'success', message: 'Document replaced', data: doc });
+      }
+
+      // Create new document
+      const doc = await prisma.candidateDocument.create({
+        data: { type, fileName, fileUrl, candidateId: candidate.id },
+      });
       await candidatesController.calculateScore(userId);
       res.status(201).json({ status: 'success', data: doc });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
