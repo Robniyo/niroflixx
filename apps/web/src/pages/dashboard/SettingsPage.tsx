@@ -12,7 +12,6 @@ export default function DashboardSettingsPage() {
     window.location.href = '/login';
     return null;
   }
-  const { user } = useAuth();
   const [form, setForm] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
