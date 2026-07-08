@@ -4,6 +4,7 @@ import { GraduationCap, ArrowRight, Clock, Users } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import AdBanner from '@/components/ui/AdBanner';
+import Skeleton from '@/components/ui/Skeleton';
 
 
 export default function AcademyPage() {
@@ -14,7 +15,19 @@ export default function AcademyPage() {
     api.get('/courses', { params: { status: 'PUBLISHED' } }).then(r => setCourses(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
+  if (loading) return (
+  <div className="pt-32 pb-16">
+    <div className="container-page">
+      <div className="text-center mb-12">
+        <Skeleton className="h-8 w-48 mx-auto" />
+        <Skeleton className="h-5 w-96 mx-auto mt-4" />
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1,2,3].map(i => <Skeleton key={i} className="h-64 rounded-xl" />)}
+      </div>
+    </div>
+  </div>
+);
 
   return (
     <div className="pt-32 pb-16">
