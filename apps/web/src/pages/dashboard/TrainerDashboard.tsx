@@ -26,12 +26,13 @@ function isWithinClassTime(startTime: string, endTime: string): boolean {
 }
 
 export default function TrainerDashboard() {
-  const { user } = useAuth();
-if (!user) {
-  window.location.href = '/login';
-  return null;
-}
   const { user, logout } = useAuth();
+  
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
+  
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClass, setSelectedClass] = useState<any>(null);
