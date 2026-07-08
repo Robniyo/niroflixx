@@ -20,13 +20,15 @@ export default function AuthPage() {
   const [registerForm, setRegisterForm] = useState({
     firstName: '', lastName: '', username: '', email: '', password: '', passwordConfirm: ''
   });
-    const [counts, setCounts] = useState({ courses: 0, opportunities: 0 });
 
-useEffect(() => {
-  api.get('/stats/public').then(r => {
-    setCounts(r.data.data);
-  }).catch(() => {});
-}, []);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordFeedback, setPasswordFeedback] = useState('');
+  const [counts, setCounts] = useState({ courses: 0, opportunities: 0 });
+    useEffect(() => {
+      api.get('/stats/public').then(r => {
+        setCounts(r.data.data);
+      }).catch(() => {});
+    }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,77 +161,41 @@ useEffect(() => {
                       />
                     </div>
                   </div>
-                  <div>
+                                   <div>
                     <label className="block text-sm font-medium text-secondary-700 mb-1.5">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'} required
-                        value={loginForm.password}
-                        onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
-                        placeholder="Enter your password"
-                        className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all"
-                      />
+                      <input type={showPassword ? 'text' : 'password'} required value={registerForm.password} onChange={e => {
+                        const pw = e.target.value;
+                        setRegisterForm({ ...registerForm, password: pw });
+                        let score = 0;
+                        if (pw.length >= 8) score++;
+                        if (pw.length >= 12) score++;
+                        if (/[A-Z]/.test(pw)) score++;
+                        if (/[0-9]/.test(pw)) score++;
+                        if (/[^A-Za-z0-9]/.test(pw)) score++;
+                        setPasswordStrength(score);
+                        if (score <= 2) setPasswordFeedback('Weak — use 8+ chars, mix letters & numbers');
+                        else if (score <= 3) setPasswordFeedback('Medium — add special characters');
+                        else if (score <= 4) setPasswordFeedback('Strong');
+                        else setPasswordFeedback('Very Strong!');
+                      }} placeholder="Min 6 characters" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center gap-2 text-secondary-600">
-                      <input type="checkbox" className="rounded border-secondary-300 text-primary-600 focus:ring-primary-500" />
-                      Remember me
-                    </label>
-                    <Link to="/forgot-password" className="text-primary-600 hover:underline font-medium">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Button type="submit" className="w-full" size="lg" isLoading={loading} rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    Sign In
-                  </Button>
-                </form>
-              ) : (
-                /* Register Form */
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-secondary-700 mb-1.5">First Name</label>
-                      <div className="relative">
-                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                        <input type="text" required value={registerForm.firstName} onChange={e => setRegisterForm({ ...registerForm, firstName: e.target.value })} placeholder="Niro" className="w-full pl-10 pr-3 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
+                    {registerForm.password && (
+                      <div className="mt-2">
+                        <div className="flex gap-1">
+                          {[1,2,3,4,5].map(i => (
+                            <div key={i} className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? 'bg-success' : 'bg-secondary-200'}`} />
+                          ))}
+                        </div>
+                        <p className={`text-xs mt-1 ${passwordStrength >= 3 ? 'text-success' : 'text-secondary-400'}`}>
+                          {passwordFeedback}
+                        </p>
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-secondary-700 mb-1.5">Last Name</label>
-                      <div className="relative">
-                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                        <input type="text" required value={registerForm.lastName} onChange={e => setRegisterForm({ ...registerForm, lastName: e.target.value })} placeholder="Bwimba" className="w-full pl-10 pr-3 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1.5">Username</label>
-                    <div className="relative">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                      <input type="text" required value={registerForm.username} onChange={e => setRegisterForm({ ...registerForm, username: e.target.value })} placeholder="nirobwimba" className="w-full pl-11 pr-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1.5">Email Address</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                      <input type="email" required value={registerForm.email} onChange={e => setRegisterForm({ ...registerForm, email: e.target.value })} placeholder="you@example.com" className="w-full pl-11 pr-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1.5">Password</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                      <input type={showPassword ? 'text' : 'password'} required value={registerForm.password} onChange={e => setRegisterForm({ ...registerForm, password: e.target.value })} placeholder="Min 6 characters" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-secondary-700 mb-1.5">Confirm Password</label>
@@ -238,18 +204,6 @@ useEffect(() => {
                       <input type={showPassword ? 'text' : 'password'} required value={registerForm.passwordConfirm} onChange={e => setRegisterForm({ ...registerForm, passwordConfirm: e.target.value })} placeholder="Re-enter password" className="w-full pl-11 pr-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all" />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full" size="lg" isLoading={loading} rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    Create Account
-                  </Button>
-                  <p className="text-xs text-secondary-400 text-center mt-4">
-                    By creating an account, you agree to our{' '}
-                    <Link to="/terms" className="text-primary-600 hover:underline">Terms</Link> and{' '}
-                    <Link to="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link>.
-                  </p>
-                </form>
-              )}
-            </div>
-          </div>
 
           {/* Footer */}
           <p className="text-center text-body-sm text-secondary-400 mt-8">

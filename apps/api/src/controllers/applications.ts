@@ -29,7 +29,8 @@ export const applicationsController = {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
-create: async (req: Request, res: Response) => {
+
+  create: async (req: Request, res: Response) => {
     try {
       const { name, email, phone, message, opportunityId } = req.body;
       
@@ -41,7 +42,6 @@ create: async (req: Request, res: Response) => {
         },
       });
       
-      // Also notify admin via contact message
       await prisma.contactMessage.create({
         data: {
           name: name || 'Applicant',
@@ -52,6 +52,9 @@ create: async (req: Request, res: Response) => {
       });
 
       res.status(201).json({ status: 'success', data: application });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+    } catch (error) { 
+      console.error('APPLICATION CREATE ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); 
+    }
   },
 };
