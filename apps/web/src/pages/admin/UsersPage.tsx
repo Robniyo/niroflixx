@@ -108,16 +108,20 @@ export default function UsersPage() {
                 'bg-secondary-100 text-secondary-600'
               }`}>{u.role === 'SUPER_ADMIN' ? 'Super Admin' : u.role === 'ADMIN' ? 'Admin' : u.role === 'CONTENT_MANAGER' ? 'Content Mgr' : u.role === 'INSTRUCTOR' ? 'Instructor' : 'User'}</span>
             )},
-            { key: 'status', label: 'Status', render: (u) => (
-              <div className="flex items-center gap-2">
-                <button onClick={() => u.role !== 'SUPER_ADMIN' && toggleStatus(u.id, u.status)} className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
+                  { key: 'status', label: 'Status', render: (u) => (
+          <div className="flex items-center gap-2">
+            {u.role === 'SUPER_ADMIN' ? (
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Super Admin</span>
+            ) : (
+              <>
+                <button onClick={() => toggleStatus(u.id, u.status)} className={`px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
                   {u.status === 'ACTIVE' ? 'Active' : 'Suspended'}
                 </button>
-                {u.role !== 'SUPER_ADMIN' && (
-                  <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline">Delete</button>
-                )}
-              </div>
-            )},
+                <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline">Delete</button>
+              </>
+            )}
+          </div>
+        )},
             { key: 'date', label: 'Joined', render: (u) => (
               <span className="text-xs text-secondary-400">{new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             ), hideOnMobile: true },
