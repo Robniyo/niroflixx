@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 
-const GEMINI_API_KEY = 'AQ.Ab8RN6L6u_Q4bwPp51dQ0uT-fvE1Dh5zeJF1qHPGo4sQSTu41g';
+const OPENROUTER_API_KEY = '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';
 
 export default function ChatBot() {
   const location = useLocation();
@@ -11,7 +11,7 @@ export default function ChatBot() {
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ text: string; from: 'user' | 'bot' }[]>([
-    { text: 'Hi! 👋 I\'m the Niroflixx assistant powered by Gemini AI. Ask me anything!', from: 'bot' },
+    { text: "Hi! 👋 I'm the Niroflixx AI assistant. Ask me anything!", from: 'bot' },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,18 +29,22 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `https://ai.google.dev/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Contact: robertniyonkuru001@gmail.com, +250 795 064 502. Be friendly, helpful, and concise. User asks: ${userMsg}` }] }],
-          }),
-        }
-      );
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.0-flash-001',
+          messages: [
+            { role: 'system', content: 'You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Contact: robertniyonkuru001@gmail.com, +250 795 064 502. Be friendly, helpful, and concise.' },
+            { role: 'user', content: userMsg }
+          ],
+        }),
+      });
       const data = await response.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'I\'m not sure about that. Can you rephrase?';
+      const reply = data?.choices?.[0]?.message?.content || "Sorry, I had trouble connecting. Try again.";
       setMessages(prev => [...prev, { text: reply, from: 'bot' }]);
     } catch {
       setMessages(prev => [...prev, { text: 'Sorry, I had trouble connecting. Please try again.', from: 'bot' }]);
@@ -63,7 +67,7 @@ export default function ChatBot() {
             <Bot className="w-6 h-6" />
             <div>
               <h3 className="font-semibold text-sm">Niroflixx AI Assistant</h3>
-              <p className="text-white/70 text-xs">Powered by Gemini</p>
+              <p className="text-white/70 text-xs">Powered by Gemini + OpenRouter</p>
             </div>
           </div>
 
