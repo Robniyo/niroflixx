@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 
-const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
 
 export default function ChatBot() {
   const location = useLocation();
