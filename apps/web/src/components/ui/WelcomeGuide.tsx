@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { X, ArrowRight, GraduationCap, Briefcase } from 'lucide-react';
 import Button from './Button';
-
+import { useAuth } from '@/contexts/AuthContext';
 export default function WelcomeGuide() {
+  const { isAuthenticated } = useAuth();
+
+// Don't show to logged-in users
+if (isAuthenticated) return null;
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(0);
 
@@ -35,7 +39,7 @@ export default function WelcomeGuide() {
             <p className="text-body-sm text-secondary-500 mb-4">Scholarships, jobs, internships — we'll match you with the best ones.</p>
             <div className="flex gap-2 justify-center">
               <Button size="sm" onClick={() => setStep(1)} rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>Yes, Show Me</Button>
-              <button onClick={dismiss} className="text-sm text-secondary-400 hover:text-secondary-600">I'm here to learn</button>
+              <button onClick={() => { dismiss(); window.location.href = '/academy'; }} className="text-sm text-secondary-400 hover:text-secondary-600">I'm here to learn</button>
             </div>
           </div>
         )}

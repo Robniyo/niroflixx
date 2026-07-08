@@ -53,24 +53,31 @@ export default function AuthPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Password validation
+    if (registerForm.password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(registerForm.password)) {
+      setError('Password must contain at least one uppercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(registerForm.password)) {
+      setError('Password must contain at least one number');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(registerForm.password)) {
+      setError('Password must contain at least one special character (!@#$%^&*)');
+      return;
+    }
     if (registerForm.password !== registerForm.passwordConfirm) {
       setError('Passwords do not match');
       return;
     }
+    
     setLoading(true);
-    try {
-      await register({
-        firstName: registerForm.firstName,
-        lastName: registerForm.lastName,
-        username: registerForm.username,
-        email: registerForm.email,
-        password: registerForm.password,
-      });
-      navigate('/dashboard/candidate');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
-    } finally { setLoading(false); }
-  };
+    // ... rest of register code
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-primary-50 via-white to-accent-50">
