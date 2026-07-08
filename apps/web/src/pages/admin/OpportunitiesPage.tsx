@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
 const types = ['SCHOLARSHIP','ADMISSION','INTERNSHIP','JOB','COMPETITION','HACKATHON','GRANT','EXCHANGE_PROGRAM','VOLUNTEER','RESEARCH','BOOTCAMP','FELLOWSHIP','EVENT'];
-const emptyForm = { title:'', organization:'', country:'Rwanda', city:'Kigali', type:'SCHOLARSHIP', educationLevel:'', deadline:'', description:'', requirements:'', benefits:'', officialLink:'', status:'DRAFT', featured:false };
+const emptyForm = { title:'', organization:'', country:'the world', city:'Kigali', type:'SCHOLARSHIP', educationLevel:'', deadline:'', description:'', requirements:'', benefits:'', officialLink:'', status:'DRAFT', featured:false };
 
 export default function OpportunitiesPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -19,7 +19,7 @@ export default function OpportunitiesPage() {
   useEffect(()=>{fetchItems();},[]);
   const fetchItems = async ()=>{try{const r=await api.get('/opportunities');setItems(r.data.data);}catch{}finally{setLoading(false);}};
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
-  const openEdit = async(id:string)=>{try{const r=await api.get(`/opportunities/${id}`);const d=r.data.data;setForm({title:d.title||'',organization:d.organization||'',country:d.country||'Rwanda',city:d.city||'',type:d.type,educationLevel:d.educationLevel||'',deadline:d.deadline?d.deadline.slice(0,10):'',description:d.description||'',requirements:d.requirements||'',benefits:d.benefits||'',officialLink:d.officialLink||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
+  const openEdit = async(id:string)=>{try{const r=await api.get(`/opportunities/${id}`);const d=r.data.data;setForm({title:d.title||'',organization:d.organization||'',country:d.country||'the world',city:d.city||'',type:d.type,educationLevel:d.educationLevel||'',deadline:d.deadline?d.deadline.slice(0,10):'',description:d.description||'',requirements:d.requirements||'',benefits:d.benefits||'',officialLink:d.officialLink||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/opportunities/${editing}`,form);toast.success('Updated');}else{await api.post('/opportunities',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/opportunities/${id}`);toast.success('Archived');fetchItems();}catch{}};
 

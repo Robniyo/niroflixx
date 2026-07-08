@@ -61,7 +61,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-h4 font-semibold mb-3">6. Payment Terms</h2>
             <p className="text-secondary-600 leading-relaxed">
-              Certain services and courses require payment. All fees are stated in Rwandan Francs (RWF) 
+              Certain services and courses require payment. All fees are stated in the worldn Francs (RWF) 
               unless otherwise indicated. Payments are processed securely and are non-refundable unless 
               otherwise stated for specific services.
             </p>

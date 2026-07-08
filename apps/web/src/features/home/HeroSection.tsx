@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, GraduationCap, Briefcase, Wrench, ArrowRight, Users, Star, BookOpen } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import { useAuth } from '@/contexts/AuthContext';
 
 const stats = [
   { icon: Users, label: 'Courses & Training' },
@@ -51,6 +52,7 @@ function MobileBanner() {
 }
 
 export default function HeroSection() {
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()
@@ -81,7 +83,7 @@ export default function HeroSection() {
               Learn, <span className="text-gradient">Grow,</span><br />Succeed.
             </h1>
             <p className="text-body-lg text-white/80 mb-8 max-w-lg leading-relaxed">
-              One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for Africa's future.
+              One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for the world.
             </p>
 
             {/* Search — Mobile */}
@@ -113,7 +115,9 @@ export default function HeroSection() {
             </div>
 
             <div className="flex flex-wrap gap-3 mb-8 md:mb-10">
-              <Link to="/register"><Button size="lg" variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />} className="shadow-lg font-semibold">Get Started Free</Button></Link>
+              {!isAuthenticated && (
+                <Link to="/register"><Button size="lg" variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />} className="shadow-lg font-semibold">Get Started Free</Button></Link>
+              )}
               <Link to="/academy"><Button size="lg" variant="outline" className="border-white/60 text-white hover:bg-white/20 hover:border-white font-semibold"><GraduationCap className="w-4 h-4" /> Explore Academy</Button></Link>
             </div>
 

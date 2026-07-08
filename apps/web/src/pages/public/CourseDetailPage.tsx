@@ -11,6 +11,7 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState<any[]>([]);
+  const [enrolled, setEnrolled] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -23,14 +24,24 @@ export default function CourseDetailPage() {
         const matching = allClasses.filter((c: any) => c.courseId === r.data.data.id && c.status === 'PUBLISHED');
         setClasses(matching);
       }).catch(() => {});
+      
+      // Check if user is enrolled
+      if (isAuthenticated) {
+        api.get('/enrollments').then(enrRes => {
+          const myEnrollments = enrRes.data.data || [];
+          const found = myEnrollments.find((e: any) => e.courseId === r.data.data.id);
+          setEnrolled(!!found);
+        }).catch(() => {});
+      }
     }).catch(() => {}).finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, isAuthenticated]);
 
   const handleEnroll = async () => {
     if (!isAuthenticated) { navigate('/login'); return; }
     try {
       await api.post('/enrollments', { courseId: course.id });
       toast.success('Enrolled successfully!');
+      setEnrolled(true);
       setCourse({ ...course, enrollmentCount: (course.enrollmentCount || 0) + 1 });
     } catch (err: any) { toast.error(err.response?.data?.message || 'Enrollment failed'); }
   };
@@ -84,7 +95,9 @@ export default function CourseDetailPage() {
                 <div className="flex items-center gap-2"><Users className="w-4 h-4" /> {course.enrollmentCount || 0} Students Enrolled</div>
                 <div className="flex items-center gap-2"><GraduationCap className="w-4 h-4" /> Level: {course.level}</div>
               </div>
-              <Button className="w-full" size="lg" onClick={handleEnroll}>{isAuthenticated ? 'Enroll Now' : 'Login to Enroll'}</Button>
+              <Button className="w-full" size="lg" onClick={handleEnroll} disabled={enrolled}>
+              {enrolled ? 'Enrolled ✅' : isAuthenticated ? 'Enroll Now' : 'Login to Enroll'}
+            </Button>
             </div>
           </div>
         </div>

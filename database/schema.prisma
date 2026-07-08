@@ -334,7 +334,7 @@ model Opportunity {
 model Application {
   id             String   @id @default(uuid())
   userId         String?
-  candidateId    String
+  candidateId    String?
   opportunityId  String
   status         String   @default("DRAFT")
   submittedAt    DateTime?

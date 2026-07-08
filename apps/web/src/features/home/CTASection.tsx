@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function CTASection() {
+  const { isAuthenticated } = useAuth();
+
+if (isAuthenticated) return null;
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-r from-primary-700 to-primary-600">
       {/* Decorative elements */}

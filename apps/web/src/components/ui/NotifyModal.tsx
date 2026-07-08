@@ -70,7 +70,7 @@ export default function NotifyModal({ isOpen, onClose }: NotifyModalProps) {
                 <label className="block text-label text-secondary-700 mb-1.5">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Niro Bwimba" className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 text-secondary-900 text-body-sm" />
+                  <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="ROBERT NIYONKURU" className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 text-secondary-900 text-body-sm" />
                 </div>
               </div>
               <div>

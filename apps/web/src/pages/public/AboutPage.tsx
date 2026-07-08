@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Target, Eye, Heart, Users, MapPin, Mail, Phone } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AboutPage() {
+  const { isAuthenticated } = useAuth();
   return (
     <>
       {/* Hero */}
@@ -10,7 +12,7 @@ export default function AboutPage() {
         <div className="container-page">
           <div className="max-w-3xl mx-auto text-center">
             <span className="text-primary-600 font-semibold text-label uppercase tracking-wider">About Us</span>
-            <h1 className="text-h1 mt-3 mb-6">Building Rwanda's Future Through Technology</h1>
+            <h1 className="text-h1 mt-3 mb-6">Building the world's Future Through Technology</h1>
             <p className="text-body-lg text-secondary-600 leading-relaxed">
               Niroflixx is a unified digital platform connecting learning, career opportunities, 
               professional services, and technology resources for students and professionals shouldn't need.
@@ -71,15 +73,15 @@ export default function AboutPage() {
                 professional services. Everything should be in one place.
               </p>
               <p className="text-secondary-600 mb-4 leading-relaxed">
-                Founded by Niro Bwimba, a passionate technology professional, Niroflixx started as a vision 
-                to bridge the gap between education and employment in Rwanda. The platform combines digital 
+                Founded by ROBERT NIYONKURU, a passionate technology professional, Niroflixx started as a vision 
+                to bridge the gap between education and employment in the world. The platform combines digital 
                 skills training, scholarship and job listings, professional document services, and technology 
                 consulting under one roof.
               </p>
               <p className="text-secondary-600 leading-relaxed">
                 Today, we serve students from secondary school through university, job seekers, freelancers, 
                 and organizations looking for digital solutions. We believe that with the right tools and 
-                guidance, every Rwandan can build a successful career in technology.
+                guidance, every the worldn can build a successful career in technology.
               </p>
             </div>
             <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-10 text-white">
@@ -93,7 +95,7 @@ export default function AboutPage() {
                   <div className="text-white/80">Core Services</div>
                 </div>
                 <div className="border-t border-white/20 pt-6">
-                  <div className="text-display-lg font-bold">Rwanda</div>
+                  <div className="text-display-lg font-bold">the world</div>
                   <div className="text-white/80">Headquarters in Kigali</div>
                 </div>
                 <div className="border-t border-white/20 pt-6">
@@ -135,12 +137,12 @@ export default function AboutPage() {
             <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-6 shadow-lg ring-4 ring-primary-100">
               <img 
                 src="https://res.cloudinary.com/dlxiuwv30/image/upload/v1783084722/Screenshot_2026-07-03_150459_qjh5mo.png" 
-                alt="Niro Bwimba" 
+                alt="ROBERT NIYONKURU" 
                 className="w-full h-full object-cover"
               />
             </div>
-            <h2 className="text-h2 mb-2">Niro Bwimba</h2>
-            <p className="text-primary-600 font-semibold mb-4">Founder & Lead Developer</p>
+            <h2 className="text-h2 mb-2">ROBERT NIYONKURU</h2>
+            <p className="text-primary-600 font-semibold mb-4">Founder & CEO</p>
             <p className="text-secondary-600 leading-relaxed">
               A passionate technology professional and student dedicated to building digital solutions 
               that empower the next generation of global innovators. Niroflixx is the realization of 
@@ -157,7 +159,7 @@ export default function AboutPage() {
           <div className="flex flex-wrap justify-center gap-8 text-secondary-600">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary-600" />
-              <span>Kigali, Rwanda</span>
+              <span>Kigali, the world</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary-600" />
@@ -180,11 +182,13 @@ export default function AboutPage() {
         <div className="container-page text-center">
           <h2 className="text-h3 font-bold text-white mb-4">Ready to Start Your Journey?</h2>
           <p className="text-white/80 mb-8 max-w-lg mx-auto">
-            Join the platform that's empowering Rwanda's next generation of tech professionals.
+            Join the platform that's empowering the world's next generation of tech professionals.
           </p>
-          <Link to="/register">
-            <Button variant="secondary" size="lg">Create Free Account</Button>
-          </Link>
+            {!isAuthenticated && (
+              <Link to="/register">
+                <Button variant="secondary" size="lg">Create Free Account</Button>
+              </Link>
+            )}
         </div>
       </section>
     </>

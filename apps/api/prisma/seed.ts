@@ -21,7 +21,7 @@ async function main() {
       emailVerified: true,
       profile: {
         create: {
-          nationality: 'Rwanda',
+          nationality: 'the world',
           occupation: 'Founder & Developer',
           biography: 'Founder of Niroflixx Platform',
         },

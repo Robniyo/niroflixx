@@ -2,10 +2,24 @@ import { useState } from 'react';
 import { MapPin, Mail, Phone, Clock, Send, MessageSquare } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const { user, isAuthenticated } = useAuth();
+
+useEffect(() => {
+  if (isAuthenticated && user) {
+    setForm({
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email || '',
+      subject: '',
+      message: '',
+    });
+  }
+}, [isAuthenticated, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +52,7 @@ export default function ContactPage() {
                 <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0"><MapPin className="w-5 h-5 text-white" /></div>
                 <div>
                   <h4 className="font-semibold text-secondary-900 mb-1">Location</h4>
-                  <p className="text-body-sm text-secondary-600">Kigali, Rwanda</p>
+                  <p className="text-body-sm text-secondary-600">Kigali, the world</p>
                   <p className="text-body-sm text-secondary-600">Available for remote work worldwide</p>
                 </div>
               </div>
@@ -65,9 +79,9 @@ export default function ContactPage() {
                 <div className="w-12 h-12 bg-info rounded-lg flex items-center justify-center flex-shrink-0"><Clock className="w-5 h-5 text-white" /></div>
                 <div>
                   <h4 className="font-semibold text-secondary-900 mb-1">Business Hours</h4>
-                  <p className="text-body-sm text-secondary-600">Monday – Friday: 8:00 AM – 6:00 PM</p>
-                  <p className="text-body-sm text-secondary-600">Saturday: 9:00 AM – 1:00 PM</p>
-                  <p className="text-body-sm text-secondary-600">Sunday: Closed</p>
+                  <p className="text-body-sm text-secondary-600">Available 24/7 — Online Platform</p>
+                  <p className="text-body-sm text-secondary-600">Response within 24 hours</p>
+                  <p className="text-body-sm text-secondary-600">Support available daily</p>
                 </div>
               </div>
             </div>
@@ -87,7 +101,7 @@ export default function ContactPage() {
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-label text-secondary-700 mb-1.5">Full Name *</label>
-                        <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Niro Bwimba" className="w-full px-4 py-3 bg-white border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-secondary-900" />
+                        <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="ROBERT NIYONKURU" className="w-full px-4 py-3 bg-white border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-secondary-900" />
                       </div>
                       <div>
                         <label className="block text-label text-secondary-700 mb-1.5">Email Address *</label>
@@ -116,7 +130,7 @@ export default function ContactPage() {
           <div className="h-64 bg-secondary-100 rounded-2xl flex items-center justify-center">
             <div className="text-center">
               <MapPin className="w-10 h-10 text-secondary-400 mx-auto mb-2" />
-              <p className="text-secondary-500 font-medium">Kigali, Rwanda</p>
+              <p className="text-secondary-500 font-medium">Kigali, the world</p>
               <p className="text-body-sm text-secondary-400">Map integration coming soon</p>
             </div>
           </div>

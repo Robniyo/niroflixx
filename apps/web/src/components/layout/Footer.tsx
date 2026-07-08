@@ -57,7 +57,7 @@ export default function Footer() {
                 <Phone className="w-4 h-4" /> +250 795 064 502
               </a>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" /> Kigali, Rwanda
+                <MapPin className="w-4 h-4" /> Kigali, the world
               </div>
             </div>
           </div>

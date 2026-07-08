@@ -3,6 +3,8 @@ import { X, Send, User, Mail, Phone, FileText } from 'lucide-react';
 import api from '@/services/api';
 import Button from './Button';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 
 interface ApplyModalProps {
   isOpen: boolean;
@@ -15,6 +17,18 @@ export default function ApplyModal({ isOpen, onClose, opportunityTitle, opportun
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+
+useEffect(() => {
+  if (isAuthenticated && user) {
+    setForm({
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email || '',
+      phone: user.phone || '',
+      message: '',
+    });
+  }
+}, [isAuthenticated, user]);
 
   if (!isOpen) return null;
 
@@ -73,7 +87,7 @@ export default function ApplyModal({ isOpen, onClose, opportunityTitle, opportun
                 <label className="block text-sm font-medium mb-1">Full Name *</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border rounded-lg text-sm" placeholder="Niro Bwimba" />
+                  <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border rounded-lg text-sm" placeholder="ROBERT NIYONKURU" />
                 </div>
               </div>
               <div>
