@@ -2,38 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 
-const greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'howdy', 'yo', 'sup'];
-
-const answers: Record<string, string> = {
-  'courses': 'We offer courses in Cybersecurity, Programming, Web Development, UI/UX Design, and more! Visit /academy to browse all courses.',
-  'academy': 'Our Digital Skills Academy offers expert-led training in tech skills. From beginner to advanced levels. Check /academy!',
-  'opportunities': 'We post scholarships, jobs, internships, and admissions. Visit /opportunities to find your next opportunity!',
-  'scholarships': 'We regularly post scholarship opportunities for students. Check /opportunities?type=SCHOLARSHIP for the latest!',
-  'services': 'We offer CV writing, web development, graphic design, video editing, and more. Visit /services to see all services.',
-  'cv': 'We can help you create a professional CV! Visit /services and request our CV Writing service.',
-  'apply': 'To apply for opportunities, create an account, complete your candidate profile at /dashboard/candidate, then click Apply on any opportunity.',
-  'register': 'Create a free account at /register to unlock all features!',
-  'contact': 'You can reach us at robertniyonkuru001@gmail.com or call +250 795 064 502. Or use the /contact form.',
-  'price': 'Our services start from 10,000 RWF. Courses range from 40,000 to 200,000 RWF. Many resources are free!',
-  'free': 'Yes! We have free learning resources at /resources. Some courses and services are also offered at no cost.',
-  'certificate': 'We issue certificates upon course completion. Enroll in a course at /academy to get started!',
-  'trainer': 'Our courses are taught by experienced industry professionals. Visit /about to learn more about our team.',
-  'help': 'I can help you find courses, opportunities, services, or guide you through the application process. What are you looking for?',
-  'thanks': 'You\'re welcome! 😊 Is there anything else I can help with?',
-  'thank you': 'Happy to help! 🚀 Let me know if you need anything else.',
-  'bye': 'Goodbye! 👋 Come back anytime you need help with courses, opportunities, or services.',
-  'who are you': 'I\'m the Niroflixx Assistant! I help visitors find courses, opportunities, services, and guide them through the platform. What can I help you with?',
-  'what is niroflixx': 'Niroflixx is a digital platform that combines learning, career opportunities, professional services, and resources — all in one place. We help you learn skills, find scholarships and jobs, and grow your career!',
-};
-
-const defaultReply = "I can help you with courses, opportunities, services, or applications. Try asking about 'courses', 'scholarships', 'CV writing', or 'how to apply'!";
-
-const greetingReplies = [
-  "Hello! 👋 I'm the Niroflixx assistant. How can I help you today?",
-  "Hi there! 😊 Looking for courses, opportunities, or services? Just ask!",
-  "Hey! Welcome to Niroflixx. What can I help you find?",
-  "Good to see you! Ask me about our courses, scholarships, or services.",
-];
+const GEMINI_API_KEY = 'AIzaSyAb8RN6Ivkd9vIGaIh_L6mUZMuM_j5tQ2lh75KGQH2zGsBuuvnw';
 
 export default function ChatBot() {
   const location = useLocation();
@@ -42,48 +11,49 @@ export default function ChatBot() {
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ text: string; from: 'user' | 'bot' }[]>([
-    { text: 'Hi! I\'m the Niroflixx assistant. Ask me anything about our platform!', from: 'bot' },
+    { text: 'Hi! 👋 I\'m the Niroflixx assistant powered by Gemini AI. Ask me anything!', from: 'bot' },
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  const handleSend = () => {
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    const userMsg = input.trim().toLowerCase();
-    setMessages(prev => [...prev, { text: input, from: 'user' }]);
+    const userMsg = input.trim();
+    setMessages(prev => [...prev, { text: userMsg, from: 'user' }]);
     setInput('');
+    setLoading(true);
 
-    setTimeout(() => {
-      let reply = defaultReply;
-
-      // Check greetings first
-      if (greetings.some(g => userMsg.includes(g))) {
-        reply = greetingReplies[Math.floor(Math.random() * greetingReplies.length)];
-      } else {
-        // Check keyword matches
-        for (const [key, value] of Object.entries(answers)) {
-          if (userMsg.includes(key)) {
-            reply = value;
-            break;
-          }
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `You are the Niroflixx assistant. Niroflixx is a digital platform for learning tech skills, finding scholarships/jobs/internships, and getting professional services like CV writing, web development, graphic design. The platform is at niroflixx.vercel.app. Contact: robertniyonkuru001@gmail.com, +250 795 064 502. Be friendly, helpful, and concise. User asks: ${userMsg}` }] }],
+          }),
         }
-      }
-
+      );
+      const data = await response.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'I\'m not sure about that. Can you rephrase?';
       setMessages(prev => [...prev, { text: reply, from: 'bot' }]);
-    }, 500);
+    } catch {
+      setMessages(prev => [...prev, { text: 'Sorry, I had trouble connecting. Please try again.', from: 'bot' }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isAdmin || isTrainer) return null;
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-all flex items-center justify-center hover:scale-110"
-      >
+      <button onClick={() => setOpen(!open)} className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-all flex items-center justify-center hover:scale-110">
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </button>
 
@@ -92,8 +62,8 @@ export default function ChatBot() {
           <div className="bg-primary-600 text-white px-5 py-4 flex items-center gap-3">
             <Bot className="w-6 h-6" />
             <div>
-              <h3 className="font-semibold text-sm">Niroflixx Assistant</h3>
-              <p className="text-white/70 text-xs">Ask me anything!</p>
+              <h3 className="font-semibold text-sm">Niroflixx AI Assistant</h3>
+              <p className="text-white/70 text-xs">Powered by Gemini</p>
             </div>
           </div>
 
@@ -105,19 +75,23 @@ export default function ChatBot() {
                 </div>
               </div>
             ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-secondary-100 px-4 py-2.5 rounded-2xl rounded-bl-md">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                    <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={bottomRef} />
           </div>
 
           <div className="border-t p-3 flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="Ask about courses, services..."
-              className="flex-1 px-4 py-2.5 bg-secondary-50 border rounded-xl text-sm focus:outline-none focus:border-primary-500"
-            />
-            <button onClick={handleSend} className="px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors">
+            <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Ask me anything..." className="flex-1 px-4 py-2.5 bg-secondary-50 border rounded-xl text-sm focus:outline-none focus:border-primary-500" disabled={loading} />
+            <button onClick={handleSend} disabled={loading} className="px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50">
               <Send className="w-4 h-4" />
             </button>
           </div>
