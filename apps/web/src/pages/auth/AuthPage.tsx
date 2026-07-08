@@ -9,7 +9,9 @@ import 'react-phone-input-2/lib/style.css';
 
 export default function AuthPage() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPass, setShowLoginPass] = useState(false);
+  const [showRegPass, setShowRegPass] = useState(false);
+  const [showRegConfirm, setShowRegConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login, register } = useAuth();
@@ -115,8 +117,10 @@ export default function AuthPage() {
                     <label className="block text-sm font-medium text-secondary-700 mb-1.5">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-                      <input type={showPassword ? 'text' : 'password'} required value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Enter your password" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400"><Eye className="w-4 h-4" /></button>
+                      <input type={showLoginPass ? 'text' : 'password'} required value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Enter your password" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" />
+                      <button type="button" onClick={() => setShowLoginPass(!showLoginPass)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600">
+                        {showLoginPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm">
@@ -139,7 +143,13 @@ export default function AuthPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1.5">Password</label>
-                    <input type={showPassword ? 'text' : 'password'} required value={registerForm.password} onChange={e => { const pw = e.target.value; setRegisterForm({...registerForm, password: pw}); let score = 0; if (pw.length >= 8) score++; if (pw.length >= 12) score++; if (/[A-Z]/.test(pw)) score++; if (/[0-9]/.test(pw)) score++; if (/[^A-Za-z0-9]/.test(pw)) score++; setPasswordStrength(score); if (score <= 2) setPasswordFeedback('Weak'); else if (score <= 3) setPasswordFeedback('Medium'); else if (score <= 4) setPasswordFeedback('Strong'); else setPasswordFeedback('Very Strong!'); }} className="w-full px-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" />
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
+                      <input type={showRegPass ? 'text' : 'password'} required value={registerForm.password} onChange={e => { const pw = e.target.value; setRegisterForm({...registerForm, password: pw}); let score = 0; if (pw.length >= 8) score++; if (pw.length >= 12) score++; if (/[A-Z]/.test(pw)) score++; if (/[0-9]/.test(pw)) score++; if (/[^A-Za-z0-9]/.test(pw)) score++; setPasswordStrength(score); if (score <= 2) setPasswordFeedback('Weak'); else if (score <= 3) setPasswordFeedback('Medium'); else if (score <= 4) setPasswordFeedback('Strong'); else setPasswordFeedback('Very Strong!'); }} placeholder="Min 6 characters" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" />
+                      <button type="button" onClick={() => setShowRegPass(!showRegPass)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600">
+                        {showRegPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     {registerForm.password && (
                       <div className="mt-2">
                         <div className="flex gap-1">{[1,2,3,4,5].map(i => (<div key={i} className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? 'bg-success' : 'bg-secondary-200'}`} />))}</div>
@@ -147,7 +157,16 @@ export default function AuthPage() {
                       </div>
                     )}
                   </div>
-                  <div><label className="block text-sm font-medium mb-1.5">Confirm Password</label><input type={showPassword ? 'text' : 'password'} required value={registerForm.passwordConfirm} onChange={e => setRegisterForm({...registerForm, passwordConfirm: e.target.value})} className="w-full px-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" /></div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
+                      <input type={showRegConfirm ? 'text' : 'password'} required value={registerForm.passwordConfirm} onChange={e => setRegisterForm({...registerForm, passwordConfirm: e.target.value})} placeholder="Re-enter password" className="w-full pl-11 pr-12 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm focus:outline-none focus:border-primary-500" />
+                      <button type="button" onClick={() => setShowRegConfirm(!showRegConfirm)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600">
+                        {showRegConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
                   <Button type="submit" className="w-full" size="lg" isLoading={loading} rightIcon={<ArrowRight className="w-4 h-4" />}>Create Account</Button>
                   <p className="text-xs text-secondary-400 text-center mt-4">By creating an account, you agree to our <Link to="/terms" className="text-primary-600 hover:underline">Terms</Link> and <Link to="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link>.</p>
                 </form>
