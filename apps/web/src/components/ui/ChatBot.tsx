@@ -38,7 +38,7 @@ export default function ChatBot() {
           'X-Title': 'Niroflixx',
         },
         body: JSON.stringify({
-          model: 'mistralai/mistral-7b-instruct:free',
+          model: 'google/gemini-flash-1.5',
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: userMsg }
