@@ -4,6 +4,12 @@ import { ArrowLeft, Download, FileText } from 'lucide-react';
 import api from '@/services/api';
 
 export default function DownloadsPage() {
+  const { user } = useAuth();
+  
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
   const [downloads, setDownloads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 

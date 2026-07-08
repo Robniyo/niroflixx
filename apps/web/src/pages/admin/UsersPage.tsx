@@ -110,10 +110,12 @@ export default function UsersPage() {
             )},
             { key: 'status', label: 'Status', render: (u) => (
               <div className="flex items-center gap-2">
-                <button onClick={() => toggleStatus(u.id, u.status)} className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
+                <button onClick={() => u.role !== 'SUPER_ADMIN' && toggleStatus(u.id, u.status)} className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.status === 'ACTIVE' ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'}`}>
                   {u.status === 'ACTIVE' ? 'Active' : 'Suspended'}
                 </button>
-                <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline">Delete</button>
+                {u.role !== 'SUPER_ADMIN' && (
+                  <button onClick={() => deleteUser(u.id, u.email)} className="text-xs text-danger hover:underline">Delete</button>
+                )}
               </div>
             )},
             { key: 'date', label: 'Joined', render: (u) => (

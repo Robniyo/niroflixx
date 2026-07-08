@@ -7,6 +7,12 @@ import toast from 'react-hot-toast';
 
 export default function DashboardSettingsPage() {
   const { user } = useAuth();
+  
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
+  const { user } = useAuth();
   const [form, setForm] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',

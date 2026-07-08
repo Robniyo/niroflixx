@@ -8,6 +8,12 @@ import toast from 'react-hot-toast';
 
 export default function CandidateProfilePage() {
   const { user } = useAuth();
+  
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
+  const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ headline: '', summary: '', currentEducation: '', currentInstitution: '', availability: '' });

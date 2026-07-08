@@ -4,6 +4,8 @@ import { Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
 import api from '@/services/api';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 export default function AuthPage() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
@@ -18,7 +20,7 @@ export default function AuthPage() {
 
   // Register form
   const [registerForm, setRegisterForm] = useState({
-    firstName: '', lastName: '', username: '', email: '', password: '', passwordConfirm: ''
+    firstName: '', lastName: '', username: '', email: '', phone: '', password: '', passwordConfirm: ''
   });
 
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -161,7 +163,19 @@ export default function AuthPage() {
                       />
                     </div>
                   </div>
-                                   <div>
+                    <div>
+                      <div>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1.5">Phone Number</label>
+                      <PhoneInput
+                        country={'rw'}
+                        value={registerForm.phone}
+                        onChange={(phone) => setRegisterForm({ ...registerForm, phone })}
+                        inputClass="w-full !pl-14 !py-3.5 !bg-secondary-50 !border !border-secondary-200 !rounded-xl !text-sm"
+                        buttonClass="!bg-secondary-50 !border !border-secondary-200 !rounded-l-xl"
+                        containerClass=""
+                        placeholder="7XX XXX XXX"
+                      />
+                  </div>
                     <label className="block text-sm font-medium text-secondary-700 mb-1.5">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />

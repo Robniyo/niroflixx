@@ -7,6 +7,11 @@ import AdBanner from '@/components/ui/AdBanner';
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
+  
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
   const [stats, setStats] = useState({ enrollments: 0, downloads: 0, applications: 0 });
   const [candidateStatus, setCandidateStatus] = useState<any>(null);
 
