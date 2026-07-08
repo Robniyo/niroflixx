@@ -57,7 +57,7 @@ import ReportsPage from './pages/admin/ReportsPage';
 import CategoriesPage from './pages/admin/CategoriesPage';
 
 import ScrollToTop from './components/ui/ScrollToTop';
-import ChatBot from './components/ui/ChatBot';
+//import ChatBot from './components/ui/ChatBot';
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -147,7 +147,6 @@ export default function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <ChatBot />
     </>
   );
 }
