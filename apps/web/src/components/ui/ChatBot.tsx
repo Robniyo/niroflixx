@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 
-const GEMINI_API_KEY = 'AIzaSyAb8RN6Ivkd9vIGaIh_L6mUZMuM_j5tQ2lh75KGQH2zGsBuuvnw';
+const GEMINI_API_KEY = 'AQ.Ab8RN6L6u_Q4bwPp51dQ0uT-fvE1Dh5zeJF1qHPGo4sQSTu41g';
 
 export default function ChatBot() {
   const location = useLocation();
@@ -30,7 +30,7 @@ export default function ChatBot() {
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://ai.google.dev/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
