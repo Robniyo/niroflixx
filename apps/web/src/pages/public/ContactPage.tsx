@@ -125,17 +125,23 @@ useEffect(() => {
         </div>
       </section>
 
-      <section className="pb-16 bg-white">
-        <div className="container-page">
-          <div className="h-64 bg-secondary-100 rounded-2xl flex items-center justify-center">
-            <div className="text-center">
-              <MapPin className="w-10 h-10 text-secondary-400 mx-auto mb-2" />
-              <p className="text-secondary-500 font-medium">Kigali, the world</p>
-              <p className="text-body-sm text-secondary-400">Map integration coming soon</p>
-            </div>
-          </div>
-        </div>
-      </section>
+     {/* Map */}
+<section className="pb-16 bg-white">
+  <div className="container-page">
+    <div className="rounded-2xl overflow-hidden shadow-md h-64 sm:h-80">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=30.0400,-1.9650,30.0800,-1.9350&layer=mapnik&marker=-1.9500,30.0600"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        title="Kigali, Rwanda"
+      />
+    </div>
+    <p className="text-center text-xs text-secondary-400 mt-2">📍 Kigali, Rwanda — Available worldwide online</p>
+  </div>
+</section>
     </>
   );
 }

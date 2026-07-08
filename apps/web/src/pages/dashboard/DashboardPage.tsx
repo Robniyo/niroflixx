@@ -11,8 +11,13 @@ export default function DashboardPage() {
   const [candidateStatus, setCandidateStatus] = useState<any>(null);
 
   useEffect(() => {
-    api.get('/enrollments').then(r => setStats(prev => ({ ...prev, enrollments: r.data.data?.length || 0 }))).catch(() => {});
-    api.get('/candidates/status').then(r => setCandidateStatus(r.data.data)).catch(() => {});
+    Promise.all([
+      api.get('/enrollments').then(r => r.data.data?.length || 0).catch(() => 0),
+      api.get('/applications').then(r => r.data.data?.length || 0).catch(() => 0),
+      api.get('/resources').then(r => r.data.pagination?.total || r.data.data?.length || 0).catch(() => 0),
+    ]).then(([enrollments, applications, downloads]) => {
+      setStats({ enrollments, applications, downloads });
+    });
   }, []);
 
   return (
