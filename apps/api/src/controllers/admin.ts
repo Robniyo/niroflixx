@@ -141,4 +141,24 @@ export const adminController = {
       res.json({ status: 'success', message: 'Deleted' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+  exportData: async (req: Request, res: Response) => {
+    try {
+      const data = {
+        users: await prisma.user.findMany(),
+        courses: await prisma.course.findMany(),
+        opportunities: await prisma.opportunity.findMany(),
+        services: await prisma.service.findMany(),
+        resources: await prisma.resource.findMany(),
+        news: await prisma.news.findMany(),
+        candidates: await prisma.candidate.findMany(),
+        applications: await prisma.application.findMany(),
+        testimonials: await prisma.testimonial.findMany(),
+        partners: await prisma.partner.findMany(),
+        settings: await prisma.setting.findMany(),
+        subscribers: await prisma.newsletterSubscriber.findMany(),
+        messages: await prisma.contactMessage.findMany(),
+      };
+      res.json({ status: 'success', data });
+    } catch (error) { res.status(500).json({ status: 'error', message: 'Export failed', code: 500 }); }
+  },
 };
