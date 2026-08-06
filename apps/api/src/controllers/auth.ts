@@ -28,7 +28,6 @@ export const authController = {
 
       res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000, path: '/' });
 
-      // Send welcome email
       emailService.sendWelcome(email, firstName).catch(e => console.error('Email failed:', e));
 
       res.status(201).json({ status: 'success', message: 'Account created', data: { id: user.id, firstName, lastName, email, role: user.role } });
@@ -95,11 +94,11 @@ export const authController = {
       res.json({ status: 'success', data: user });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to get user', code: 500 }); }
   },
-    googleLogin: async (req: Request, res: Response) => {
+
+  googleLogin: async (req: Request, res: Response) => {
     try {
       const { idToken } = req.body;
       
-      // Verify the Google token
       const { OAuth2Client } = await import('google-auth-library');
       const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
       
@@ -115,13 +114,11 @@ export const authController = {
 
       const { email, given_name, family_name, picture, sub: googleId } = payload;
 
-      // Find or create user
       let user = await prisma.user.findFirst({
         where: { OR: [{ googleId }, { email }] },
       });
 
       if (user) {
-        // Link Google account if email matches but googleId not set
         if (!user.googleId) {
           user = await prisma.user.update({
             where: { id: user.id },
@@ -129,7 +126,6 @@ export const authController = {
           });
         }
       } else {
-        // Create new user
         const username = email.split('@')[0] + '_' + Date.now().toString().slice(-4);
         user = await prisma.user.create({
           data: {
@@ -148,7 +144,6 @@ export const authController = {
         });
       }
 
-      // Generate tokens
       const { token, refreshToken } = generateTokens(user.id);
       await prisma.session.create({
         data: {
@@ -184,6 +179,91 @@ export const authController = {
     } catch (error: any) {
       console.error('GOOGLE LOGIN ERROR:', error);
       res.status(500).json({ status: 'error', message: 'Google login failed', code: 500 });
+    }
+  },
+
+  // Server-side OAuth callback (used when client script doesn't load)
+  googleCallback: async (req: Request, res: Response) => {
+    try {
+      const { code } = req.query;
+      if (!code) {
+        return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=google_failed`);
+      }
+
+      const { OAuth2Client } = require('google-auth-library');
+      const client = new OAuth2Client(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}/api/v1/auth/google/callback`
+      );
+
+      const { tokens } = await client.getToken(code as string);
+      const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token!,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email) {
+        return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=invalid_token`);
+      }
+
+      const { email, given_name, family_name, picture, sub: googleId } = payload;
+
+      let user = await prisma.user.findFirst({
+        where: { OR: [{ googleId }, { email }] },
+      });
+
+      if (user) {
+        if (!user.googleId) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { googleId, avatar: picture || user.avatar, emailVerified: true },
+          });
+        }
+      } else {
+        const username = email.split('@')[0] + '_' + Date.now().toString().slice(-4);
+        user = await prisma.user.create({
+          data: {
+            firstName: given_name || 'Google',
+            lastName: family_name || 'User',
+            username,
+            email,
+            googleId,
+            avatar: picture,
+            emailVerified: true,
+            password: null,
+            role: 'USER',
+            status: 'ACTIVE',
+            profile: { create: {} },
+          },
+        });
+      }
+
+      const { token, refreshToken } = generateTokens(user.id);
+      await prisma.session.create({
+        data: {
+          userId: user.id,
+          token,
+          refreshToken,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
+      return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}`);
+    } catch (error) {
+      console.error('GOOGLE CALLBACK ERROR:', error);
+      return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=google_failed`);
     }
   },
 };
