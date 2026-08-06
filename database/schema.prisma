@@ -13,8 +13,9 @@ model User {
   lastName       String
   username       String   @unique
   email          String   @unique
+  googleId       String?   @unique
   phone          String?
-  password       String
+  password       String?
   role           String   @default("USER")
   status         String   @default("REGISTERED")
   avatar         String?
@@ -460,17 +461,22 @@ model Service {
 }
 
 model ServiceRequest {
-  id          String   @id @default(uuid())
-  serviceId   String
-  userId      String
-  description String?
-  status      String   @default("DRAFT")
-  quotation   Float?
-  notes       String?
-  submittedAt DateTime?
-  completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String    @id @default(uuid())
+  serviceId     String
+  userId        String
+  description   String?
+  status        String    @default("DRAFT")
+  quotation     Float?
+  notes         String?
+  submittedAt   DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Payment fields
+  paymentStatus String?   @default("UNPAID")
+  paymentProof  String?
+  paymentMethod String?
 
   service Service @relation(fields: [serviceId], references: [id])
   user    User    @relation(fields: [userId], references: [id])

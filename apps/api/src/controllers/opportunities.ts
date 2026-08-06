@@ -1,33 +1,73 @@
 import { Request, Response } from 'express';
 import { prisma } from '../models/prisma';
 
+// Helper to compute status dynamically from deadline
+function getComputedStatus(deadline: Date | string | null): 'OPEN' | 'CLOSING_SOON' | 'CLOSED' {
+  if (!deadline) return 'OPEN';
+  const now = new Date();
+  const d = new Date(deadline);
+  if (d < now) return 'CLOSED';
+  const threeDays = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+  if (d <= threeDays) return 'CLOSING_SOON';
+  return 'OPEN';
+}
+
 export const opportunitiesController = {
   getAll: async (req: Request, res: Response) => {
     try {
-      const { page = 1, limit = 12, type, status, country, search } = req.query;
+      const {
+        page = 1,
+        limit = 12,
+        type,
+        status,
+        country,
+        search,
+        educationLevel,
+        computedStatus,
+      } = req.query;
       const skip = (Number(page) - 1) * Number(limit);
 
       const where: any = {};
       if (type) where.type = type;
       if (status) where.status = status;
       if (country) where.country = country;
+      if (educationLevel) where.educationLevel = educationLevel;
       if (search) where.title = { contains: search as string };
 
-      const [opportunities, total] = await Promise.all([
+      // Fetch all matching opportunities (no limit first, because we might need to filter by computedStatus)
+      let [allOpportunities, total] = await Promise.all([
         prisma.opportunity.findMany({
           where,
           include: { category: true },
-          skip,
-          take: Number(limit),
           orderBy: { createdAt: 'desc' },
         }),
         prisma.opportunity.count({ where }),
       ]);
 
+      // Add computed status to each
+      let data = allOpportunities.map(opp => ({
+        ...opp,
+        computedStatus: getComputedStatus(opp.deadline),
+      }));
+
+      // If computedStatus filter is provided, apply it
+      if (computedStatus) {
+        data = data.filter(opp => opp.computedStatus === computedStatus);
+        total = data.length; // new total after filtering
+      }
+
+      // Apply pagination after filtering
+      const paginatedData = data.slice(skip, skip + Number(limit));
+
       res.json({
         status: 'success',
-        data: opportunities,
-        pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / Number(limit)) },
+        data: paginatedData,
+        pagination: {
+          page: Number(page),
+          limit: Number(limit),
+          total,
+          totalPages: Math.ceil(total / Number(limit)),
+        },
       });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed to fetch opportunities', code: 500 });
@@ -40,12 +80,21 @@ export const opportunitiesController = {
         where: { id: req.params.id },
         include: { category: true, tags: true },
       });
-      if (!opportunity) return res.status(404).json({ status: 'error', message: 'Opportunity not found', code: 404 });
-      res.json({ status: 'success', data: opportunity });
+      if (!opportunity)
+        return res.status(404).json({ status: 'error', message: 'Opportunity not found', code: 404 });
+
+      res.json({
+        status: 'success',
+        data: {
+          ...opportunity,
+          computedStatus: getComputedStatus(opportunity.deadline),
+        },
+      });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed to fetch opportunity', code: 500 });
     }
   },
+
   create: async (req: Request, res: Response) => {
     try {
       const data: any = { ...req.body };
@@ -77,8 +126,7 @@ export const opportunitiesController = {
       console.error('OPPORTUNITY CREATE ERROR:', error);
       res.status(500).json({ status: 'error', message: 'Failed to create opportunity', code: 500 });
     }
-  }, 
-  
+  },
 
   update: async (req: Request, res: Response) => {
     try {

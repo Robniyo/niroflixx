@@ -17,4 +17,5 @@ router.put('/maintenance', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), admi
 router.delete('/subscribers/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.deleteSubscriber);
 router.delete('/messages/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), adminController.deleteMessage);
 router.get('/export', authenticate, authorize('SUPER_ADMIN'), adminController.exportData);
+router.get('/service-requests', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.getServiceRequests);
 export default router;

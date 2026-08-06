@@ -45,9 +45,17 @@ export default function CandidateProfilePage() {
     } catch {} finally { setLoading(false); }
   };
 
-  const updateProfile = async () => {
+ const updateProfile = async () => {
     setSaving(true);
-    try { await api.put('/candidates/me', form); toast.success('Profile updated'); fetchProfile(); } catch { toast.error('Failed'); } finally { setSaving(false); }
+    try {
+      const r = await api.put('/candidates/me', form);
+      setProfile(r.data.data); // use response directly, no re-fetch needed
+      toast.success('Profile updated');
+    } catch {
+      toast.error('Failed');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const addEducation = async () => {

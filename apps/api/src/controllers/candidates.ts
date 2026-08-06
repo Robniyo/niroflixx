@@ -39,15 +39,29 @@ export const candidatesController = {
   updateProfile: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
-      const data = cleanData(req.body);
+      const { headline, summary, currentEducation, currentInstitution, availability } = req.body;
+
+      // Build update object, converting empty strings to null
+      const data: any = {};
+      if (headline !== undefined) data.headline = headline === '' ? null : headline;
+      if (summary !== undefined) data.summary = summary === '' ? null : summary;
+      if (currentEducation !== undefined) data.currentEducation = currentEducation === '' ? null : currentEducation;
+      if (currentInstitution !== undefined) data.currentInstitution = currentInstitution === '' ? null : currentInstitution;
+      if (availability !== undefined) data.availability = availability === '' ? null : availability;
+
       const candidate = await prisma.candidate.upsert({
         where: { userId },
         update: data,
         create: { userId, ...data },
       });
+
       await candidatesController.calculateScore(userId);
+
+      // Return the updated candidate directly so frontend can update state without extra fetch
       res.json({ status: 'success', data: candidate });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
   },
 
   calculateScore: async (userId: string) => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Wrench, MessageSquare } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Wrench, MessageSquare, Eye, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -9,26 +9,52 @@ const emptyForm = { title:'', description:'', categoryId:'', startingPrice:0, es
 export default function ServicesPage() {
   const [items, setItems] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
+  const [serviceRequests, setServiceRequests] = useState<any[]>([]); // New ServiceRequest records
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<string|null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<'services' | 'requests'>('services');
+  const [tab, setTab] = useState<'services' | 'requests' | 'payments'>('services');
+
+  // For payment proof view
+  const [selectedProof, setSelectedProof] = useState<string | null>(null);
 
   useEffect(()=>{
     fetchItems();
+    fetchServiceRequests();
     api.get('/admin/subscribers').then(r => {
-      const serviceRequests = (r.data.data?.messages || []).filter((m: any) => m.subject?.includes('Service Request'));
-      setRequests(serviceRequests);
+      const serviceMsgs = (r.data.data?.messages || []).filter((m: any) => m.subject?.includes('Service Request'));
+      setRequests(serviceMsgs);
     }).catch(() => {});
   },[]);
 
   const fetchItems = async()=>{try{const r=await api.get('/services');setItems(r.data.data);}catch{}finally{setLoading(false);}};
+  
+    const fetchServiceRequests = async () => {
+    try {
+      const r = await api.get('/admin/service-requests');
+      setServiceRequests(r.data.data);
+    } catch {
+      // silently fail
+    }
+  };
+
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
   const openEdit = async(id:string)=>{try{const r=await api.get(`/services/${id}`);const d=r.data.data;setForm({title:d.title||'',description:d.description||'',categoryId:d.categoryId||'',startingPrice:d.startingPrice||0,estimatedTime:d.estimatedTime||'',icon:d.icon||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/services/${editing}`,form);toast.success('Updated');}else{await api.post('/services',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/services/${id}`);toast.success('Archived');fetchItems();}catch{}};
+
+  // Payment status update
+  const updatePaymentStatus = async (requestId: string, status: string) => {
+    try {
+      await api.put(`/services/payment-status/${requestId}`, { paymentStatus: status });
+      toast.success(`Payment ${status === 'PAID' ? 'approved' : 'rejected'}`);
+      fetchServiceRequests();
+    } catch {
+      toast.error('Failed to update');
+    }
+  };
 
   if(loading)return<div className="text-center py-16 text-secondary-500">Loading...</div>;
 
@@ -44,6 +70,9 @@ export default function ServicesPage() {
         <button onClick={() => setTab('services')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === 'services' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>Services</button>
         <button onClick={() => setTab('requests')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${tab === 'requests' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>
           <MessageSquare className="w-4 h-4" /> Requests {requests.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{requests.length}</span>}
+        </button>
+        <button onClick={() => setTab('payments')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${tab === 'payments' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>
+          <Eye className="w-4 h-4" /> Payment Proofs {serviceRequests.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{serviceRequests.length}</span>}
         </button>
       </div>
 
@@ -86,6 +115,90 @@ export default function ServicesPage() {
         </div>
       )}
 
+      {/* Payment Proofs Tab */}
+      {tab === 'payments' && (
+        <div className="space-y-4">
+          {serviceRequests.length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-secondary-200 p-12 text-center">
+              <Eye className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
+              <p className="text-secondary-500 font-medium">No payment proofs yet</p>
+              <p className="text-secondary-400 text-body-sm mt-1">When users upload payment proofs, they will appear here.</p>
+            </div>
+          ) : (
+            serviceRequests.map((req: any) => (
+              <div key={req.id} className="bg-white rounded-xl border border-secondary-100 p-6 hover:shadow-md transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold text-secondary-900">{req.service?.title || req.serviceId}</h3>
+                    <p className="text-body-sm text-secondary-500">Requested by: {req.user?.firstName} {req.user?.lastName} ({req.user?.email})</p>
+                    <p className="text-sm text-secondary-400">Payment method: {req.paymentMethod || 'N/A'}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                      req.paymentStatus === 'PENDING_VERIFICATION' ? 'bg-yellow-100 text-yellow-700' :
+                      req.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' :
+                      req.paymentStatus === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {req.paymentStatus === 'PENDING_VERIFICATION' && <AlertCircle className="w-3.5 h-3.5" />}
+                      {req.paymentStatus === 'PAID' && <CheckCircle className="w-3.5 h-3.5" />}
+                      {req.paymentStatus === 'REJECTED' && <XCircle className="w-3.5 h-3.5" />}
+                      {req.paymentStatus || 'UNPAID'}
+                    </span>
+                    {req.paymentProof && (
+                      <button
+                        onClick={() => setSelectedProof(req.paymentProof)}
+                        className="block mt-1 text-xs text-primary-600 hover:underline"
+                      >
+                        View Proof
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {req.paymentProof && selectedProof && (
+                  <div className="mb-4 relative">
+                    <button
+                      onClick={() => setSelectedProof(null)}
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <img
+                      src={selectedProof}
+                      alt="Payment proof"
+                      className="max-w-full h-auto rounded-lg border"
+                    />
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  {req.paymentStatus !== 'PAID' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updatePaymentStatus(req.id, 'PAID')}
+                      className="text-green-600 border-green-300 hover:bg-green-50"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                    </Button>
+                  )}
+                  {req.paymentStatus !== 'REJECTED' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updatePaymentStatus(req.id, 'REJECTED')}
+                      className="text-red-600 border-red-300 hover:bg-red-50"
+                    >
+                      <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Service Create/Edit Modal */}
       {showModal&&(
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[5vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={()=>setShowModal(false)}/>

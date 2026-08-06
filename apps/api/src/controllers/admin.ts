@@ -141,6 +141,20 @@ export const adminController = {
       res.json({ status: 'success', message: 'Deleted' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+    getServiceRequests: async (_req: Request, res: Response) => {
+    try {
+      const requests = await prisma.serviceRequest.findMany({
+        include: {
+          service: { select: { title: true } },
+          user: { select: { firstName: true, lastName: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      res.json({ status: 'success', data: requests });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to fetch service requests', code: 500 });
+    }
+  },
   exportData: async (req: Request, res: Response) => {
     try {
       const data = {

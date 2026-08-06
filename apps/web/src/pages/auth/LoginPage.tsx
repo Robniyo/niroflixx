@@ -1,8 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
+import api from '@/services/api';
+
+// Extend Window interface for Google Identity Services
+declare global {
+  interface Window {
+    google?: any;
+    handleGoogleResponse?: (response: any) => void;
+  }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,8 +19,50 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Load Google Identity Services script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    window.handleGoogleResponse = async (response: any) => {
+      setGoogleLoading(true);
+      setError('');
+      try {
+        // Send Google token to your backend
+        const res = await api.post('/auth/google', {
+          idToken: response.credential,
+        });
+
+        // Set user in context (backend already returned user data)
+        const userData = res.data.data;
+        // Update auth context with the user data
+        // Since the login function is for email/password, we'll directly call a custom method.
+        // Actually, we can use the same pattern: set user from response.
+        // We'll need to update AuthContext to support external user setting, but for now,
+        // we can simply reload the user via fetchUser (context). Or we can store the token
+        // and let the app work. The simplest: call login with dummy? No.
+        // We'll make the login function in context accept a token and user data.
+        // But to keep it simple, we'll redirect to dashboard and the AuthContext's fetchUser will get the logged-in user from the cookie.
+        navigate('/');
+      } catch (err: any) {
+        setError('Google login failed. Please try again.');
+      } finally {
+        setGoogleLoading(false);
+      }
+    };
+
+    return () => {
+      // Cleanup
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +103,38 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
+          {/* Google Login Button */}
+          <div className="mb-6">
+            <div
+              id="g_id_onload"
+              data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+              data-context="signin"
+              data-ux_mode="popup"
+              data-callback="handleGoogleResponse"
+              data-auto_prompt="false"
+            />
+            <div
+              className="g_id_signin"
+              data-type="standard"
+              data-shape="pill"
+              data-theme="outline"
+              data-text="continue_with"
+              data-size="large"
+              data-logo_alignment="left"
+              style={{ display: 'flex', justifyContent: 'center' }}
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-secondary-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-secondary-500">or sign in with email</span>
+            </div>
+          </div>
+
           {error && (
             <div className="bg-danger-light text-danger-dark px-4 py-3 rounded-lg mb-6 text-body-sm">
               {error}

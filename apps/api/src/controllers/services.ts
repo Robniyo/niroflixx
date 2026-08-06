@@ -77,7 +77,10 @@ export const servicesController = {
 
   requestService: async (req: Request, res: Response) => {
     try {
-      const { serviceId, description, name, email, phone } = req.body;
+      const { serviceId, description, name, email, phone, paymentMethod } = req.body;
+      
+      // Get the authenticated user from middleware (if logged in)
+      const userId = (req as any).userId;
       
       let serviceName = serviceId;
       try {
@@ -85,14 +88,29 @@ export const servicesController = {
         if (service) serviceName = service.title;
       } catch {}
 
+      // Create a contact message (keeps existing functionality)
       await prisma.contactMessage.create({
         data: {
           name,
           email,
           subject: `Service Request: ${serviceName}`,
-          message: `Phone: ${phone || 'N/A'}\n\n${description || 'No details provided'}`,
+          message: `Phone: ${phone || 'N/A'}\nPayment Method: ${paymentMethod || 'Not specified'}\n\n${description || 'No details provided'}`,
         },
       });
+
+      // Also create a ServiceRequest record with payment status
+      if (userId) {
+        await prisma.serviceRequest.create({
+          data: {
+            serviceId,
+            userId,
+            description,
+            status: 'PENDING',
+            paymentStatus: 'UNPAID',
+            paymentMethod: paymentMethod || 'Not specified',
+          },
+        });
+      }
 
       // Send auto-reply email
       try {
@@ -100,7 +118,98 @@ export const servicesController = {
         await emailService.sendServiceRequestConfirmation(email, name, serviceName, description);
       } catch (e) { console.error('Service request email failed:', e); }
 
-      res.status(201).json({ status: 'success', message: 'Request sent!' });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+      res.status(201).json({ status: 'success', message: 'Request sent! You will receive payment instructions.' });
+    } catch (error) { 
+      console.error('SERVICE REQUEST ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); 
+    }
+  },
+
+  // Get payment instructions (from settings)
+  getPaymentSettings: async (_req: Request, res: Response) => {
+    try {
+      const bankDetails = await prisma.setting.findUnique({ where: { key: 'payment_bank_details' } });
+      const momoDetails = await prisma.setting.findUnique({ where: { key: 'payment_momo_details' } });
+      const instructions = await prisma.setting.findUnique({ where: { key: 'payment_instructions' } });
+      res.json({
+        status: 'success',
+        data: {
+          bankDetails: bankDetails?.value || '',
+          momoDetails: momoDetails?.value || '',
+          instructions: instructions?.value || '',
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+
+  // User uploads payment proof
+  uploadPaymentProof: async (req: Request, res: Response) => {
+    try {
+      const { requestId, proofUrl } = req.body;
+      const userId = (req as any).userId;
+
+      const request = await prisma.serviceRequest.findUnique({ where: { id: requestId } });
+      if (!request) return res.status(404).json({ status: 'error', message: 'Request not found', code: 404 });
+      if (request.userId !== userId) return res.status(403).json({ status: 'error', message: 'Not your request', code: 403 });
+
+      const updated = await prisma.serviceRequest.update({
+        where: { id: requestId },
+        data: { paymentProof: proofUrl, paymentStatus: 'PENDING_VERIFICATION' },
+      });
+
+      // Notify admins
+      try {
+        const admins = await prisma.user.findMany({ where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } }, select: { id: true } });
+        if (admins.length > 0) {
+          await prisma.notification.createMany({
+            data: admins.map(a => ({
+              userId: a.id,
+              title: 'Payment Proof Submitted',
+              message: `A payment proof has been submitted for service request #${requestId.slice(0, 8)}.`,
+              link: '/admin/services',
+              type: 'PAYMENT',
+            })),
+          });
+        }
+      } catch (e) {}
+
+      res.json({ status: 'success', data: updated });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+
+  // Admin updates payment status (approve/reject)
+  updatePaymentStatus: async (req: Request, res: Response) => {
+    try {
+      const { paymentStatus, notes } = req.body; // paymentStatus: 'PAID' or 'REJECTED'
+      const request = await prisma.serviceRequest.update({
+        where: { id: req.params.id },
+        data: { paymentStatus, notes },
+      });
+
+      // Notify the user about payment status change
+      if (request.userId) {
+        try {
+          await prisma.notification.create({
+            data: {
+              userId: request.userId,
+              title: paymentStatus === 'PAID' ? 'Payment Confirmed' : 'Payment Rejected',
+              message: paymentStatus === 'PAID' 
+                ? 'Your payment has been verified. We will begin working on your request.' 
+                : `Your payment was not verified. Notes: ${notes || 'Please check your payment and try again.'}`,
+              link: '/dashboard',
+              type: 'PAYMENT',
+            },
+          });
+        } catch (e) {}
+      }
+
+      res.json({ status: 'success', data: request });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
   },
 };

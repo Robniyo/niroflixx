@@ -35,7 +35,34 @@ const handleRequest = async (e: React.FormEvent) => {
     finally { setSubmitting(false); }
   };
 
-  if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
+if (loading) {
+  return (
+    <div className="pt-32 pb-16">
+      <div className="container-page">
+        {/* Title skeleton */}
+        <div className="text-center mb-12">
+          <div className="h-5 w-20 bg-secondary-200 rounded animate-pulse mx-auto mb-3" />
+          <div className="h-10 w-64 bg-secondary-200 rounded animate-pulse mx-auto mb-4" />
+          <div className="h-5 w-96 max-w-full bg-secondary-200 rounded animate-pulse mx-auto" />
+        </div>
+
+        {/* Cards skeleton */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white rounded-2xl border border-secondary-100 p-6 text-center">
+              <div className="w-16 h-16 bg-secondary-100 rounded-2xl animate-pulse mx-auto mb-5" />
+              <div className="h-5 w-3/4 bg-secondary-100 rounded animate-pulse mx-auto mb-2" />
+              <div className="h-4 w-full bg-secondary-100 rounded animate-pulse mx-auto mb-3" />
+              <div className="h-4 w-2/3 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
+              <div className="h-6 w-24 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
+              <div className="h-10 w-full bg-secondary-100 rounded-lg animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="pt-32 pb-16">

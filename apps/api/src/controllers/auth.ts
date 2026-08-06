@@ -95,4 +95,95 @@ export const authController = {
       res.json({ status: 'success', data: user });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to get user', code: 500 }); }
   },
+    googleLogin: async (req: Request, res: Response) => {
+    try {
+      const { idToken } = req.body;
+      
+      // Verify the Google token
+      const { OAuth2Client } = await import('google-auth-library');
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email) {
+        return res.status(400).json({ status: 'error', message: 'Invalid Google token', code: 400 });
+      }
+
+      const { email, given_name, family_name, picture, sub: googleId } = payload;
+
+      // Find or create user
+      let user = await prisma.user.findFirst({
+        where: { OR: [{ googleId }, { email }] },
+      });
+
+      if (user) {
+        // Link Google account if email matches but googleId not set
+        if (!user.googleId) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { googleId, avatar: picture || user.avatar, emailVerified: true },
+          });
+        }
+      } else {
+        // Create new user
+        const username = email.split('@')[0] + '_' + Date.now().toString().slice(-4);
+        user = await prisma.user.create({
+          data: {
+            firstName: given_name || 'Google',
+            lastName: family_name || 'User',
+            username,
+            email,
+            googleId,
+            avatar: picture,
+            emailVerified: true,
+            password: null,
+            role: 'USER',
+            status: 'ACTIVE',
+            profile: { create: {} },
+          },
+        });
+      }
+
+      // Generate tokens
+      const { token, refreshToken } = generateTokens(user.id);
+      await prisma.session.create({
+        data: {
+          userId: user.id,
+          token,
+          refreshToken,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
+      res.json({
+        status: 'success',
+        message: 'Google login successful',
+        data: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+        },
+      });
+    } catch (error: any) {
+      console.error('GOOGLE LOGIN ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Google login failed', code: 500 });
+    }
+  },
 };
