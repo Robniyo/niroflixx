@@ -103,7 +103,7 @@ export default function LoginPage() {
           <div className="mb-6 flex justify-center">
             <div
               id="g_id_onload"
-              data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+              data-client_id="256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com"
               data-context="signin"
               data-ux_mode="popup"
               data-callback="handleGoogleResponse"
