@@ -55,7 +55,18 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const userData = await login(email, password);
-      if (['ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'].includes(userData.role)) {
+
+      // Check if user was trying to apply before login
+      const pendingApply = sessionStorage.getItem('applyAfterLogin');
+      if (pendingApply) {
+        sessionStorage.removeItem('applyAfterLogin');
+        try {
+          const { opportunityId } = JSON.parse(pendingApply);
+          navigate(`/opportunities/${opportunityId}`);
+        } catch {
+          navigate('/');
+        }
+      } else if (['ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'].includes(userData.role)) {
         navigate('/admin');
       } else if (userData.role === 'INSTRUCTOR') {
         navigate('/trainer');
