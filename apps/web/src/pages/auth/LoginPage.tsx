@@ -101,7 +101,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
           {/* Google Sign-In Button */}
           <div className="mb-6 flex justify-center">
-            <div
+          <div
               id="g_id_onload"
               data-client_id="256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com"
               data-context="signin"
