@@ -70,9 +70,9 @@ if (loading) {
                 <p className="text-body-sm text-secondary-500 mb-4">{r.description?.slice(0, 80)}...</p>
                 <div className="flex items-center justify-center gap-2 text-body-sm text-secondary-400 mb-3"><Download className="w-3.5 h-3.5" /> {r.downloadCount || 0} downloads</div>
                 {r.fileUrl && (
-                  <a href={`https://niroflixx.onrender.com/api/v1/resources/${r.id}/file`} target="_blank" download target="_blank" className="text-primary-600 text-sm font-medium hover:underline" download>
-                    Download
-                  </a>
+                  <a href={`https://niroflixx.onrender.com/api/v1/resources/${r.id}/file`} download className="text-primary-600 text-sm font-medium hover:underline">
+                  Download
+                </a>
                 )}
               </div>
             ))}
