@@ -20,33 +20,50 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const googleScriptLoaded = useRef(false);
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+  const scriptLoaded = useRef(false);
 
-  // Safely load the Google script once
+  // Load the Google script once and initialise the button
   useEffect(() => {
-    if (googleScriptLoaded.current) return;
-    googleScriptLoaded.current = true;
+    if (scriptLoaded.current) return;
+    scriptLoaded.current = true;
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
+    // Define the callback that Google will call after sign-in
     window.handleGoogleResponse = async (response: any) => {
       setError('');
       try {
         await api.post('/auth/google', {
           idToken: response.credential,
         });
-        // Auth context will pick up the session on next load
+        // Session cookie is set – redirect to home
         navigate('/');
       } catch (err: any) {
         setError('Google login failed. Please try again.');
       }
     };
 
-    // No cleanup – the script stays for the page lifetime
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+
+    script.onload = () => {
+      // Initialize Google Identity Services
+      if (window.google && googleBtnRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: '256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com',
+          callback: window.handleGoogleResponse,
+        });
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'pill',
+        });
+      }
+    };
+
+    document.body.appendChild(script);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,8 +72,6 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const userData = await login(email, password);
-
-      // Check if user was trying to apply before login
       const pendingApply = sessionStorage.getItem('applyAfterLogin');
       if (pendingApply) {
         sessionStorage.removeItem('applyAfterLogin');
@@ -83,7 +98,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary-50 px-4 py-16">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
@@ -97,30 +111,12 @@ export default function LoginPage() {
           <p className="text-secondary-500 mt-2">Sign in to access your account</p>
         </div>
 
-        {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
-          {/* Google Sign-In Button */}
+          {/* Google button container – will be filled by Google */}
           <div className="mb-6 flex justify-center">
-          <div
-              id="g_id_onload"
-              data-client_id="256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com"
-              data-context="signin"
-              data-ux_mode="popup"
-              data-callback="handleGoogleResponse"
-              data-auto_prompt="false"
-            />
-            <div
-              className="g_id_signin"
-              data-type="standard"
-              data-shape="pill"
-              data-theme="outline"
-              data-text="continue_with"
-              data-size="large"
-              data-logo_alignment="left"
-            />
+            <div ref={googleBtnRef} />
           </div>
 
-          {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-secondary-200" />
@@ -151,7 +147,6 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-label text-secondary-700 mb-1.5">Password</label>
               <div className="relative">
@@ -173,7 +168,6 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-body-sm text-secondary-600">
                 <input type="checkbox" className="rounded border-secondary-300 text-primary-600 focus:ring-primary-500" />
@@ -183,7 +177,6 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-
             <Button type="submit" size="lg" className="w-full" isLoading={loading} rightIcon={<LogIn className="w-4 h-4" />}>
               Sign In
             </Button>
