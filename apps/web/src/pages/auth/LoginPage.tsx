@@ -63,7 +63,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
-          {/* Google sign-in link (server-side flow) */}
+        {/* Google server-side sign-in */}
           <div className="mb-6 flex justify-center">
             <a
               href="https://niroflixx.onrender.com/api/v1/auth/google"
