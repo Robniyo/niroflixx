@@ -48,23 +48,29 @@ export default function LoginPage() {
     script.defer = true;
 
     script.onload = () => {
-      // Initialize Google Identity Services
-      if (window.google && googleBtnRef.current) {
-        window.google.accounts.id.initialize({
-          client_id: '256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com',
-          callback: window.handleGoogleResponse,
-        });
-        window.google.accounts.id.renderButton(googleBtnRef.current, {
-          theme: 'outline',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'pill',
-        });
-      }
-    };
+  const tryRender = () => {
+    if (window.google && googleBtnRef.current) {
+      window.google.accounts.id.initialize({
+        client_id: '256590045652-hdr95vi17qksfl8kcr216dg435djkfm8.apps.googleusercontent.com',
+        callback: window.handleGoogleResponse,
+      });
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: 'outline',
+        size: 'large',
+        text: 'continue_with',
+        shape: 'pill',
+      });
+      return true;
+    }
+    return false;
+  };
+  if (!tryRender()) {
+    setTimeout(tryRender, 500);
+  }
+};
 
-    document.body.appendChild(script);
-  }, []);
+document.body.appendChild(script);
+}, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
