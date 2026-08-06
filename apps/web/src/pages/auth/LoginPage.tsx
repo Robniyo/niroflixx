@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
 import api from '@/services/api';
 
-// Extend Window interface for Google Identity Services
 declare global {
   interface Window {
     google?: any;
@@ -23,7 +22,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const googleScriptLoaded = useRef(false);
 
-  // Load Google Identity Services script safely
+  // Safely load the Google script once
   useEffect(() => {
     if (googleScriptLoaded.current) return;
     googleScriptLoaded.current = true;
@@ -37,17 +36,17 @@ export default function LoginPage() {
     window.handleGoogleResponse = async (response: any) => {
       setError('');
       try {
-        const res = await api.post('/auth/google', {
+        await api.post('/auth/google', {
           idToken: response.credential,
         });
-        // On success, redirect to home; AuthContext will pick up the session on next load
+        // Auth context will pick up the session on next load
         navigate('/');
       } catch (err: any) {
         setError('Google login failed. Please try again.');
       }
     };
 
-    // No cleanup needed – the script stays mounted for the lifetime of the page
+    // No cleanup – the script stays for the page lifetime
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +55,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const userData = await login(email, password);
-      if (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN' || userData.role === 'CONTENT_MANAGER') {
+      if (['ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'].includes(userData.role)) {
         navigate('/admin');
       } else if (userData.role === 'INSTRUCTOR') {
         navigate('/trainer');
@@ -89,7 +88,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
-          {/* Google Login Button */}
+          {/* Google Sign-In Button */}
           <div className="mb-6 flex justify-center">
             <div
               id="g_id_onload"
