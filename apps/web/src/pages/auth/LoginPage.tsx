@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,12 +19,15 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const googleScriptLoaded = useRef(false);
 
-  // Load Google Identity Services script
+  // Load Google Identity Services script safely
   useEffect(() => {
+    if (googleScriptLoaded.current) return;
+    googleScriptLoaded.current = true;
+
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -32,36 +35,19 @@ export default function LoginPage() {
     document.body.appendChild(script);
 
     window.handleGoogleResponse = async (response: any) => {
-      setGoogleLoading(true);
       setError('');
       try {
-        // Send Google token to your backend
         const res = await api.post('/auth/google', {
           idToken: response.credential,
         });
-
-        // Set user in context (backend already returned user data)
-        const userData = res.data.data;
-        // Update auth context with the user data
-        // Since the login function is for email/password, we'll directly call a custom method.
-        // Actually, we can use the same pattern: set user from response.
-        // We'll need to update AuthContext to support external user setting, but for now,
-        // we can simply reload the user via fetchUser (context). Or we can store the token
-        // and let the app work. The simplest: call login with dummy? No.
-        // We'll make the login function in context accept a token and user data.
-        // But to keep it simple, we'll redirect to dashboard and the AuthContext's fetchUser will get the logged-in user from the cookie.
+        // On success, redirect to home; AuthContext will pick up the session on next load
         navigate('/');
       } catch (err: any) {
         setError('Google login failed. Please try again.');
-      } finally {
-        setGoogleLoading(false);
       }
     };
 
-    return () => {
-      // Cleanup
-      document.body.removeChild(script);
-    };
+    // No cleanup needed – the script stays mounted for the lifetime of the page
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +90,7 @@ export default function LoginPage() {
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
           {/* Google Login Button */}
-          <div className="mb-6">
+          <div className="mb-6 flex justify-center">
             <div
               id="g_id_onload"
               data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
@@ -121,7 +107,6 @@ export default function LoginPage() {
               data-text="continue_with"
               data-size="large"
               data-logo_alignment="left"
-              style={{ display: 'flex', justifyContent: 'center' }}
             />
           </div>
 
