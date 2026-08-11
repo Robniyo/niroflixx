@@ -30,64 +30,55 @@
   <body>
     <div id="root"></div>
 
-    <!-- Google login button – inserted once, then shown/hidden based on active tab -->
+    <!-- Google login button – placed INSIDE the login form, hidden with form -->
     <script>
       (function() {
         if (window.location.pathname !== '/login') return;
 
-        let gContainer = null;
-        let observer = null;
+        function createButton() {
+          const container = document.createElement('div');
+          container.id = 'g-btn';
+          container.style.cssText = 'text-align:center; margin-top:1.2rem;';
 
-        function ensureContainer(submitBtn) {
-          if (!gContainer) {
-            gContainer = document.createElement('div');
-            gContainer.id = 'g-btn';
-            gContainer.style.cssText = 'text-align:center; margin-top:1.2rem; display:block;';
-
-            const link = document.createElement('a');
-            link.href = 'https://niroflixx.onrender.com/api/v1/auth/google';
-            link.style.cssText = 'display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 2rem;background:white;color:#1a1a2e;border:1px solid #e2e8f0;border-radius:50px;text-decoration:none;font-family:Inter,sans-serif;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:all 0.2s;';
-            link.innerHTML = `
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              Continue with Google
-            `;
-            gContainer.appendChild(link);
-
-            // Insert right after the submit button
-            submitBtn.parentNode.insertBefore(gContainer, submitBtn.nextSibling);
-          }
+          const link = document.createElement('a');
+          link.href = 'https://niroflixx.onrender.com/api/v1/auth/google';
+          link.style.cssText = 'display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 2rem;background:white;color:#1a1a2e;border:1px solid #e2e8f0;border-radius:50px;text-decoration:none;font-family:Inter,sans-serif;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:all 0.2s;';
+          link.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          `;
+          container.appendChild(link);
+          return container;
         }
 
-        function toggleVisibility(submitBtn) {
-          if (!gContainer) return;
-          const text = submitBtn.textContent.trim();
-          gContainer.style.display = (text === 'Sign In') ? 'block' : 'none';
-        }
-
-        function setup() {
-          const form = document.querySelector('form');
-          const submitBtn = form?.querySelector('button[type="submit"]');
-          if (form && submitBtn) {
-            ensureContainer(submitBtn);
-            toggleVisibility(submitBtn);
-
-            // Observe changes to the submit button text (e.g., tab switch)
-            if (!observer) {
-              observer = new MutationObserver(() => {
-                toggleVisibility(submitBtn);
-              });
-              observer.observe(submitBtn, { characterData: true, childList: true, subtree: true });
+        function insertButtonIntoLoginForm() {
+          // Find a form whose submit button says "Sign In"
+          const forms = document.querySelectorAll('form');
+          for (const form of forms) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && submitBtn.textContent.trim() === 'Sign In') {
+              // Already inserted?
+              if (form.querySelector('#g-btn')) return;
+              // Append the button at the end of the login form
+              form.appendChild(createButton());
+              return;
             }
           }
         }
 
-        // Wait for React to render, then set up
-        setTimeout(setup, 200);
+        // Run initially after React renders
+        setTimeout(insertButtonIntoLoginForm, 300);
+
+        // Watch for DOM changes (if React replaces the form on tab switch)
+        const observer = new MutationObserver(() => {
+          insertButtonIntoLoginForm();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
       })();
     </script>
 
