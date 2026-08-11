@@ -30,7 +30,7 @@
   <body>
     <div id="root"></div>
 
-    <!-- Safe script: insert Google button inside login form, then stop -->
+    <!-- Safe script: insert Google button ONLY inside the SIGN IN form, not signup -->
     <script>
       (function() {
         // Only run on /login
@@ -42,6 +42,9 @@
           const form = document.querySelector('form');
           const submitBtn = form?.querySelector('button[type="submit"]');
           if (form && submitBtn) {
+            // Only insert if the submit button is "Sign In" (not "Create Account")
+            if (submitBtn.textContent.trim() !== 'Sign In') return;
+
             // Check if already inserted by us
             if (document.getElementById('g-btn')) {
               inserted = true;
