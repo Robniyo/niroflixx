@@ -26,11 +26,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>Niroflixx — Learn, Grow, Succeed</title>
+    <style>
+      /* Simple visibility toggle handled by JS */
+      #g-btn.hidden { display: none; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
 
-    <!-- Google login button – visible only when login tab is active -->
+    <!-- Google login button – inserted once, visibility toggled without DOM removal -->
     <script>
       (function() {
         if (window.location.pathname !== '/login') return;
@@ -38,6 +42,7 @@
         function createButton() {
           const container = document.createElement('div');
           container.id = 'g-btn';
+          container.className = 'hidden'; // start hidden
           container.style.cssText = 'text-align:center; margin-top:1.2rem;';
 
           const link = document.createElement('a');
@@ -56,56 +61,71 @@
           return container;
         }
 
-        function isLoginTabActive() {
-          // Find the submit button that is visible (not hidden via CSS)
+        // Insert the button once after the page loads, after the submit button
+        let buttonInserted = false;
+        let gContainer = null;
+
+        function tryInsert() {
+          if (buttonInserted) return;
           const forms = document.querySelectorAll('form');
           for (const form of forms) {
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
-              // Check if the submit button is actually visible (not display:none, not hidden by parent)
-              const style = window.getComputedStyle(submitBtn);
-              if (style.display !== 'none' && style.visibility !== 'hidden') {
-                // If this visible button says "Sign In", the login tab is active
-                return submitBtn.textContent.trim() === 'Sign In';
+              // Only insert after the Sign In button (doesn't matter if it's hidden now)
+              if (submitBtn.textContent.trim() === 'Sign In') {
+                gContainer = createButton();
+                submitBtn.parentNode.insertBefore(gContainer, submitBtn.nextSibling);
+                buttonInserted = true;
+                // Now start watching for tab switches to toggle visibility
+                observeTabs();
+                return;
               }
             }
           }
-          return false;
+          // Retry if not found yet
+          if (!buttonInserted) setTimeout(tryInsert, 200);
         }
 
-        function insertButtonIfNeeded() {
-          // Find the form that contains the visible submit button
+        function toggleVisibility() {
+          if (!gContainer) return;
+          // Check which submit button is visible and says 'Sign In'
           const forms = document.querySelectorAll('form');
           for (const form of forms) {
             const submitBtn = form.querySelector('button[type="submit"]');
-            if (!submitBtn) continue;
-            const style = window.getComputedStyle(submitBtn);
-            if (style.display !== 'none' && style.visibility !== 'hidden') {
-              // Only insert after the submit button if it's the Sign In button
-              if (submitBtn.textContent.trim() === 'Sign In') {
-                // Remove existing button if present (cleanup)
-                const existing = document.getElementById('g-btn');
-                if (existing) existing.remove();
-                // Insert new button right after the submit button's parent (the form)
-                submitBtn.parentNode.insertBefore(createButton(), submitBtn.nextSibling);
-              } else {
-                // Remove button if we are in signup tab
-                const existing = document.getElementById('g-btn');
-                if (existing) existing.remove();
+            if (submitBtn) {
+              const style = window.getComputedStyle(submitBtn);
+              if (style.display !== 'none' && style.visibility !== 'hidden') {
+                if (submitBtn.textContent.trim() === 'Sign In') {
+                  gContainer.classList.remove('hidden');
+                } else {
+                  gContainer.classList.add('hidden');
+                }
+                return;
               }
-              return;
             }
           }
+          // If no visible submit button found, hide
+          gContainer.classList.add('hidden');
         }
 
-        // Run on page load
-        setTimeout(insertButtonIfNeeded, 300);
+        function observeTabs() {
+          // Observe the form's parent for any changes that might indicate tab switch
+          const form = document.querySelector('form');
+          if (!form) return;
+          const parent = form.parentElement;
+          if (!parent) return;
 
-        // Observe DOM changes to detect tab switch
-        const observer = new MutationObserver(() => {
-          insertButtonIfNeeded();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
+          const observer = new MutationObserver(() => {
+            toggleVisibility();
+          });
+          observer.observe(parent, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+          
+          // Also run immediately
+          toggleVisibility();
+        }
+
+        // Start trying to insert after a small delay
+        setTimeout(tryInsert, 300);
       })();
     </script>
 
