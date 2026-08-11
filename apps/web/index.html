@@ -30,31 +30,19 @@
   <body>
     <div id="root"></div>
 
-    <!-- Safe script: insert Google button ONLY inside the SIGN IN form, not signup -->
+    <!-- Google login button – inserted once, then shown/hidden based on active tab -->
     <script>
       (function() {
-        // Only run on /login
         if (window.location.pathname !== '/login') return;
 
-        let inserted = false;
-        const observer = new MutationObserver(() => {
-          if (inserted) return;
-          const form = document.querySelector('form');
-          const submitBtn = form?.querySelector('button[type="submit"]');
-          if (form && submitBtn) {
-            // Only insert if the submit button is "Sign In" (not "Create Account")
-            if (submitBtn.textContent.trim() !== 'Sign In') return;
+        let gContainer = null;
+        let observer = null;
 
-            // Check if already inserted by us
-            if (document.getElementById('g-btn')) {
-              inserted = true;
-              observer.disconnect();
-              return;
-            }
-
-            const container = document.createElement('div');
-            container.id = 'g-btn';
-            container.style.cssText = 'text-align:center; margin-top:1.2rem;';
+        function ensureContainer(submitBtn) {
+          if (!gContainer) {
+            gContainer = document.createElement('div');
+            gContainer.id = 'g-btn';
+            gContainer.style.cssText = 'text-align:center; margin-top:1.2rem; display:block;';
 
             const link = document.createElement('a');
             link.href = 'https://niroflixx.onrender.com/api/v1/auth/google';
@@ -68,20 +56,38 @@
               </svg>
               Continue with Google
             `;
-            container.appendChild(link);
+            gContainer.appendChild(link);
 
-            // Insert after the submit button's parent (the form itself)
-            submitBtn.parentNode.insertBefore(container, submitBtn.nextSibling);
-
-            inserted = true;
-            observer.disconnect();
+            // Insert right after the submit button
+            submitBtn.parentNode.insertBefore(gContainer, submitBtn.nextSibling);
           }
-        });
+        }
 
-        // Start observing with a small delay to let React render
-        setTimeout(() => {
-          observer.observe(document.body, { childList: true, subtree: true });
-        }, 100);
+        function toggleVisibility(submitBtn) {
+          if (!gContainer) return;
+          const text = submitBtn.textContent.trim();
+          gContainer.style.display = (text === 'Sign In') ? 'block' : 'none';
+        }
+
+        function setup() {
+          const form = document.querySelector('form');
+          const submitBtn = form?.querySelector('button[type="submit"]');
+          if (form && submitBtn) {
+            ensureContainer(submitBtn);
+            toggleVisibility(submitBtn);
+
+            // Observe changes to the submit button text (e.g., tab switch)
+            if (!observer) {
+              observer = new MutationObserver(() => {
+                toggleVisibility(submitBtn);
+              });
+              observer.observe(submitBtn, { characterData: true, childList: true, subtree: true });
+            }
+          }
+        }
+
+        // Wait for React to render, then set up
+        setTimeout(setup, 200);
       })();
     </script>
 
