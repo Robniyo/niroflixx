@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- version 20260807-cache-bust -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Niroflixx — Learn digital skills, find scholarships, jobs, internships, and get professional CV writing, web development, and graphic design services in the world." />
     <meta name="keywords" content="Niroflixx, digital skills, scholarships the world, CV writing, web development Kigali, online courses, internships, jobs the world, graphic design, career development" />
@@ -25,8 +26,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>Niroflixx — Learn, Grow, Succeed</title>
-    <script type="module" crossorigin src="/assets/index-DLvDoD6G.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dpq17l8R.css">
   </head>
   <body>
     <div id="root"></div>
@@ -48,32 +47,33 @@
       </a>
     </div>
 
-    <!-- Script to show/hide button based on URL path -->
+    <!-- Toggle button visibility for React Router -->
     <script>
       (function() {
         const btn = document.getElementById('google-login-btn');
-        function toggleButton() {
+        function showHide() {
           if (window.location.pathname === '/login') {
             btn.style.display = 'block';
           } else {
             btn.style.display = 'none';
           }
         }
-        // Run on page load
-        toggleButton();
-        // Listen for SPA navigation (React Router changes)
+        showHide();
+        // Watch for SPA navigation
         const originalPush = history.pushState;
         const originalReplace = history.replaceState;
         history.pushState = function(...args) {
           originalPush.apply(this, args);
-          toggleButton();
+          showHide();
         };
         history.replaceState = function(...args) {
           originalReplace.apply(this, args);
-          toggleButton();
+          showHide();
         };
-        window.addEventListener('popstate', toggleButton);
+        window.addEventListener('popstate', showHide);
       })();
     </script>
+
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
