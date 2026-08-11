@@ -30,7 +30,7 @@
   <body>
     <div id="root"></div>
 
-    <!-- Google login button – placed INSIDE the login form, hidden with form -->
+    <!-- Google login button – visible only when login tab is active -->
     <script>
       (function() {
         if (window.location.pathname !== '/login') return;
@@ -56,27 +56,54 @@
           return container;
         }
 
-        function insertButtonIntoLoginForm() {
-          // Find a form whose submit button says "Sign In"
+        function isLoginTabActive() {
+          // Find the submit button that is visible (not hidden via CSS)
           const forms = document.querySelectorAll('form');
           for (const form of forms) {
             const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn && submitBtn.textContent.trim() === 'Sign In') {
-              // Already inserted?
-              if (form.querySelector('#g-btn')) return;
-              // Append the button at the end of the login form
-              form.appendChild(createButton());
+            if (submitBtn) {
+              // Check if the submit button is actually visible (not display:none, not hidden by parent)
+              const style = window.getComputedStyle(submitBtn);
+              if (style.display !== 'none' && style.visibility !== 'hidden') {
+                // If this visible button says "Sign In", the login tab is active
+                return submitBtn.textContent.trim() === 'Sign In';
+              }
+            }
+          }
+          return false;
+        }
+
+        function insertButtonIfNeeded() {
+          // Find the form that contains the visible submit button
+          const forms = document.querySelectorAll('form');
+          for (const form of forms) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (!submitBtn) continue;
+            const style = window.getComputedStyle(submitBtn);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
+              // Only insert after the submit button if it's the Sign In button
+              if (submitBtn.textContent.trim() === 'Sign In') {
+                // Remove existing button if present (cleanup)
+                const existing = document.getElementById('g-btn');
+                if (existing) existing.remove();
+                // Insert new button right after the submit button's parent (the form)
+                submitBtn.parentNode.insertBefore(createButton(), submitBtn.nextSibling);
+              } else {
+                // Remove button if we are in signup tab
+                const existing = document.getElementById('g-btn');
+                if (existing) existing.remove();
+              }
               return;
             }
           }
         }
 
-        // Run initially after React renders
-        setTimeout(insertButtonIntoLoginForm, 300);
+        // Run on page load
+        setTimeout(insertButtonIfNeeded, 300);
 
-        // Watch for DOM changes (if React replaces the form on tab switch)
+        // Observe DOM changes to detect tab switch
         const observer = new MutationObserver(() => {
-          insertButtonIntoLoginForm();
+          insertButtonIfNeeded();
         });
         observer.observe(document.body, { childList: true, subtree: true });
       })();
