@@ -27,14 +27,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>Niroflixx — Learn, Grow, Succeed</title>
     <style>
-      /* Simple visibility toggle handled by JS */
+      /* Hiding class for the Google button */
       #g-btn.hidden { display: none; }
     </style>
   </head>
   <body>
     <div id="root"></div>
 
-    <!-- Google login button – inserted once, visibility toggled without DOM removal -->
+    <!-- Google login button – inserted once after Sign In, then toggled by timer -->
     <script>
       (function() {
         if (window.location.pathname !== '/login') return;
@@ -42,7 +42,6 @@
         function createButton() {
           const container = document.createElement('div');
           container.id = 'g-btn';
-          container.className = 'hidden'; // start hidden
           container.style.cssText = 'text-align:center; margin-top:1.2rem;';
 
           const link = document.createElement('a');
@@ -61,71 +60,72 @@
           return container;
         }
 
-        // Insert the button once after the page loads, after the submit button
-        let buttonInserted = false;
         let gContainer = null;
 
         function tryInsert() {
-          if (buttonInserted) return;
           const forms = document.querySelectorAll('form');
           for (const form of forms) {
             const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) {
-              // Only insert after the Sign In button (doesn't matter if it's hidden now)
-              if (submitBtn.textContent.trim() === 'Sign In') {
-                gContainer = createButton();
-                submitBtn.parentNode.insertBefore(gContainer, submitBtn.nextSibling);
-                buttonInserted = true;
-                // Now start watching for tab switches to toggle visibility
-                observeTabs();
-                return;
-              }
+            if (submitBtn && submitBtn.textContent.trim() === 'Sign In') {
+              gContainer = createButton();
+              submitBtn.parentNode.insertBefore(gContainer, submitBtn.nextSibling);
+              return true;
             }
           }
-          // Retry if not found yet
-          if (!buttonInserted) setTimeout(tryInsert, 200);
+          return false;
         }
 
-        function toggleVisibility() {
-          if (!gContainer) return;
-          // Check which submit button is visible and says 'Sign In'
+        // Attempt insertion a few times
+        let attempts = 0;
+        function attemptInsert() {
+          if (tryInsert()) {
+            // Start visibility toggle timer
+            startToggleTimer();
+          } else if (attempts < 30) {
+            attempts++;
+            setTimeout(attemptInsert, 200);
+          }
+        }
+
+        function isSignupVisible() {
           const forms = document.querySelectorAll('form');
           for (const form of forms) {
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
               const style = window.getComputedStyle(submitBtn);
               if (style.display !== 'none' && style.visibility !== 'hidden') {
-                if (submitBtn.textContent.trim() === 'Sign In') {
-                  gContainer.classList.remove('hidden');
-                } else {
-                  gContainer.classList.add('hidden');
-                }
-                return;
+                return submitBtn.textContent.trim() === 'Create Account';
               }
             }
           }
-          // If no visible submit button found, hide
-          gContainer.classList.add('hidden');
+          return false;
         }
 
-        function observeTabs() {
-          // Observe the form's parent for any changes that might indicate tab switch
-          const form = document.querySelector('form');
-          if (!form) return;
-          const parent = form.parentElement;
-          if (!parent) return;
+        function toggleVisibility() {
+          if (!gContainer) return;
+          if (isSignupVisible()) {
+            gContainer.classList.add('hidden');
+          } else {
+            gContainer.classList.remove('hidden');
+          }
+        }
 
-          const observer = new MutationObserver(() => {
-            toggleVisibility();
-          });
-          observer.observe(parent, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
-          
+        let visibilityInterval = null;
+        function startToggleTimer() {
+          if (visibilityInterval) return;
+          // Check every 500ms – very lightweight
+          visibilityInterval = setInterval(toggleVisibility, 500);
           // Also run immediately
           toggleVisibility();
         }
 
-        // Start trying to insert after a small delay
-        setTimeout(tryInsert, 300);
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+          if (visibilityInterval) clearInterval(visibilityInterval);
+        });
+
+        // Start the insertion attempts
+        setTimeout(attemptInsert, 300);
       })();
     </script>
 
