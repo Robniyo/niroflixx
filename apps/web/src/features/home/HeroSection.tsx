@@ -64,7 +64,7 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="animate-fade-in">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-body-sm mb-6 border border-white/20">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />Welcome to Niroflix
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />Welcome to Future Scholars
             </div>
             <h1 className="text-display-xl text-white mb-6 leading-[1.05]">Learn, <span className="text-gradient">Grow,</span><br />Succeed.</h1>
             <p className="text-body-lg text-white/80 mb-8 max-w-lg leading-relaxed">One platform for digital skills, scholarships, jobs, professional services, and career growth. Built for the world.</p>

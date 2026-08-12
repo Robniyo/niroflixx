@@ -25,14 +25,12 @@ export default function Navbar() {
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'CONTENT_MANAGER';
 
   return (
-    <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full max-w-[100vw]', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
+          <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full max-w-[100vw]', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
       <div className="container-page">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <span className="text-xl font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
+            <img src="/flogo.PNG" alt="Future Scholars" className="h-8 w-auto transition-transform group-hover:scale-105" />
+            <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">

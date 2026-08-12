@@ -44,14 +44,12 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-secondary-50 px-4 py-16">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <span className="text-xl font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
-          </Link>
+        <Link to="/" className="inline-flex items-center gap-2 mb-6">
+  <img src="/flogo.PNG" alt="Future Scholars" className="h-10 w-auto" />
+  <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
+</Link>
           <h1 className="text-h3 font-bold text-secondary-900">Create Account</h1>
-          <p className="text-secondary-500 mt-2">Join the Niroflixx community</p>
+          <p className="text-secondary-500 mt-2">Join the Future Scholars community</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">

@@ -18,7 +18,7 @@ if (isAuthenticated) return null;
           Ready to Start Your Journey?
         </h2>
         <p className="text-white/80 text-body-lg mb-8 max-w-xl mx-auto">
-          Join thousands of learners and professionals building their future with Niroflixx.
+          Join thousands of learners and professionals building their future with Future Scholars.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link to="/register">

@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const [maintenance, setMaintenance] = useState(false);
   const [form, setForm] = useState({
-    siteName: 'Niroflixx',
+    siteName: 'Future Scholars',
     siteDescription: 'Learn, Grow, Succeed',
     contactEmail: 'robertniyonkuru001@gmail.com',
     contactPhone: '+250795064502',

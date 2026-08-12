@@ -51,13 +51,9 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <span className="text-xl font-bold text-secondary-900">
-              Niro<span className="text-primary-600">flixx</span>
-            </span>
-          </Link>
+          <img src="/flogo.PNG" alt="Future Scholars" className="h-10 w-auto" />
+          <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
+        </Link>
           <h1 className="text-h3 font-bold text-secondary-900">Welcome Back</h1>
           <p className="text-secondary-500 mt-2">Sign in to access your account</p>
         </div>

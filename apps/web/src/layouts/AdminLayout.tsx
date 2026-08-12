@@ -92,7 +92,7 @@ export default function AdminLayout() {
           <button onClick={() => setSidebarOpen(true)} className="p-1.5 hover:bg-secondary-50 rounded-lg">
             <Menu className="w-5 h-5" />
           </button>
-          <span className="font-semibold text-secondary-900 text-sm truncate">Niroflixx Admin</span>
+          <span className="font-semibold text-secondary-900 text-sm truncate">Future Scholars Admin</span>
         </div>
 
         {/* Page Content */}

@@ -24,7 +24,7 @@ export default function AgreementModal({ isOpen, onAccept, onDecline, opportunit
           </div>
           <h2 className="text-h4 font-bold text-secondary-900 mb-2">Get Expert Help with Your Application</h2>
           <p className="text-secondary-500 text-body-sm">
-            Niroflixx will assist you in applying for <strong>{opportunityTitle}</strong>
+            Future Scholars will assist you in applying for <strong>{opportunityTitle}</strong>
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export default function AgreementModal({ isOpen, onAccept, onDecline, opportunit
         </div>
 
         <p className="text-body-sm text-secondary-600 mb-6">
-          By continuing, you agree that Niroflixx may store your personal information, documents, and use them to assist
+          By continuing, you agree that Future Scholars may store your personal information, documents, and use them to assist
           you with this and future opportunities. We will never share your data without your permission.
         </p>
 
@@ -57,7 +57,7 @@ export default function AgreementModal({ isOpen, onAccept, onDecline, opportunit
             className="mt-1 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
           />
           <label htmlFor="agree" className="text-sm text-secondary-700 cursor-pointer">
-            I understand and agree to the terms. I want Niroflixx to help me with this application.
+            I understand and agree to the terms. I want Future Scholars to help me with this application.
           </label>
         </div>
 

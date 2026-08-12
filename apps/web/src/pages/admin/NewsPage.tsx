@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import ResponsiveTable from '@/components/ui/ResponsiveTable';
 
-const emptyForm = { title:'', summary:'', content:'', categoryId:'', author:'Niroflixx Team', coverImage:'', status:'DRAFT', featured:false };
+const emptyForm = { title:'', summary:'', content:'', categoryId:'', author:'Future Scholars Team', coverImage:'', status:'DRAFT', featured:false };
 
 export default function NewsPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -18,7 +18,7 @@ export default function NewsPage() {
   useEffect(()=>{fetchItems();},[]);
   const fetchItems = async()=>{try{const r=await api.get('/news');setItems(r.data.data);}catch{}finally{setLoading(false);}};
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
-  const openEdit = async(id:string)=>{try{const r=await api.get(`/news/${id}`);const d=r.data.data;setForm({title:d.title||'',summary:d.summary||'',content:d.content||'',categoryId:d.categoryId||'',author:d.author||'Niroflixx Team',coverImage:d.coverImage||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
+  const openEdit = async(id:string)=>{try{const r=await api.get(`/news/${id}`);const d=r.data.data;setForm({title:d.title||'',summary:d.summary||'',content:d.content||'',categoryId:d.categoryId||'',author:d.author||'Future Scholars Team',coverImage:d.coverImage||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/news/${editing}`,form);toast.success('Updated');}else{await api.post('/news',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/news/${id}`);toast.success('Archived');fetchItems();}catch{}};
 

@@ -69,7 +69,7 @@ export default function AuthPage() {
           <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
             <span className="text-white font-bold text-3xl">N</span>
           </div>
-          <h1 className="text-display-lg text-white font-bold mb-4">Welcome to Niroflixx</h1>
+          <h1 className="text-display-lg text-white font-bold mb-4">Welcome to Future Scholars</h1>
           <p className="text-white/70 text-body-lg leading-relaxed mb-8">Learn digital skills, discover opportunities, and grow your career — all in one platform.</p>
           <div className="grid grid-cols-2 gap-4 text-center">
             {[{ value: counts.courses || '—', label: 'Courses' },{ value: counts.opportunities || '—', label: 'Opportunities' }].map((s) => (
@@ -86,7 +86,7 @@ export default function AuthPage() {
         <div className="w-full max-w-md">
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">N</span></div>
+              <img src="/flogo.PNG" alt="Future Scholars" className="h-10 w-auto" />
               <span className="text-xl font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
             </Link>
           </div>

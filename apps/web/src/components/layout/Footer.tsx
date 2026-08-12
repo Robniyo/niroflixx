@@ -35,16 +35,14 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-secondary-900 text-secondary-100 pt-16 pb-8 w-full overflow-hidden">
+              <footer className="bg-secondary-900 text-secondary-100 pt-16 pb-8 w-full overflow-hidden">
       <div className="container-page">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-300 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">N</span>
-              </div>
-              <span className="text-xl font-bold text-white">Niro<span className="text-primary-400">flixx</span></span>
+              <img src="/flogo.PNG" alt="Future Scholars" className="h-9 w-auto" />
+              <span className="text-xl font-bold text-white">Future Scholars</span>
             </Link>
             <p className="text-secondary-400 text-body-sm mb-6 max-w-sm">
               Learn, discover opportunities, request professional services, and grow your career through one unified digital ecosystem.
@@ -117,7 +115,7 @@ export default function Footer() {
         <AdBanner position="footer" />
         <div className="border-t border-secondary-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-secondary-500 text-body-sm">
-            &copy; {new Date().getFullYear()} Niroflixx. All rights reserved.
+            &copy; {new Date().getFullYear()} Future Scholars. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
           {socialLinks.map((social) => (

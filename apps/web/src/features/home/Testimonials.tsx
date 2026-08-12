@@ -20,7 +20,7 @@ export default function Testimonials() {
         <div className="text-center mb-12">
           <span className="text-primary-600 font-semibold text-label uppercase tracking-wider">Testimonials</span>
           <h2 className="section-title mt-2">What Our Users Say</h2>
-          <p className="section-subtitle">Real stories from students and professionals who use Niroflixx.</p>
+          <p className="section-subtitle">Real stories from students and professionals who use Future Scholars.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {items.slice(0, 3).map((t) => (
