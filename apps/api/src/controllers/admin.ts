@@ -12,7 +12,8 @@ export const adminController = {
       res.json({ status: 'success', data: users });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to fetch users', code: 500 }); }
   },
-    getEnrollments: async (_req: Request, res: Response) => {
+
+  getEnrollments: async (_req: Request, res: Response) => {
     try {
       const enrollments = await prisma.enrollment.findMany({
         include: {
@@ -34,12 +35,12 @@ export const adminController = {
         where: { id: req.params.id },
         data: { paymentStatus, notes: adminNotes },
       });
-      // Optionally notify user
       res.json({ status: 'success', data: enrollment });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
+
   updateUserRole: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -55,7 +56,7 @@ export const adminController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to update role', code: 500 }); }
   },
 
-    sendPaymentReminders: async (_req: Request, res: Response) => {
+  sendPaymentReminders: async (_req: Request, res: Response) => {
     try {
       const enrollments = await prisma.enrollment.findMany({
         where: {
