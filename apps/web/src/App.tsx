@@ -104,6 +104,7 @@ export default function App() {
         <Route path="/dashboard/candidate" element={<CandidateProfilePage />} />
         <Route path="/dashboard/downloads" element={<DownloadsPage />} />
         <Route path="/dashboard/enrollments" element={<MyEnrollments />} />
+        <Route path="/dashboard/requests" element={<MyRequests />} />
 
         <Route path="/trainer" element={<TrainerDashboard />} />
 
@@ -148,7 +149,6 @@ export default function App() {
           <Route path="subscribers" element={<SubscribersPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="/dashboard/requests" element={<MyRequests />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
