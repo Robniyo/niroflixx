@@ -37,33 +37,33 @@ export default function FeaturedCourses() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-           {courses.map((course) => (
-  <Link to={`/academy/${course.slug || course.id}`} key={course.id} className="group">
-    <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden h-full flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-            <div className="h-44 flex items-center justify-center relative">
-  <img src="/flogo.png" alt="Future Scholars" className="h-20 w-auto" />
-</div>
-        {course.thumbnail ? (
-          <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
-        ) : (
-          <GraduationCap className="w-16 h-16 text-white/40" />
-        )}
-        <div className="absolute top-3 left-3"><span className="bg-white/90 backdrop-blur-sm text-secondary-900 text-caption font-medium px-2.5 py-1 rounded-full">{course.level}</span></div>
-      </div>
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2">{course.title}</h3>
-        <div className="flex items-center gap-4 text-body-sm text-secondary-400 mt-auto pt-4 border-t border-secondary-100">
-          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {course.duration || 'Flexible'}</span>
-          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {course.enrollmentCount || 0}</span>
-        </div>
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-h6 font-bold text-primary-600">{course.price === 0 ? 'Free' : `${course.price.toLocaleString()} RWF`}</span>
-          <span className="text-primary-600 text-body-sm font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">Learn More <ArrowRight className="w-3.5 h-3.5" /></span>
-        </div>
-      </div>
-    </div>
-  </Link>
-))}
+            {courses.map((course) => (
+              <Link to={`/academy/${course.slug || course.id}`} key={course.id} className="group">
+                <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden h-full flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  <div className="h-44 flex items-center justify-center relative bg-gradient-to-br from-primary-500 to-primary-700">
+                    {course.thumbnail ? (
+                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <GraduationCap className="w-16 h-16 text-white/40" />
+                    )}
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-white/90 backdrop-blur-sm text-secondary-900 text-caption font-medium px-2.5 py-1 rounded-full">{course.level}</span>
+                    </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2">{course.title}</h3>
+                    <div className="flex items-center gap-4 text-body-sm text-secondary-400 mt-auto pt-4 border-t border-secondary-100">
+                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {course.duration || 'Flexible'}</span>
+                      <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {course.enrollmentCount || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-3">
+                      <span className="text-h6 font-bold text-primary-600">{course.price === 0 ? 'Free' : `${course.price.toLocaleString()} RWF`}</span>
+                      <span className="text-primary-600 text-body-sm font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">Learn More <ArrowRight className="w-3.5 h-3.5" /></span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>
