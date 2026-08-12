@@ -140,6 +140,16 @@ export const adminController = {
       res.json({ status: 'success', message: 'Deleted' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+    getSetting: async (req: Request, res: Response) => {
+    try {
+      const key = req.params.key;
+      const setting = await prisma.setting.findUnique({ where: { key } });
+      if (!setting) return res.status(404).json({ status: 'error', message: 'Not found', code: 404 });
+      res.json({ status: 'success', data: setting });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
     getServiceRequests: async (_req: Request, res: Response) => {
     try {
       const requests = await prisma.serviceRequest.findMany({
