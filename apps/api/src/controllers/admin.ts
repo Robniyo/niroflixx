@@ -77,8 +77,7 @@ export const adminController = {
   getSubscribers: async (req: Request, res: Response) => {
     try {
       const subscribers = await prisma.newsletterSubscriber.findMany({ orderBy: { createdAt: 'desc' } });
-      const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
-      res.json({ status: 'success', data: { subscribers, messages } });
+      res.json({ status: 'success', data: { subscribers } });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to fetch data', code: 500 }); }
   },
 
