@@ -325,6 +325,7 @@ model Opportunity {
   description     String
   requirements    String?
   benefits        String?
+  coverImage     String?
   officialLink    String?
   contact         String?
   featured        Boolean  @default(false)

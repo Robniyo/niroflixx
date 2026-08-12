@@ -53,21 +53,24 @@ export default function OpportunityDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Opportunities
         </Link>
 
-        <div
-          className={`bg-white rounded-2xl border border-secondary-100 p-8 ${
-            isClosed ? 'opacity-80' : ''
-          }`}
-        >
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
-              {opp.type?.replace('_', ' ')}
-            </span>
-            {badge && (
-              <span className={`text-sm px-3 py-1 rounded-full font-medium ${badge.color}`}>
-                {badge.text}
-              </span>
-            )}
-          </div>
+      <div
+  className={`bg-white rounded-2xl border border-secondary-100 p-8 ${
+    isClosed ? 'opacity-80' : ''
+  }`}
+>
+  {opp.coverImage && (
+    <img src={opp.coverImage} alt={opp.title} className="w-full h-64 object-cover rounded-xl mb-6" />
+  )}
+  <div className="flex flex-wrap items-center gap-2 mb-3">
+    <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
+      {opp.type?.replace('_', ' ')}
+    </span>
+    {badge && (
+      <span className={`text-sm px-3 py-1 rounded-full font-medium ${badge.color}`}>
+        {badge.text}
+      </span>
+    )}
+  </div>
           <h1 className="text-h2 font-bold mt-2 mb-2">{opp.title}</h1>
           <p className="text-body-lg text-secondary-600 mb-6">{opp.organization}</p>
 
