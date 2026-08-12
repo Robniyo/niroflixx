@@ -171,17 +171,16 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Profile Card */}
+                    {/* Profile Card */}
           <div className="bg-white rounded-2xl border border-secondary-100 p-6">
             <div className="text-center mb-6">
               <img src="/flogo.png" alt="Future Scholars" className="h-20 w-auto mx-auto mb-4" />
-                <span className="text-white font-bold text-2xl">{user?.firstName?.[0]}{user?.lastName?.[0]}</span>
-              </div>
-              <h3 className="font-semibold text-lg text-secondary-900">{user?.firstName} {user?.lastName}</h3>
-              <p className="text-body-sm text-secondary-500">{user?.email}</p>
-              <span className="inline-block mt-2 px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-caption font-medium">{user?.role}</span>
+              <span className="text-white font-bold text-2xl">{user?.firstName?.[0]}{user?.lastName?.[0]}</span>
             </div>
-            <div className="space-y-3 pt-4 border-t border-secondary-100">
+            <h3 className="font-semibold text-lg text-secondary-900">{user?.firstName} {user?.lastName}</h3>
+            <p className="text-body-sm text-secondary-500">{user?.email}</p>
+            <span className="inline-block mt-2 px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-caption font-medium">{user?.role}</span>
+            <div className="space-y-3 pt-4 border-t border-secondary-100 mt-4">
               <Link to="/dashboard/settings" className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary-50 text-body-sm transition-colors">
                 <span className="flex items-center gap-2"><Settings className="w-4 h-4 text-secondary-400" /> Edit Profile</span>
                 <ArrowRight className="w-3.5 h-3.5 text-secondary-300" />
