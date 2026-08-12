@@ -72,14 +72,35 @@ export const candidatesController = {
     if (!candidate) return 0;
 
     let score = 0;
-    if (candidate.headline) score += 15;
-    if (candidate.summary) score += 15;
-    if (candidate.currentEducation) score += 10;
-    if (candidate.currentInstitution) score += 10;
-    if (candidate.education.length > 0) score += 15;
-    if (candidate.experiences.length > 0) score += 10;
-    if (candidate.skills.length > 0) score += 15;
-    if (candidate.documents.length > 0) score += 10;
+    const maxScore = 100;
+
+    // Basic info (30 points)
+    if (candidate.headline) score += 10;
+    if (candidate.summary) score += 10;
+    if (candidate.currentEducation) score += 5;
+    if (candidate.currentInstitution) score += 5;
+
+    // Education (20 points) – more points if more than one entry
+    const eduCount = candidate.education.length;
+    if (eduCount >= 2) score += 20;
+    else if (eduCount === 1) score += 10;
+
+    // Experience (20 points) – more points if more than one entry
+    const expCount = candidate.experiences.length;
+    if (expCount >= 2) score += 20;
+    else if (expCount === 1) score += 10;
+
+    // Skills (20 points) – more points for more skills
+    const skillCount = candidate.skills.length;
+    if (skillCount >= 3) score += 20;
+    else if (skillCount >= 1) score += 10;
+
+    // Documents (10 points)
+    const docCount = candidate.documents.length;
+    if (docCount >= 1) score += 10;
+
+    // Cap at maxScore
+    score = Math.min(score, maxScore);
 
     await prisma.candidate.update({
       where: { userId },
