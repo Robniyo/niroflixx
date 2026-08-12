@@ -44,7 +44,7 @@ useEffect(() => {
         </div>
       </section>
 
-      <section className="py-8 md:py-8 md:py-20 bg-white w-full overflow-hidden w-full overflow-hidden">
+      <section className="py-8 md:py-20 bg-white w-full overflow-hidden">
         <div className="container-page">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="space-y-5">

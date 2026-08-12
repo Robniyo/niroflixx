@@ -40,10 +40,10 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src="/flogo.PNG?v=2" alt="Future Scholars" className="h-9 w-auto" />
-              <span className="text-xl font-bold text-white">Future Scholars</span>
-            </Link>
+            <Link to="/" className="flex flex-col items-center gap-0.5 mb-4">
+          <img src="/flogo.png" alt="Future Scholars" className="h-9 w-auto" />
+          <span className="text-xs font-semibold text-white">Future Scholars</span>
+        </Link>
             <p className="text-secondary-400 text-body-sm mb-6 max-w-sm">
               Learn, discover opportunities, request professional services, and grow your career through one unified digital ecosystem.
             </p>
