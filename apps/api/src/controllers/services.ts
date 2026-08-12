@@ -75,20 +75,18 @@ export const servicesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-  requestService: async (req: Request, res: Response) => {
+    requestService: async (req: Request, res: Response) => {
     try {
       const { serviceId, description, name, email, phone, paymentMethod } = req.body;
-      
-      // Get the authenticated user from middleware (if logged in)
       const userId = (req as any).userId;
-      
+
       let serviceName = serviceId;
       try {
         const service = await prisma.service.findUnique({ where: { id: serviceId } });
         if (service) serviceName = service.title;
       } catch {}
 
-      // Create a contact message (keeps existing functionality)
+      // Always create a contact message for admin notification
       await prisma.contactMessage.create({
         data: {
           name,
@@ -98,27 +96,31 @@ export const servicesController = {
         },
       });
 
-      // Also create a ServiceRequest record with payment status
+      // Create a ServiceRequest record for all users (authenticated or not)
+      // If user is authenticated, link to their account
+      const requestData: any = {
+        serviceId,
+        description,
+        status: 'PENDING',
+        paymentStatus: 'UNPAID',
+        paymentMethod: paymentMethod || 'Not specified',
+      };
       if (userId) {
-        await prisma.serviceRequest.create({
-          data: {
-            serviceId,
-            userId,
-            description,
-            status: 'PENDING',
-            paymentStatus: 'UNPAID',
-            paymentMethod: paymentMethod || 'Not specified',
-          },
-        });
+        requestData.userId = userId;
       }
 
-      // Send auto-reply email
+      const serviceRequest = await prisma.serviceRequest.create({ data: requestData });
+
       try {
         const { emailService } = await import('../services/email');
         await emailService.sendServiceRequestConfirmation(email, name, serviceName, description);
       } catch (e) { console.error('Service request email failed:', e); }
 
-      res.status(201).json({ status: 'success', message: 'Request sent! You will receive payment instructions.' });
+      res.status(201).json({ 
+        status: 'success', 
+        message: 'Request sent! We will contact you soon.', 
+        data: { requestId: serviceRequest.id } 
+      });
     } catch (error) { 
       console.error('SERVICE REQUEST ERROR:', error);
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); 
@@ -206,6 +208,65 @@ export const servicesController = {
           });
         } catch (e) {}
       }
+
+      res.json({ status: 'success', data: request });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+    // Public payment page accessed via unique link
+  getPaymentPage: async (req: Request, res: Response) => {
+    try {
+      const request = await prisma.serviceRequest.findUnique({
+        where: { paymentLink: req.params.link },
+        include: { service: { select: { title: true, startingPrice: true } } },
+      });
+      if (!request) return res.status(404).json({ status: 'error', message: 'Payment link not found', code: 404 });
+      if (request.paymentStatus === 'PAID') return res.status(400).json({ status: 'error', message: 'This request is already paid', code: 400 });
+
+      const bankDetails = await prisma.setting.findUnique({ where: { key: 'payment_bank_details' } });
+      const momoDetails = await prisma.setting.findUnique({ where: { key: 'payment_momo_details' } });
+      const instructions = await prisma.setting.findUnique({ where: { key: 'payment_instructions' } });
+
+      res.json({
+        status: 'success',
+        data: {
+          requestId: request.id,
+          serviceName: request.service?.title || 'Service',
+          totalAmount: request.totalAmount || request.quotation || 0,
+          amountPaid: request.amountPaid || 0,
+          remainingBalance: request.remainingBalance || request.totalAmount || 0,
+          paymentStatus: request.paymentStatus,
+          bankDetails: bankDetails?.value || '',
+          momoDetails: momoDetails?.value || '',
+          instructions: instructions?.value || '',
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+
+  // Admin generates payment link for a service request
+  generatePaymentLink: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { totalAmount, notes } = req.body;
+
+      const crypto = require('crypto');
+      const paymentLink = crypto.randomBytes(8).toString('hex');
+
+      const request = await prisma.serviceRequest.update({
+        where: { id },
+        data: {
+          paymentLink,
+          totalAmount: totalAmount || undefined,
+          remainingBalance: totalAmount || undefined,
+          notes: notes || undefined,
+          status: 'AWAITING_PAYMENT',
+          paymentStatus: 'UNPAID',
+        },
+      });
 
       res.json({ status: 'success', data: request });
     } catch (error) {

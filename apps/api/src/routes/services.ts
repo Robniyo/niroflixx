@@ -18,5 +18,9 @@ router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGE
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), servicesController.update);
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.delete);
 router.put('/payment-status/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.updatePaymentStatus);
+// Public payment page (no auth required)
+router.get('/payment/:link', servicesController.getPaymentPage);
 
+// Admin generates payment link
+router.post('/generate-payment-link/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.generatePaymentLink);
 export default router;
