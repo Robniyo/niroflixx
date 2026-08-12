@@ -163,7 +163,7 @@ export default function ApplyModal({ isOpen, onClose, opportunityTitle, opportun
                 <label className="block text-sm font-medium mb-1">Phone (WhatsApp)</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input type="tel" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
+                    <input type="tel" required value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
                     className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../models/prisma';
+import { emailService } from '../services/email';
 
 export const applicationsController = {
   getAll: async (_req: Request, res: Response) => {
@@ -24,6 +25,32 @@ export const applicationsController = {
         where: { id: req.params.id },
         data: { status, reviewNotes, adminNotes },
       });
+
+      // Parse applicant contact info from the stored documents JSON
+      let applicantEmail = '';
+      let applicantName = '';
+      try {
+        const docs = application.documents ? JSON.parse(application.documents) : {};
+        applicantEmail = docs.email || '';
+        applicantName = docs.name || 'Applicant';
+      } catch {}
+
+      // Send email notification about status change
+      if (applicantEmail && status) {
+        const subject =
+          status === 'APPROVED'
+            ? `Your application has been approved`
+            : `Update on your application`;
+        const message =
+          status === 'APPROVED'
+            ? `Dear ${applicantName},\n\nWe're happy to inform you that your application has been approved. Our team will reach out to you with further steps.\n\nAdmin notes: ${adminNotes || 'None'}\n\n— Future Scholars Team`
+            : `Dear ${applicantName},\n\nAfter careful review, your application was not selected at this time. We encourage you to keep applying and building your profile.\n\nAdmin notes: ${adminNotes || 'None'}\n\n— Future Scholars Team`;
+
+        emailService
+          .sendGeneric(applicantEmail, subject, message)
+          .catch((e) => console.error('Email notification failed:', e));
+      }
+
       res.json({ status: 'success', data: application });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
@@ -33,7 +60,7 @@ export const applicationsController = {
   create: async (req: Request, res: Response) => {
     try {
       const { name, email, phone, message, opportunityId } = req.body;
-      const userId = (req as any).userId; // from optionalAuth middleware
+      const userId = (req as any).userId;
 
       const data: any = {
         opportunityId,
