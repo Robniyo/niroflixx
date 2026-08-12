@@ -37,18 +37,14 @@ export const applicationsController = {
 
       // Send email notification about status change
       if (applicantEmail && status) {
-        const subject =
-          status === 'APPROVED'
-            ? `Your application has been approved`
-            : `Update on your application`;
-        const message =
-          status === 'APPROVED'
-            ? `Dear ${applicantName},\n\nWe're happy to inform you that your application has been approved. Our team will reach out to you with further steps.\n\nAdmin notes: ${adminNotes || 'None'}\n\n— Future Scholars Team`
-            : `Dear ${applicantName},\n\nAfter careful review, your application was not selected at this time. We encourage you to keep applying and building your profile.\n\nAdmin notes: ${adminNotes || 'None'}\n\n— Future Scholars Team`;
-
+        const opp = await prisma.opportunity.findUnique({
+          where: { id: application.opportunityId },
+          select: { title: true },
+        });
+        const opportunityTitle = opp?.title || 'this opportunity';
         emailService
-          .sendGeneric(applicantEmail, subject, message)
-          .catch((e) => console.error('Email notification failed:', e));
+          .sendApplicationStatus(applicantEmail, applicantName, status, opportunityTitle, adminNotes || '')
+          .catch(e => console.error('Email notification failed:', e));
       }
 
       res.json({ status: 'success', data: application });
@@ -60,7 +56,7 @@ export const applicationsController = {
   create: async (req: Request, res: Response) => {
     try {
       const { name, email, phone, message, opportunityId } = req.body;
-      const userId = (req as any).userId;
+      const userId = (req as any).userId; // from optionalAuth middleware
 
       const data: any = {
         opportunityId,
