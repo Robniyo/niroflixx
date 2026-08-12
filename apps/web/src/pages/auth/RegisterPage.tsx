@@ -45,7 +45,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
         <Link to="/" className="inline-flex items-center gap-2 mb-6">
-  <img src="/flogo.PNG" alt="Future Scholars" className="h-10 w-auto" />
+  <img src="/flogo.PNG?v=2" alt="Future Scholars" className="h-10 w-auto" />
   <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
 </Link>
           <h1 className="text-h3 font-bold text-secondary-900">Create Account</h1>

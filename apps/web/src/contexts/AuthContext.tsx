@@ -13,7 +13,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
@@ -48,10 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-const login = async (email: string, password: string) => {
-    const res = await api.post('/auth/login', { email, password });
-    setUser(res.data.data);
-    return res.data.data;
+  const login = async (email: string, password: string) => {
+  const res = await api.post('/auth/login', { email, password });
+  setUser(res.data.data);
+  return res.data.data;
   };
 
   const register = async (data: RegisterData) => {

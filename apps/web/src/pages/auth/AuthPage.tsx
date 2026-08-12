@@ -86,7 +86,7 @@ export default function AuthPage() {
         <div className="w-full max-w-md">
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <img src="/flogo.PNG" alt="Future Scholars" className="h-10 w-auto" />
+              <img src="/flogo.PNG?v=2" alt="Future Scholars" className="h-10 w-auto" />
               <span className="text-xl font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
             </Link>
           </div>
