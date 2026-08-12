@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin, Upload } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -23,6 +23,7 @@ const emptyForm = {
   requirements: '',
   benefits: '',
   officialLink: '',
+  coverImage: '',
   status: 'DRAFT',
   featured: false,
 };
@@ -45,6 +46,7 @@ export default function OpportunitiesPage() {
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchItems();
@@ -53,7 +55,6 @@ export default function OpportunitiesPage() {
   const fetchItems = async () => {
     try {
       const r = await api.get('/opportunities');
-      // Each item now has computedStatus from backend, but we compute again for robustness
       const data = r.data.data.map((o: any) => ({
         ...o,
         computedStatus: o.computedStatus || getComputedStatus(o.deadline),
@@ -87,6 +88,7 @@ export default function OpportunitiesPage() {
         requirements: d.requirements || '',
         benefits: d.benefits || '',
         officialLink: d.officialLink || '',
+        coverImage: d.coverImage || '',
         status: d.status,
         featured: d.featured,
       });
@@ -122,6 +124,25 @@ export default function OpportunitiesPage() {
       toast.success('Archived');
       fetchItems();
     } catch {}
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await api.post('/uploads', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setForm({ ...form, coverImage: res.data.data.url });
+      toast.success('Image uploaded');
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (loading)
@@ -176,8 +197,8 @@ export default function OpportunitiesPage() {
               key: 'status',
               label: 'Status',
               render: (o) => {
-                const cs = o.computedStatus; // OPEN, CLOSING_SOON, CLOSED
-                if (!cs) return <span className="text-xs">{o.status}</span>; // fallback
+                const cs = o.computedStatus;
+                if (!cs) return <span className="text-xs">{o.status}</span>;
                 const color =
                   cs === 'CLOSED'
                     ? 'bg-red-100 text-red-700'
@@ -218,7 +239,7 @@ export default function OpportunitiesPage() {
         />
       )}
 
-      {/* Modal (unchanged except we keep it exactly as before) */}
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
           <div
@@ -367,6 +388,18 @@ export default function OpportunitiesPage() {
                   onChange={(e) => setForm({ ...form, officialLink: e.target.value })}
                   className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                  Cover Image
+                </label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg cursor-pointer hover:bg-secondary-100 text-sm text-secondary-600">
+                    <Upload className="w-4 h-4" /> {uploading ? 'Uploading...' : 'Choose Image'}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                  </label>
+                  {form.coverImage && <span className="text-xs text-success truncate max-w-[200px]">Uploaded ✓</span>}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <input

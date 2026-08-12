@@ -51,16 +51,16 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-          <img src="/flogo.PNG?v=2" alt="Future Scholars" className="h-10 w-auto" />
-          <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
-        </Link>
+            <img src="/flogo.png" alt="Future Scholars" className="h-10 w-auto" />
+            <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
+          </Link>
           <h1 className="text-h3 font-bold text-secondary-900">Welcome Back</h1>
           <p className="text-secondary-500 mt-2">Sign in to access your account</p>
         </div>
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-8">
-        {/* Google sign-in link */}
+          {/* Google sign-in link */}
           <div className="mb-6 flex justify-center">
             <a
               href="https://niroflixx.onrender.com/api/v1/auth/google"
