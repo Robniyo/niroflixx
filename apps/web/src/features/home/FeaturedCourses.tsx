@@ -40,7 +40,9 @@ export default function FeaturedCourses() {
            {courses.map((course) => (
   <Link to={`/academy/${course.slug || course.id}`} key={course.id} className="group">
     <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden h-full flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <div className="h-44 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center relative">
+            <div className="h-44 flex items-center justify-center relative">
+  <img src="/flogo.png" alt="Future Scholars" className="h-20 w-auto" />
+</div>
         {course.thumbnail ? (
           <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
         ) : (

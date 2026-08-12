@@ -50,12 +50,10 @@ export default function AdminLayout() {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
         <div className="p-4 border-b border-secondary-100 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">N</span>
-            </div>
-            <span className="text-lg font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
-          </Link>
+        <Link to="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
+        <img src="/flogo.png" alt="Future Scholars" className="h-8 w-auto" />
+        <span className="text-lg font-bold text-secondary-900">Future Scholars</span>
+      </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1.5 hover:bg-secondary-50 rounded-lg">
             <X className="w-5 h-5" />
           </button>

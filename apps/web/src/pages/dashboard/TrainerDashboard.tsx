@@ -124,14 +124,12 @@ export default function TrainerDashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50">
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50">
       {/* Top Bar */}
         <div className="bg-white/80 backdrop-blur-md border-b border-secondary-100 sticky top-0 z-30">
           <div className="px-4 lg:container-page flex items-center justify-between h-14 lg:h-16">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">N</span>
-            </div>
+            <img src="/flogo.png" alt="Future Scholars" className="h-9 w-auto" />
             <div>
               <h1 className="font-semibold text-secondary-900">Trainer Portal</h1>
               <p className="text-xs text-secondary-500">{user.firstName} {user.lastName} • {getTodayName()}</p>

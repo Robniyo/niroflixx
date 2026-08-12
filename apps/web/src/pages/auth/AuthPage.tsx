@@ -61,14 +61,13 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-primary-50 via-white to-accent-50">
+      {/* Left decorative panel (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-30 bg-repeat" />
         <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent-400/20 rounded-full blur-3xl" />
         <div className="relative z-10 text-center px-12 max-w-lg">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-            <span className="text-white font-bold text-3xl">N</span>
-          </div>
+          <img src="/flogo.png" alt="Future Scholars" className="h-20 w-auto mx-auto mb-8" />
           <h1 className="text-display-lg text-white font-bold mb-4">Welcome to Future Scholars</h1>
           <p className="text-white/70 text-body-lg leading-relaxed mb-8">Learn digital skills, discover opportunities, and grow your career — all in one platform.</p>
           <div className="grid grid-cols-2 gap-4 text-center">
@@ -82,12 +81,14 @@ export default function AuthPage() {
         </div>
       </div>
 
+      {/* Right form area */}
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
+          {/* Mobile logo (only visible on small screens) */}
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <img src="/flogo.PNG?v=2" alt="Future Scholars" className="h-10 w-auto" />
-              <span className="text-xl font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
+              <img src="/flogo.png" alt="Future Scholars" className="h-10 w-auto" />
+              <span className="text-xl font-bold text-secondary-900">Future Scholars</span>
             </Link>
           </div>
 

@@ -30,12 +30,10 @@ export default function DashboardPage() {
       {/* Top Bar */}
       <div className="bg-white/80 backdrop-blur-md border-b border-secondary-100 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">N</span>
-            </div>
-            <span className="text-lg font-bold text-secondary-900">Niro<span className="text-primary-600">flixx</span></span>
-          </Link>
+        <Link to="/" className="flex items-center gap-2">
+  <img src="/flogo.png" alt="Future Scholars" className="h-8 w-auto" />
+  <span className="text-lg font-bold text-secondary-900">Future Scholars</span>
+</Link>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-secondary-50 rounded-full">
               <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
@@ -176,7 +174,7 @@ export default function DashboardPage() {
           {/* Profile Card */}
           <div className="bg-white rounded-2xl border border-secondary-100 p-6">
             <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-200">
+              <img src="/flogo.png" alt="Future Scholars" className="h-20 w-auto mx-auto mb-4" />
                 <span className="text-white font-bold text-2xl">{user?.firstName?.[0]}{user?.lastName?.[0]}</span>
               </div>
               <h3 className="font-semibold text-lg text-secondary-900">{user?.firstName} {user?.lastName}</h3>
