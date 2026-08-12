@@ -270,13 +270,21 @@ model Enrollment {
   id                String   @id @default(uuid())
   courseId          String
   userId            String
-  paymentStatus     String   @default("PENDING")
+  paymentStatus     String   @default("UNPAID")
   enrollmentDate    DateTime @default(now())
   completion        Int      @default(0)
   certificateIssued Boolean  @default(false)
   status            String   @default("active")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  // Payment installment fields
+  paymentPlan       String?   // FULL, HALF, CUSTOM
+  totalAmount       Float?    // course price at enrollment
+  amountPaid        Float     @default(0)
+  remainingBalance  Float?
+  lastPaymentDate   DateTime?
+  paymentProof      String?
 
   course Course @relation(fields: [courseId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
@@ -461,22 +469,26 @@ model Service {
 }
 
 model ServiceRequest {
-  id            String    @id @default(uuid())
-  serviceId     String
-  userId        String
-  description   String?
-  status        String    @default("DRAFT")
-  quotation     Float?
-  notes         String?
-  submittedAt   DateTime?
-  completedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String    @id @default(uuid())
+  serviceId        String
+  userId           String
+  description      String?
+  status           String    @default("PENDING")
+  quotation        Float?
+  notes            String?
+  submittedAt      DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Payment fields
-  paymentStatus String?   @default("UNPAID")
-  paymentProof  String?
-  paymentMethod String?
+  paymentStatus    String?   @default("UNPAID")
+  paymentProof     String?
+  paymentMethod    String?
+  paymentLink      String?   @unique
+  totalAmount      Float?
+  amountPaid       Float     @default(0)
+  remainingBalance Float?
 
   service Service @relation(fields: [serviceId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
