@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Briefcase, Download, Settings, LogOut, User, TrendingUp, ArrowRight, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Briefcase, Download, Settings, LogOut, User, TrendingUp, ArrowRight, Clock, CheckCircle, XCircle, AlertCircle, Wrench } from 'lucide-react';
 import api from '@/services/api';
 import AdBanner from '@/components/ui/AdBanner';
 
@@ -156,6 +156,8 @@ export default function DashboardPage() {
                 { label: 'Download Resources', desc: 'Free PDFs & templates', href: '/resources', icon: Download },
                 { label: 'Request Services', desc: 'CV writing, design & more', href: '/services', icon: Settings },
                 { label: 'Account Settings', desc: 'Update your info', href: '/dashboard/settings', icon: Settings },
+                { label: 'My Enrollments', desc: 'Track course payments', href: '/dashboard/enrollments', icon: BookOpen },
+                { label: 'My Requests', desc: 'Service requests status', href: '/dashboard/requests', icon: Wrench },
               ].map((a) => (
                 <Link key={a.label} to={a.href} className={`flex items-start gap-3 p-4 rounded-xl border transition-all group ${a.highlight ? 'border-primary-300 bg-primary-50/50 hover:bg-primary-50 hover:border-primary-400' : 'border-secondary-100 hover:border-primary-200 hover:bg-primary-50/30'}`}>
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0 ${a.highlight ? 'bg-primary-100' : 'bg-primary-50'}`}>

@@ -147,17 +147,23 @@ export const servicesController = {
   },
 
   // User uploads payment proof
-  uploadPaymentProof: async (req: Request, res: Response) => {
+    uploadPaymentProof: async (req: Request, res: Response) => {
     try {
-      const { requestId, proofUrl } = req.body;
-      const userId = (req as any).userId;
+      const { requestId, paymentLink, proofUrl } = req.body;
 
-      const request = await prisma.serviceRequest.findUnique({ where: { id: requestId } });
+      let request;
+      if (requestId) {
+        request = await prisma.serviceRequest.findUnique({ where: { id: requestId } });
+      } else if (paymentLink) {
+        request = await prisma.serviceRequest.findUnique({ where: { paymentLink } });
+      } else {
+        return res.status(400).json({ status: 'error', message: 'requestId or paymentLink required', code: 400 });
+      }
+
       if (!request) return res.status(404).json({ status: 'error', message: 'Request not found', code: 404 });
-      if (request.userId !== userId) return res.status(403).json({ status: 'error', message: 'Not your request', code: 403 });
 
       const updated = await prisma.serviceRequest.update({
-        where: { id: requestId },
+        where: { id: request.id },
         data: { paymentProof: proofUrl, paymentStatus: 'PENDING_VERIFICATION' },
       });
 
@@ -169,7 +175,7 @@ export const servicesController = {
             data: admins.map(a => ({
               userId: a.id,
               title: 'Payment Proof Submitted',
-              message: `A payment proof has been submitted for service request #${requestId.slice(0, 8)}.`,
+              message: `A payment proof has been submitted for service request #${request.id.slice(0, 8)}.`,
               link: '/admin/services',
               type: 'PAYMENT',
             })),
@@ -269,6 +275,19 @@ export const servicesController = {
       });
 
       res.json({ status: 'success', data: request });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+    getMyRequests: async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      const requests = await prisma.serviceRequest.findMany({
+        where: { userId },
+        include: { service: { select: { title: true } } },
+        orderBy: { createdAt: 'desc' },
+      });
+      res.json({ status: 'success', data: requests });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }

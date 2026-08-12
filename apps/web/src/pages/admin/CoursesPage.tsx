@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, BookOpen, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, X, BookOpen, Upload, Eye, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import ResponsiveTable from '@/components/ui/ResponsiveTable';
+
 interface Course {
   id: string; title: string; level: string; type: string; status: string; price: number; enrollmentCount: number; category?: { name: string }; thumbnail?: string;
 }
@@ -12,6 +13,7 @@ const emptyForm = { title: '', description: '', categoryId: '', level: 'BEGINNER
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -19,14 +21,21 @@ export default function CoursesPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [tab, setTab] = useState<'courses' | 'enrollments'>('courses');
 
-  useEffect(() => { fetchCourses(); fetchCategories(); }, []);
+  useEffect(() => { fetchCourses(); fetchCategories(); fetchEnrollments(); }, []);
 
   const fetchCourses = async () => {
     try { const res = await api.get('/courses'); setCourses(res.data.data); } catch { toast.error('Failed'); } finally { setLoading(false); }
   };
   const fetchCategories = async () => {
     try { const res = await api.get('/categories'); setCategories(res.data.data || []); } catch {}
+  };
+  const fetchEnrollments = async () => {
+    try {
+      const res = await api.get('/admin/enrollments');
+      setEnrollments(res.data.data);
+    } catch {}
   };
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setShowModal(true); };
@@ -68,6 +77,14 @@ export default function CoursesPage() {
     try { await api.delete(`/courses/${id}`); toast.success('Archived'); fetchCourses(); } catch { toast.error('Failed'); }
   };
 
+  const updateEnrollmentPayment = async (enrollmentId: string, status: string) => {
+    try {
+      await api.patch(`/admin/enrollments/${enrollmentId}/payment`, { paymentStatus: status });
+      toast.success(`Payment ${status}`);
+      fetchEnrollments();
+    } catch { toast.error('Failed'); }
+  };
+
   if (loading) return <div className="text-center py-16 text-secondary-500">Loading...</div>;
 
   return (
@@ -77,28 +94,87 @@ export default function CoursesPage() {
         <Button leftIcon={<Plus className="w-4 h-4" />} onClick={openCreate}>Add Course</Button>
       </div>
 
-      {courses.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200">
-          <BookOpen className="w-12 h-12 text-secondary-300 mx-auto mb-3" /><p className="text-secondary-500">No courses yet.</p>
-        </div>
-      ) : (
-        <ResponsiveTable
-        columns={[
-          { key: 'title', label: 'Title', render: (c) => <span className="font-medium text-sm">{c.title}</span> },
-          { key: 'level', label: 'Level', render: (c) => <span className="text-xs text-secondary-600">{c.level}</span> },
-          { key: 'type', label: 'Type', render: (c) => <span className="text-xs text-secondary-600">{c.type?.replace('_',' ')}</span> },
-          { key: 'price', label: 'Price', render: (c) => <span className="text-sm font-medium">{c.price.toLocaleString()} RWF</span> },
-          { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span> },
-          { key: 'actions', label: '', render: (c) => (
-            <div className="flex gap-1">
-              <button onClick={()=>openEdit(c.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
-              <button onClick={()=>handleDelete(c.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+      {/* Tabs */}
+      <div className="flex gap-3 mb-6">
+        <button onClick={() => setTab('courses')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === 'courses' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>Courses</button>
+        <button onClick={() => setTab('enrollments')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${tab === 'enrollments' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>
+          <DollarSign className="w-4 h-4" /> Enrollments {enrollments.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{enrollments.length}</span>}
+        </button>
+      </div>
+
+      {/* Courses Tab */}
+      {tab === 'courses' && (
+        <>
+          {courses.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200">
+              <BookOpen className="w-12 h-12 text-secondary-300 mx-auto mb-3" /><p className="text-secondary-500">No courses yet.</p>
             </div>
-          ), hideOnMobile: true },
-        ]}
-        data={courses}
-        emptyMessage="No courses yet"
-      />
+          ) : (
+            <ResponsiveTable
+            columns={[
+              { key: 'title', label: 'Title', render: (c) => <span className="font-medium text-sm">{c.title}</span> },
+              { key: 'level', label: 'Level', render: (c) => <span className="text-xs text-secondary-600">{c.level}</span> },
+              { key: 'type', label: 'Type', render: (c) => <span className="text-xs text-secondary-600">{c.type?.replace('_',' ')}</span> },
+              { key: 'price', label: 'Price', render: (c) => <span className="text-sm font-medium">{c.price.toLocaleString()} RWF</span> },
+              { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span> },
+              { key: 'actions', label: '', render: (c) => (
+                <div className="flex gap-1">
+                  <button onClick={()=>openEdit(c.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+                  <button onClick={()=>handleDelete(c.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+                </div>
+              ), hideOnMobile: true },
+            ]}
+            data={courses}
+            emptyMessage="No courses yet"
+          />
+          )}
+        </>
+      )}
+
+      {/* Enrollments Tab */}
+      {tab === 'enrollments' && (
+        <div className="space-y-4">
+          {enrollments.length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-secondary-200 p-12 text-center">
+              <DollarSign className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
+              <p className="text-secondary-500 font-medium">No enrollments yet</p>
+            </div>
+          ) : (
+            enrollments.map((e) => (
+              <div key={e.id} className="bg-white rounded-xl border p-6">
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <div>
+                    <h3 className="font-semibold text-secondary-900">{e.course?.title || 'N/A'}</h3>
+                    <p className="text-sm text-secondary-500">{e.user?.firstName} {e.user?.lastName} • {e.user?.email}</p>
+                    <div className="flex gap-4 mt-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">{e.paymentPlan || 'Not set'}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Paid: {(e.amountPaid || 0).toLocaleString()} RWF</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Total: {(e.totalAmount || 0).toLocaleString()} RWF</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Remaining: {(e.remainingBalance || 0).toLocaleString()} RWF</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      e.paymentStatus === 'PAID' ? 'bg-success-light text-success-dark' :
+                      e.paymentStatus === 'PARTIALLY_PAID' ? 'bg-accent-100 text-accent-700' :
+                      'bg-secondary-100 text-secondary-600'
+                    }`}>{e.paymentStatus}</span>
+                    {e.paymentStatus !== 'PAID' && (
+                      <Button size="sm" onClick={() => updateEnrollmentPayment(e.id, 'PAID')} className="text-success border-success hover:bg-success-light">
+                        <CheckCircle className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                {e.paymentProof && (
+                  <div className="mt-2">
+                    <a href={e.paymentProof} target="_blank" className="text-xs text-primary-600 underline">View Payment Proof</a>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       )}
 
       {showModal && (

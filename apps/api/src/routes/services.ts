@@ -11,7 +11,7 @@ router.get('/:slug', servicesController.getBySlug);
 router.post('/request', servicesController.requestService);
 
 // Authenticated users
-router.post('/payment-proof', authenticate, servicesController.uploadPaymentProof);
+router.post('/payment-proof', servicesController.uploadPaymentProof);
 
 // Admin
 router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), servicesController.create);
@@ -23,4 +23,5 @@ router.get('/payment/:link', servicesController.getPaymentPage);
 
 // Admin generates payment link
 router.post('/generate-payment-link/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.generatePaymentLink);
+router.get('/my-requests', authenticate, servicesController.getMyRequests);
 export default router;

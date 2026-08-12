@@ -1,49 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Clock, Users, GraduationCap, ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Clock, Users, Star, DollarSign, BookOpen, CheckCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
-import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function CourseDetailPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [classes, setClasses] = useState<any[]>([]);
-  const [enrolled, setEnrolled] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const [enrolling, setEnrolling] = useState(false);
+  const [plan, setPlan] = useState('FULL');
+  const [enrollment, setEnrollment] = useState<any>(null);
 
   useEffect(() => {
     if (!slug) return;
-    api.get(`/courses/${slug}`).then(r => {
-      setCourse(r.data.data);
-      api.get('/classes').then(clsRes => {
-        const allClasses = clsRes.data.data || [];
-        const matching = allClasses.filter((c: any) => c.courseId === r.data.data.id && c.status === 'PUBLISHED');
-        setClasses(matching);
+    api.get(`/courses/${slug}`).then(r => setCourse(r.data.data)).catch(() => {}).finally(() => setLoading(false));
+  }, [slug]);
+
+  useEffect(() => {
+    if (isAuthenticated && course) {
+      api.get('/courses/my-enrollments').then(r => {
+        const existing = r.data.data.find((e: any) => e.courseId === course.id);
+        setEnrollment(existing || null);
       }).catch(() => {});
-      
-      // Check if user is enrolled
-      if (isAuthenticated) {
-        api.get('/enrollments').then(enrRes => {
-          const myEnrollments = enrRes.data.data || [];
-          const found = myEnrollments.find((e: any) => e.courseId === r.data.data.id);
-          setEnrolled(!!found);
-        }).catch(() => {});
-      }
-    }).catch(() => {}).finally(() => setLoading(false));
-  }, [slug, isAuthenticated]);
+    }
+  }, [isAuthenticated, course]);
 
   const handleEnroll = async () => {
-    if (!isAuthenticated) { navigate('/login'); return; }
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    setEnrolling(true);
     try {
-      await api.post('/enrollments', { courseId: course.id });
-      toast.success('Enrolled successfully!');
-      setEnrolled(true);
-      setCourse({ ...course, enrollmentCount: (course.enrollmentCount || 0) + 1 });
-    } catch (err: any) { toast.error(err.response?.data?.message || 'Enrollment failed'); }
+      await api.post('/courses/enroll', { courseId: course.id, paymentPlan: plan });
+      toast.success('Enrolled! Track your payments in My Enrollments.');
+      const r = await api.get('/courses/my-enrollments');
+      const existing = r.data.data.find((e: any) => e.courseId === course.id);
+      setEnrollment(existing || null);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Enrollment failed');
+    } finally {
+      setEnrolling(false);
+    }
   };
 
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
@@ -51,55 +54,83 @@ export default function CourseDetailPage() {
 
   return (
     <div className="pt-32 pb-16">
-      <div className="container-page">
-        <Link to="/academy" className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"><ArrowLeft className="w-4 h-4" /> Back to Academy</Link>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="h-64 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mb-8">
-              {course.thumbnail ? <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover rounded-2xl" /> : <GraduationCap className="w-20 h-20 text-white/40" />}
+      <div className="container-content max-w-4xl">
+        <Link to="/academy" className="flex items-center gap-2 text-sm text-secondary-500 hover:text-primary-600 mb-8">
+          <ArrowLeft className="w-4 h-4" /> Back to Academy
+        </Link>
+        <div className="bg-white rounded-2xl border p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center">
+              <BookOpen className="w-8 h-8 text-primary-600" />
             </div>
-            <span className="text-primary-600 font-semibold text-sm">{course.level} • {course.type?.replace('_', ' ')}</span>
-            <h1 className="text-h2 font-bold mt-2 mb-4">{course.title}</h1>
-            <p className="text-body-lg text-secondary-600 mb-8">{course.description}</p>
-
-            {classes.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-h4 font-semibold mb-4">Available Classes</h3>
-                <div className="space-y-3">
-                  {classes.map((cls: any) => (
-                    <div key={cls.id} className="bg-secondary-50 rounded-xl p-4 border border-secondary-100">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold">{cls.name}</h4>
-                          <div className="flex items-center gap-3 text-body-sm text-secondary-500 mt-1">
-                            {cls.startDate && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {new Date(cls.startDate).toLocaleDateString()}</span>}
-                            {cls.startTime && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {cls.startTime}</span>}
-                            <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {cls.enrolledCount || 0}/{cls.capacity} enrolled</span>
-                          </div>
-                        </div>
-                        <span className="px-2 py-1 rounded-full text-caption font-medium bg-success-light text-success-dark">{cls.status}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div>
+              <span className="text-primary-600 font-semibold text-sm">{course.level || 'All Levels'}</span>
+              <h1 className="text-h2 font-bold">{course.title}</h1>
+            </div>
+          </div>
+          <p className="text-body-lg text-secondary-600 mb-6">{course.description}</p>
+          <div className="flex flex-wrap gap-6 mb-8 pb-8 border-b">
+            <div className="text-center">
+              <p className="text-h3 font-bold text-primary-600">{course.price === 0 ? 'Free' : `${course.price.toLocaleString()} RWF`}</p>
+              <p className="text-sm text-secondary-500">Price</p>
+            </div>
+            {course.duration && (
+              <div className="text-center">
+                <p className="text-h3 font-bold text-secondary-900 flex items-center gap-1"><Clock className="w-5 h-5" /> {course.duration}</p>
+                <p className="text-sm text-secondary-500">Duration</p>
+              </div>
+            )}
+            {course.enrollmentCount !== undefined && (
+              <div className="text-center">
+                <p className="text-h3 font-bold text-secondary-900 flex items-center gap-1"><Users className="w-5 h-5" /> {course.enrollmentCount}</p>
+                <p className="text-sm text-secondary-500">Enrolled</p>
               </div>
             )}
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-secondary-100 p-6 sticky top-24">
-              <div className="text-h3 font-bold text-primary-600 mb-4">{course.price === 0 ? 'Free' : `${course.price.toLocaleString()} RWF`}</div>
-              <div className="space-y-3 mb-6 text-body-sm text-secondary-600">
-                <div className="flex items-center gap-2"><Clock className="w-4 h-4" /> Duration: {course.duration || 'Flexible'}</div>
-                <div className="flex items-center gap-2"><Users className="w-4 h-4" /> {course.enrollmentCount || 0} Students Enrolled</div>
-                <div className="flex items-center gap-2"><GraduationCap className="w-4 h-4" /> Level: {course.level}</div>
-              </div>
-              <Button className="w-full" size="lg" onClick={handleEnroll} disabled={enrolled}>
-              {enrolled ? 'Enrolled ✅' : isAuthenticated ? 'Enroll Now' : 'Login to Enroll'}
+          {course.price === 0 ? (
+            <Button size="lg" onClick={handleEnroll} isLoading={enrolling}>
+              Enroll for Free
             </Button>
+          ) : enrollment ? (
+            <div className="bg-success-light border border-success rounded-2xl p-5 flex items-center gap-3">
+              <CheckCircle className="w-6 h-6 text-success flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-success-dark">Already Enrolled</h4>
+                <p className="text-sm text-success-dark/80">
+                  Payment status: {enrollment.paymentStatus} | Paid: {(enrollment.amountPaid || 0).toLocaleString()} RWF
+                  {enrollment.remainingBalance > 0 && ` | Remaining: ${enrollment.remainingBalance.toLocaleString()} RWF`}
+                </p>
+                <Link to="/dashboard/enrollments" className="text-primary-600 text-sm font-medium underline mt-1 inline-block">
+                  View My Enrollments
+                </Link>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-h4 font-semibold">Choose a Payment Plan</h3>
+              <div className="grid sm:grid-cols-3 gap-3">
+                {['FULL', 'HALF', 'CUSTOM'].map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPlan(p)}
+                    className={`p-4 rounded-xl border-2 transition-all text-center ${
+                      plan === p ? 'border-primary-600 bg-primary-50' : 'border-secondary-200 hover:border-primary-300'
+                    }`}
+                  >
+                    <DollarSign className={`w-5 h-5 mx-auto mb-2 ${plan === p ? 'text-primary-600' : 'text-secondary-400'}`} />
+                    <p className="font-semibold text-sm">{p === 'FULL' ? 'Full Payment' : p === 'HALF' ? '50% Now' : 'Custom'}</p>
+                    <p className="text-xs text-secondary-500 mt-1">
+                      {p === 'FULL' ? `${course.price.toLocaleString()} RWF` : p === 'HALF' ? `${Math.round(course.price / 2).toLocaleString()} RWF` : 'Pay what you can'}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              <Button size="lg" onClick={handleEnroll} isLoading={enrolling}>
+                Enroll Now
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

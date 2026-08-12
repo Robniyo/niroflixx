@@ -279,12 +279,13 @@ model Enrollment {
   updatedAt         DateTime @updatedAt
 
   // Payment installment fields
-  paymentPlan       String?   // FULL, HALF, CUSTOM
-  totalAmount       Float?    // course price at enrollment
+  paymentPlan       String?
+  totalAmount       Float?
   amountPaid        Float     @default(0)
   remainingBalance  Float?
   lastPaymentDate   DateTime?
   paymentProof      String?
+  notes             String?
 
   course Course @relation(fields: [courseId], references: [id])
   user   User   @relation(fields: [userId], references: [id])

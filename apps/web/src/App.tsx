@@ -55,6 +55,9 @@ import SubscribersPage from './pages/admin/SubscribersPage';
 import SessionsPage from './pages/admin/SessionsPage';
 import ReportsPage from './pages/admin/ReportsPage';
 import CategoriesPage from './pages/admin/CategoriesPage';
+import PaymentPage from '@/pages/public/PaymentPage';
+import MyEnrollments from '@/pages/dashboard/MyEnrollments';
+import MyRequests from '@/pages/dashboard/MyRequests';
 
 import ScrollToTop from './components/ui/ScrollToTop';
 //import ChatBot from './components/ui/ChatBot';
@@ -100,6 +103,7 @@ export default function App() {
         <Route path="/dashboard/settings" element={<DashboardSettingsPage />} />
         <Route path="/dashboard/candidate" element={<CandidateProfilePage />} />
         <Route path="/dashboard/downloads" element={<DownloadsPage />} />
+        <Route path="/dashboard/enrollments" element={<MyEnrollments />} />
 
         <Route path="/trainer" element={<TrainerDashboard />} />
 
@@ -117,6 +121,7 @@ export default function App() {
           <Route path="/opportunities/:id" element={<OpportunityDetailPage />} />
           <Route path="/services" element={<PublicServicesPage />} />
           <Route path="/services/:slug" element={<ServiceDetailPage />} />
+          <Route path="/pay/:link" element={<PaymentPage />} />
           <Route path="/resources" element={<PublicResourcesPage />} />
           <Route path="/resources/:slug" element={<ResourceDetailPage />} />
           <Route path="/news" element={<PublicNewsPage />} />
@@ -143,6 +148,7 @@ export default function App() {
           <Route path="subscribers" element={<SubscribersPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="/dashboard/requests" element={<MyRequests />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

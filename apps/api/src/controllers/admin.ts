@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../models/prisma';
+import { emailService } from '../services/email';
 
 export const adminController = {
   getUsers: async (req: Request, res: Response) => {
@@ -11,7 +12,34 @@ export const adminController = {
       res.json({ status: 'success', data: users });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to fetch users', code: 500 }); }
   },
+    getEnrollments: async (_req: Request, res: Response) => {
+    try {
+      const enrollments = await prisma.enrollment.findMany({
+        include: {
+          user: { select: { firstName: true, lastName: true, email: true } },
+          course: { select: { title: true, price: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      res.json({ status: 'success', data: enrollments });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
 
+  updateEnrollmentPayment: async (req: Request, res: Response) => {
+    try {
+      const { paymentStatus, adminNotes } = req.body;
+      const enrollment = await prisma.enrollment.update({
+        where: { id: req.params.id },
+        data: { paymentStatus, notes: adminNotes },
+      });
+      // Optionally notify user
+      res.json({ status: 'success', data: enrollment });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
   updateUserRole: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -25,6 +53,44 @@ export const adminController = {
       const user = await prisma.user.update({ where: { id }, data: { role }, select: { id: true, firstName: true, lastName: true, email: true, role: true } });
       res.json({ status: 'success', message: `Role updated to ${role}`, data: user });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to update role', code: 500 }); }
+  },
+
+    sendPaymentReminders: async (_req: Request, res: Response) => {
+    try {
+      const enrollments = await prisma.enrollment.findMany({
+        where: {
+          remainingBalance: { gt: 0 },
+          paymentStatus: { not: 'PAID' },
+        },
+        include: {
+          user: { select: { email: true, firstName: true } },
+          course: { select: { title: true, price: true } },
+        },
+      });
+
+      let sent = 0;
+      for (const e of enrollments) {
+        if (e.user?.email) {
+          try {
+            await emailService.sendPaymentReminder(
+              e.user.email,
+              e.user.firstName || 'Student',
+              e.course?.title || 'your course',
+              e.amountPaid || 0,
+              e.remainingBalance || 0,
+              e.totalAmount || 0
+            );
+            sent++;
+          } catch (err) {
+            console.error(`Failed to send reminder to ${e.user.email}:`, err);
+          }
+        }
+      }
+
+      res.json({ status: 'success', message: `Reminders sent to ${sent} students.` });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
   },
 
   updateUserStatus: async (req: Request, res: Response) => {

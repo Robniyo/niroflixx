@@ -1,5 +1,5 @@
 import sgMail from '@sendgrid/mail';
-
+import { prisma } from '../models/prisma';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
 const branding = `
@@ -140,5 +140,55 @@ export const emailService = {
         `,
       });
     } catch (e) { console.error('Application status email failed:', e); }
+  },
+    sendEnrollmentPaymentConfirmation: async (to: string, name: string, courseId: string, amountPaid: number, remainingBalance: number) => {
+    try {
+      const course = await prisma.course.findUnique({ where: { id: courseId }, select: { title: true } });
+      const courseName = course?.title || 'your course';
+
+      await sgMail.send({
+        to,
+        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Academy' },
+        subject: `Payment Received for ${courseName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
+            ${branding}
+            <h2 style="color: #1E293B; margin: 0 0 12px;">Payment Received!</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Hi ${name},</p>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Your payment of <strong>${amountPaid.toLocaleString()} RWF</strong> for <strong>${courseName}</strong> has been received.</p>
+            <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin: 0 0 24px;">
+              <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Remaining Balance:</strong></p>
+              <p style="color: #2563EB; font-size: 24px; font-weight: bold; margin: 0;">${remainingBalance.toLocaleString()} RWF</p>
+            </div>
+            <p style="color: #64748B; font-size: 14px;">Continue your learning journey! If you have any questions, contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a>.</p>
+            ${footer}
+          </div>
+        `,
+      });
+    } catch (e) { console.error('Enrollment payment email failed:', e); }
+  },
+    sendPaymentReminder: async (to: string, name: string, courseName: string, amountPaid: number, remaining: number, total: number) => {
+    try {
+      await sgMail.send({
+        to,
+        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Academy' },
+        subject: `Payment Reminder for ${courseName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
+            ${branding}
+            <h2 style="color: #1E293B; margin: 0 0 12px;">Payment Reminder</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Hi ${name},</p>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">This is a friendly reminder that you have an outstanding balance for <strong>${courseName}</strong>.</p>
+            <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin: 0 0 24px;">
+              <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Total Amount:</strong> ${total.toLocaleString()} RWF</p>
+              <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Amount Paid:</strong> ${amountPaid.toLocaleString()} RWF</p>
+              <p style="color: #2563EB; font-size: 24px; font-weight: bold; margin: 0;">Remaining: ${remaining.toLocaleString()} RWF</p>
+            </div>
+            <p style="color: #64748B; font-size: 14px;">Please complete your payment to continue your learning journey. If you have already paid, please ignore this message.</p>
+            ${footer}
+          </div>
+        `,
+      });
+    } catch (e) { console.error('Payment reminder email failed:', e); }
   },
 };

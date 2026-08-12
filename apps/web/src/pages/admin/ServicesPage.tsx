@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Wrench, MessageSquare, Eye, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Wrench, MessageSquare, Copy, ExternalLink, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -8,36 +8,31 @@ const emptyForm = { title:'', description:'', categoryId:'', startingPrice:0, es
 
 export default function ServicesPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [requests, setRequests] = useState<any[]>([]);
-  const [serviceRequests, setServiceRequests] = useState<any[]>([]); // New ServiceRequest records
+  const [serviceRequests, setServiceRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<string|null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<'services' | 'requests' | 'payments'>('services');
-
-  // For payment proof view
-  const [selectedProof, setSelectedProof] = useState<string | null>(null);
+  const [tab, setTab] = useState<'services' | 'requests'>('services');
+  
+  // For payment link generation
+  const [generatingLink, setGeneratingLink] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [quoteAmount, setQuoteAmount] = useState('');
 
   useEffect(()=>{
     fetchItems();
     fetchServiceRequests();
-    api.get('/admin/subscribers').then(r => {
-      const serviceMsgs = (r.data.data?.messages || []).filter((m: any) => m.subject?.includes('Service Request'));
-      setRequests(serviceMsgs);
-    }).catch(() => {});
   },[]);
 
   const fetchItems = async()=>{try{const r=await api.get('/services');setItems(r.data.data);}catch{}finally{setLoading(false);}};
   
-    const fetchServiceRequests = async () => {
+  const fetchServiceRequests = async () => {
     try {
       const r = await api.get('/admin/service-requests');
       setServiceRequests(r.data.data);
-    } catch {
-      // silently fail
-    }
+    } catch {}
   };
 
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
@@ -45,14 +40,23 @@ export default function ServicesPage() {
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/services/${editing}`,form);toast.success('Updated');}else{await api.post('/services',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/services/${id}`);toast.success('Archived');fetchItems();}catch{}};
 
-  // Payment status update
-  const updatePaymentStatus = async (requestId: string, status: string) => {
+  // Generate payment link for a service request
+  const handleGeneratePaymentLink = async (reqId: string) => {
+    setGeneratingLink(reqId);
     try {
-      await api.put(`/services/payment-status/${requestId}`, { paymentStatus: status });
-      toast.success(`Payment ${status === 'PAID' ? 'approved' : 'rejected'}`);
+      const amount = quoteAmount || null;
+      const res = await api.post(`/services/generate-payment-link/${reqId}`, { totalAmount: amount ? Number(amount) : undefined });
+      const paymentLink = res.data.data.paymentLink;
+      const fullUrl = `${window.location.origin}/pay/${paymentLink}`;
+      await navigator.clipboard.writeText(fullUrl);
+      toast.success('Payment link generated and copied!');
+      setQuoteAmount('');
+      setSelectedRequest(null);
       fetchServiceRequests();
     } catch {
-      toast.error('Failed to update');
+      toast.error('Failed to generate link');
+    } finally {
+      setGeneratingLink(null);
     }
   };
 
@@ -69,10 +73,7 @@ export default function ServicesPage() {
       <div className="flex gap-3 mb-6">
         <button onClick={() => setTab('services')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === 'services' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>Services</button>
         <button onClick={() => setTab('requests')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${tab === 'requests' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>
-          <MessageSquare className="w-4 h-4" /> Requests {requests.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{requests.length}</span>}
-        </button>
-        <button onClick={() => setTab('payments')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${tab === 'payments' ? 'bg-primary-600 text-white shadow-md' : 'bg-white border text-secondary-600 hover:bg-secondary-50'}`}>
-          <Eye className="w-4 h-4" /> Payment Proofs {serviceRequests.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{serviceRequests.length}</span>}
+          <MessageSquare className="w-4 h-4" /> Requests {serviceRequests.length > 0 && <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-bold">{serviceRequests.length}</span>}
         </button>
       </div>
 
@@ -92,104 +93,60 @@ export default function ServicesPage() {
       {/* Requests Tab */}
       {tab === 'requests' && (
         <div className="space-y-4">
-          {requests.length === 0 ? (
+          {serviceRequests.length === 0 ? (
             <div className="bg-white rounded-xl border border-dashed border-secondary-200 p-12 text-center">
               <MessageSquare className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
               <p className="text-secondary-500 font-medium">No service requests yet</p>
               <p className="text-secondary-400 text-body-sm mt-1">When clients request a service, they will appear here.</p>
             </div>
           ) : (
-            requests.map((r: any) => (
-              <div key={r.id} className="bg-white rounded-xl border border-secondary-100 p-6 hover:shadow-md transition-all">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-secondary-900">{r.subject?.replace('Service Request: ', '')}</h3>
-                    <p className="text-body-sm text-secondary-500">{r.name} • {r.email}</p>
-                  </div>
-                  <span className="text-xs text-secondary-400">{new Date(r.createdAt).toLocaleDateString()}</span>
-                </div>
-                <div className="bg-secondary-50 rounded-lg p-4 text-body-sm text-secondary-700 whitespace-pre-line">{r.message}</div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Payment Proofs Tab */}
-      {tab === 'payments' && (
-        <div className="space-y-4">
-          {serviceRequests.length === 0 ? (
-            <div className="bg-white rounded-xl border border-dashed border-secondary-200 p-12 text-center">
-              <Eye className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
-              <p className="text-secondary-500 font-medium">No payment proofs yet</p>
-              <p className="text-secondary-400 text-body-sm mt-1">When users upload payment proofs, they will appear here.</p>
-            </div>
-          ) : (
             serviceRequests.map((req: any) => (
               <div key={req.id} className="bg-white rounded-xl border border-secondary-100 p-6 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-secondary-900">{req.service?.title || req.serviceId}</h3>
-                    <p className="text-body-sm text-secondary-500">Requested by: {req.user?.firstName} {req.user?.lastName} ({req.user?.email})</p>
-                    <p className="text-sm text-secondary-400">Payment method: {req.paymentMethod || 'N/A'}</p>
+                    <h3 className="font-semibold text-secondary-900">{req.service?.title || 'Unknown Service'}</h3>
+                    <p className="text-body-sm text-secondary-500">Requested by: {req.user?.firstName || 'Unknown'} {req.user?.lastName || ''} ({req.user?.email || 'no email'})</p>
+                    <p className="text-sm text-secondary-400">Phone: {req.user?.phone || req.paymentMethod || 'N/A'}</p>
                   </div>
                   <div className="text-right">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      req.paymentStatus === 'PENDING_VERIFICATION' ? 'bg-yellow-100 text-yellow-700' :
                       req.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' :
-                      req.paymentStatus === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-600'
+                      req.paymentStatus === 'PENDING_VERIFICATION' ? 'bg-yellow-100 text-yellow-700' :
+                      req.paymentStatus === 'UNPAID' ? 'bg-gray-100 text-gray-600' :
+                      'bg-blue-100 text-blue-700'
                     }`}>
                       {req.paymentStatus === 'PENDING_VERIFICATION' && <AlertCircle className="w-3.5 h-3.5" />}
                       {req.paymentStatus === 'PAID' && <CheckCircle className="w-3.5 h-3.5" />}
-                      {req.paymentStatus === 'REJECTED' && <XCircle className="w-3.5 h-3.5" />}
                       {req.paymentStatus || 'UNPAID'}
                     </span>
-                    {req.paymentProof && (
-                      <button
-                        onClick={() => setSelectedProof(req.paymentProof)}
-                        className="block mt-1 text-xs text-primary-600 hover:underline"
-                      >
-                        View Proof
-                      </button>
+                    {req.paymentLink && (
+                      <div className="mt-1 text-xs text-primary-600">
+                        <button onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/pay/${req.paymentLink}`);
+                          toast.success('Payment link copied!');
+                        }} className="hover:underline flex items-center gap-1">
+                          <Copy className="w-3 h-3" /> Copy Payment Link
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
-                {req.paymentProof && selectedProof && (
-                  <div className="mb-4 relative">
-                    <button
-                      onClick={() => setSelectedProof(null)}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    <img
-                      src={selectedProof}
-                      alt="Payment proof"
-                      className="max-w-full h-auto rounded-lg border"
-                    />
-                  </div>
-                )}
+                <p className="text-sm text-secondary-600 mb-4">{req.description || 'No description'}</p>
                 <div className="flex gap-2">
-                  {req.paymentStatus !== 'PAID' && (
+                  {!req.paymentLink && (
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => updatePaymentStatus(req.id, 'PAID')}
-                      className="text-green-600 border-green-300 hover:bg-green-50"
+                      onClick={() => { setSelectedRequest(req); setQuoteAmount(''); }}
+                      className="text-primary-600 border-primary-300 hover:bg-primary-50"
                     >
-                      <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                      Generate Payment Link
                     </Button>
                   )}
-                  {req.paymentStatus !== 'REJECTED' && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => updatePaymentStatus(req.id, 'REJECTED')}
-                      className="text-red-600 border-red-300 hover:bg-red-50"
-                    >
-                      <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
-                    </Button>
+                  {req.paymentProof && (
+                    <a href={req.paymentProof} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-600 hover:underline flex items-center gap-1">
+                      <ExternalLink className="w-3 h-3" /> View Proof
+                    </a>
                   )}
                 </div>
               </div>
@@ -198,7 +155,34 @@ export default function ServicesPage() {
         </div>
       )}
 
-      {/* Service Create/Edit Modal */}
+      {/* Generate Payment Link Modal */}
+      {selectedRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedRequest(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-scale-in">
+            <h3 className="text-h4 font-bold mb-4">Generate Payment Link</h3>
+            <p className="text-sm text-secondary-500 mb-4">Service: {selectedRequest.service?.title || 'N/A'}</p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Amount (RWF)</label>
+              <input
+                type="number"
+                value={quoteAmount}
+                onChange={e => setQuoteAmount(e.target.value)}
+                placeholder="e.g., 50000"
+                className="w-full px-4 py-2.5 bg-secondary-50 border rounded-lg text-sm"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setSelectedRequest(null)}>Cancel</Button>
+              <Button className="flex-1" onClick={() => handleGeneratePaymentLink(selectedRequest.id)} isLoading={generatingLink === selectedRequest.id}>
+                Generate & Copy Link
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Service Create/Edit Modal (unchanged) */}
       {showModal&&(
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[5vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={()=>setShowModal(false)}/>

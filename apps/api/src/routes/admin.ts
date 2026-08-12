@@ -19,4 +19,7 @@ router.delete('/messages/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), 
 router.get('/export', authenticate, authorize('SUPER_ADMIN'), adminController.exportData);
 router.get('/service-requests', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.getServiceRequests);
 router.get('/settings/:key', adminController.getSetting);
+router.get('/enrollments', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.getEnrollments);
+router.patch('/enrollments/:id/payment', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.updateEnrollmentPayment);
+router.post('/send-reminders', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.sendPaymentReminders);
 export default router;
