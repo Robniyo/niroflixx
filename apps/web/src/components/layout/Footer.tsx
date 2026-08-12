@@ -38,8 +38,8 @@ export default function Footer() {
       ];
       // Fetch all settings in one request if available, or individually
       const promises = keys.map(key =>
-        api.get(`/admin/settings?key=${key}`).then(r => ({ key, value: r.data.data?.value })).catch(() => ({ key, value: null }))
-      );
+          api.get(`/admin/settings/${key}`).then(r => ({ key, value: r.data.data?.value })).catch(() => ({ key, value: null }))
+        );
       const results = await Promise.all(promises);
       const newSocials: any = {};
       const newContact: any = {};
