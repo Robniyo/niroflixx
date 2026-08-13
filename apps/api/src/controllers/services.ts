@@ -75,7 +75,7 @@ export const servicesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-    requestService: async (req: Request, res: Response) => {
+  requestService: async (req: Request, res: Response) => {
     try {
       const { serviceId, description, name, email, phone, paymentMethod } = req.body;
       const userId = (req as any).userId;
@@ -86,7 +86,6 @@ export const servicesController = {
         if (service) serviceName = service.title;
       } catch {}
 
-      // Always create a contact message for admin notification
       await prisma.contactMessage.create({
         data: {
           name,
@@ -96,9 +95,7 @@ export const servicesController = {
         },
       });
 
-      // Create a ServiceRequest record for all users (authenticated or not)
-      // If user is authenticated, link to their account
-            const requestData: any = {
+      const requestData: any = {
         serviceId,
         description,
         status: 'PENDING',
@@ -128,7 +125,6 @@ export const servicesController = {
     }
   },
 
-  // Get payment instructions (from settings)
   getPaymentSettings: async (_req: Request, res: Response) => {
     try {
       const bankDetails = await prisma.setting.findUnique({ where: { key: 'payment_bank_details' } });
@@ -147,8 +143,7 @@ export const servicesController = {
     }
   },
 
-  // User uploads payment proof
-      uploadPaymentProof: async (req: Request, res: Response) => {
+  uploadPaymentProof: async (req: Request, res: Response) => {
     try {
       const { paymentLink, proofUrl } = req.body;
 
@@ -164,7 +159,6 @@ export const servicesController = {
         data: { paymentProof: proofUrl, paymentStatus: 'PENDING_VERIFICATION' },
       });
 
-      // Notify admins
       try {
         const admins = await prisma.user.findMany({ where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } }, select: { id: true } });
         if (admins.length > 0) {
@@ -186,16 +180,14 @@ export const servicesController = {
     }
   },
 
-  // Admin updates payment status (approve/reject)
   updatePaymentStatus: async (req: Request, res: Response) => {
     try {
-      const { paymentStatus, notes } = req.body; // paymentStatus: 'PAID' or 'REJECTED'
+      const { paymentStatus, notes } = req.body;
       const request = await prisma.serviceRequest.update({
         where: { id: req.params.id },
         data: { paymentStatus, notes },
       });
 
-      // Notify the user about payment status change
       if (request.userId) {
         try {
           await prisma.notification.create({
@@ -217,7 +209,7 @@ export const servicesController = {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
-    // Public payment page accessed via unique link
+
   getPaymentPage: async (req: Request, res: Response) => {
     try {
       const request = await prisma.serviceRequest.findUnique({
@@ -250,7 +242,6 @@ export const servicesController = {
     }
   },
 
-  // Admin generates payment link for a service request
   generatePaymentLink: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -276,7 +267,8 @@ export const servicesController = {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
-    getMyRequests: async (req: Request, res: Response) => {
+
+  getMyRequests: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const requests = await prisma.serviceRequest.findMany({
