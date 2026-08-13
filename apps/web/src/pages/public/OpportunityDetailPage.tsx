@@ -59,7 +59,7 @@ export default function OpportunityDetailPage() {
   }`}
 >
   {opp.coverImage && (
-    <img src={opp.coverImage} alt={opp.title} className="w-full h-64 object-cover rounded-xl mb-6" />
+    <img src={opp.coverImage} alt={opp.title} className="w-full aspect-video object-cover rounded-xl mb-6" />
   )}
   <div className="flex flex-wrap items-center gap-2 mb-3">
     <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
