@@ -36,7 +36,7 @@ export default function ServicesPage() {
   };
 
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
-  const openEdit = async(id:string)=>{try{const r=await api.get(`/services/${id}`);const d=r.data.data;setForm({title:d.title||'',description:d.description||'',categoryId:d.categoryId||'',startingPrice:d.startingPrice||0,estimatedTime:d.estimatedTime||'',icon:d.icon||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
+    const openEdit = async(id:string)=>{try{const r=await api.get(`/services/id/${id}`);const d=r.data.data;setForm({title:d.title||'',description:d.description||'',categoryId:d.categoryId||'',startingPrice:d.startingPrice||0,estimatedTime:d.estimatedTime||'',icon:d.icon||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/services/${editing}`,form);toast.success('Updated');}else{await api.post('/services',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/services/${id}`);toast.success('Archived');fetchItems();}catch{}};
 

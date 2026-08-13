@@ -7,6 +7,7 @@ const router = Router();
 // Public
 router.get('/', servicesController.getAll);
 router.get('/payment-settings', servicesController.getPaymentSettings);
+router.get('/id/:id', servicesController.getById);
 router.get('/:slug', servicesController.getBySlug);
 router.post('/request', servicesController.requestService);
 
