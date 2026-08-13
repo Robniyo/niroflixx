@@ -59,6 +59,15 @@ export default function ServicesPage() {
       setGeneratingLink(null);
     }
   };
+    const updatePaymentStatus = async (id: string, status: string) => {
+    try {
+      await api.patch(`/services/payment-status/${id}`, { paymentStatus: status });
+      toast.success(`Payment ${status}`);
+      fetchServiceRequests();
+    } catch {
+      toast.error('Failed to update');
+    }
+  };
 
   if(loading)return<div className="text-center py-16 text-secondary-500">Loading...</div>;
 
@@ -152,9 +161,27 @@ export default function ServicesPage() {
                     </Button>
                   )}
                   {req.paymentProof && (
-                    <a href={req.paymentProof} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-600 hover:underline flex items-center gap-1">
-                      <ExternalLink className="w-3 h-3" /> View Proof
-                    </a>
+                    <div className="flex items-center gap-3">
+                      <a href={req.paymentProof} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-600 hover:underline flex items-center gap-1">
+                        <ExternalLink className="w-3 h-3" /> View Proof
+                      </a>
+                      {req.paymentStatus === 'PENDING_VERIFICATION' && (
+                        <>
+                          <button
+                            onClick={() => updatePaymentStatus(req.id, 'PAID')}
+                            className="text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => updatePaymentStatus(req.id, 'REJECTED')}
+                            className="text-xs text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
