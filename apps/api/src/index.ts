@@ -76,17 +76,6 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   console.error(err);
   res.status(err.status || 500).json({ status: 'error', message: err.message || 'Internal Server Error', code: err.status || 500 });
 });
-
-app.get('/api/v1/run-migration', async (_req, res) => {
-  try {
-    const { execSync } = require('child_process');
-    const output = execSync('npx prisma db push --accept-data-loss', { encoding: 'utf8', timeout: 120000 });
-    res.json({ status: 'success', output });
-  } catch (e: any) {
-    res.status(500).json({ status: 'error', output: e.message });
-  }
-});
-
 app.listen(config.port, () => {
   console.log('Niroflixx API running on port ' + config.port);
 });
