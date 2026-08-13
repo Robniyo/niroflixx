@@ -98,12 +98,13 @@ export const servicesController = {
 
       // Create a ServiceRequest record for all users (authenticated or not)
       // If user is authenticated, link to their account
-      const requestData: any = {
+            const requestData: any = {
         serviceId,
         description,
         status: 'PENDING',
         paymentStatus: 'UNPAID',
         paymentMethod: paymentMethod || 'Not specified',
+        notes: JSON.stringify({ name, email, phone }),
       };
       if (userId) {
         requestData.userId = userId;
@@ -147,19 +148,15 @@ export const servicesController = {
   },
 
   // User uploads payment proof
-    uploadPaymentProof: async (req: Request, res: Response) => {
+      uploadPaymentProof: async (req: Request, res: Response) => {
     try {
-      const { requestId, paymentLink, proofUrl } = req.body;
+      const { paymentLink, proofUrl } = req.body;
 
-      let request;
-      if (requestId) {
-        request = await prisma.serviceRequest.findUnique({ where: { id: requestId } });
-      } else if (paymentLink) {
-        request = await prisma.serviceRequest.findUnique({ where: { paymentLink } });
-      } else {
-        return res.status(400).json({ status: 'error', message: 'requestId or paymentLink required', code: 400 });
+      if (!paymentLink || !proofUrl) {
+        return res.status(400).json({ status: 'error', message: 'paymentLink and proofUrl required', code: 400 });
       }
 
+      const request = await prisma.serviceRequest.findUnique({ where: { paymentLink } });
       if (!request) return res.status(404).json({ status: 'error', message: 'Request not found', code: 404 });
 
       const updated = await prisma.serviceRequest.update({

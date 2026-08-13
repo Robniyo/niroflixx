@@ -105,8 +105,16 @@ export default function ServicesPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="font-semibold text-secondary-900">{req.service?.title || 'Unknown Service'}</h3>
-                    <p className="text-body-sm text-secondary-500">Requested by: {req.user?.firstName || 'Unknown'} {req.user?.lastName || ''} ({req.user?.email || 'no email'})</p>
-                    <p className="text-sm text-secondary-400">Phone: {req.user?.phone || req.paymentMethod || 'N/A'}</p>
+                   {(() => {
+                    let info: any = {};
+                    try { info = JSON.parse(req.notes || '{}'); } catch {}
+                    return (
+                      <>
+                        <p className="text-body-sm text-secondary-500">Requested by: {info.name || 'Unknown'} ({info.email || 'no email'})</p>
+                        <p className="text-sm text-secondary-400">Phone: {info.phone || 'N/A'}</p>
+                      </>
+                    );
+                  })()}
                   </div>
                   <div className="text-right">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
