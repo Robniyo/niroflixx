@@ -25,4 +25,5 @@ router.get('/payment/:link', servicesController.getPaymentPage);
 // Admin generates payment link
 router.post('/generate-payment-link/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.generatePaymentLink);
 router.get('/my-requests', authenticate, servicesController.getMyRequests);
+router.patch('/payment-status/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), servicesController.updatePaymentStatus);
 export default router;
