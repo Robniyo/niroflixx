@@ -47,6 +47,17 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Temporary fix endpoint to regenerate Prisma client on the server
+app.get('/api/v1/fix', async (_req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    const output = execSync('npx prisma generate', { encoding: 'utf8', timeout: 120000 });
+    res.json({ status: 'success', output });
+  } catch (e: any) {
+    res.status(500).json({ status: 'error', output: e.message });
+  }
+});
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', coursesRoutes);
 app.use('/api/v1/opportunities', opportunitiesRoutes);
@@ -76,6 +87,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   console.error(err);
   res.status(err.status || 500).json({ status: 'error', message: err.message || 'Internal Server Error', code: err.status || 500 });
 });
+
 app.listen(config.port, () => {
   console.log('Niroflixx API running on port ' + config.port);
 });
