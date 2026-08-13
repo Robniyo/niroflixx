@@ -58,9 +58,6 @@ export default function OpportunityDetailPage() {
     isClosed ? 'opacity-80' : ''
   }`}
 >
-  {opp.coverImage && (
-    <img src={opp.coverImage} alt={opp.title} className="w-full aspect-video object-cover rounded-xl mb-6" />
-  )}
   <div className="flex flex-wrap items-center gap-2 mb-3">
     <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
       {opp.type?.replace('_', ' ')}
@@ -97,7 +94,18 @@ export default function OpportunityDetailPage() {
           <div className="prose max-w-none space-y-6">
             <div>
               <h3 className="text-h4 font-semibold mb-2">Description</h3>
-              <p className="text-secondary-600">{opp.description}</p>
+              <div className="clearfix">
+                {opp.coverImage && (
+                  <a href={opp.coverImage} target="_blank" rel="noopener noreferrer" className="float-left mr-4 mb-3 block w-56 md:w-64">
+                    <img
+                      src={opp.coverImage}
+                      alt={opp.title}
+                      className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                    />
+                  </a>
+                )}
+                <p className="text-secondary-600">{opp.description}</p>
+              </div>
             </div>
             {opp.requirements && (
               <div>
