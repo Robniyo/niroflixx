@@ -172,7 +172,7 @@ export const coursesController = {
     }
   },
 
-  payEnrollment: async (req: Request, res: Response) => {
+    payEnrollment: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const { enrollmentId, amount, proofUrl } = req.body;
@@ -180,15 +180,21 @@ export const coursesController = {
       const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId } });
       if (!enrollment || enrollment.userId !== userId) return res.status(404).json({ status: 'error', message: 'Enrollment not found', code: 404 });
 
-      const newAmountPaid = (enrollment.amountPaid || 0) + Number(amount);
-      const remaining = Math.max(0, (enrollment.totalAmount || 0) - newAmountPaid);
-      const paymentStatus = remaining === 0 ? 'PENDING_VERIFICATION' : 'PARTIALLY_PAID';
+      const remaining = Math.max(0, (enrollment.totalAmount || 0) - (enrollment.amountPaid || 0));
+      const payAmount = Number(amount);
+
+      if (payAmount <= 0) return res.status(400).json({ status: 'error', message: 'Invalid amount', code: 400 });
+      if (payAmount > remaining) return res.status(400).json({ status: 'error', message: `Amount exceeds remaining balance of ${remaining.toLocaleString()} RWF`, code: 400 });
+
+      const newAmountPaid = (enrollment.amountPaid || 0) + payAmount;
+      const newRemaining = Math.max(0, (enrollment.totalAmount || 0) - newAmountPaid);
+      const paymentStatus = newRemaining === 0 ? 'PENDING_VERIFICATION' : 'PARTIALLY_PAID';
 
       const updated = await prisma.enrollment.update({
         where: { id: enrollmentId },
         data: {
           amountPaid: newAmountPaid,
-          remainingBalance: remaining,
+          remainingBalance: newRemaining,
           paymentStatus,
           lastPaymentDate: new Date(),
           paymentProof: proofUrl || undefined,

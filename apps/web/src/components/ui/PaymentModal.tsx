@@ -9,11 +9,13 @@ interface Props {
   onSuccess: () => void;
   amount: number;
   title: string;
-  courseId?: string;
-  paymentPlan?: string;
+  courseId?: string;       // for new enrollment
+  paymentPlan?: string;    // FULL, HALF, CUSTOM
+  enrollmentId?: string;   // for paying remaining balance
+  maxAmount?: number;      // remaining balance
 }
 
-export default function PaymentModal({ isOpen, onClose, onSuccess, amount, title, courseId, paymentPlan }: Props) {
+export default function PaymentModal({ isOpen, onClose, onSuccess, amount, title, courseId, paymentPlan, enrollmentId, maxAmount }: Props) {
   const [agreed, setAgreed] = useState(false);
   const [proofUploading, setProofUploading] = useState(false);
   const [proofSent, setProofSent] = useState(false);
@@ -37,8 +39,16 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount, title
       const uploadRes = await api.post('/uploads', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       const proofUrl = uploadRes.data.data.url;
 
-      if (courseId) {
-        // Create pending enrollment with proof
+      if (enrollmentId) {
+        // Pay remaining balance
+        if (amount > (maxAmount || 0)) {
+          toast.error(`Amount cannot exceed remaining balance of ${maxAmount?.toLocaleString()} RWF`);
+          setProofUploading(false);
+          return;
+        }
+        await api.post('/courses/pay', { enrollmentId, amount, proofUrl });
+      } else if (courseId) {
+        // New enrollment
         await api.post('/courses/enroll', {
           courseId,
           paymentPlan,
@@ -74,6 +84,9 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount, title
         <div className="bg-primary-50 rounded-xl p-4 mb-4 text-center">
           <p className="text-xs text-secondary-500">Amount to Pay</p>
           <p className="text-2xl font-bold text-primary-600">{amount.toLocaleString()} RWF</p>
+          {enrollmentId && maxAmount !== undefined && (
+            <p className="text-xs text-secondary-500 mt-1">Remaining: {maxAmount.toLocaleString()} RWF</p>
+          )}
         </div>
 
         <div className="bg-secondary-50 rounded-xl p-4 space-y-2 text-sm mb-4">

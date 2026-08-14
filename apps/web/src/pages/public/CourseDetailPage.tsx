@@ -18,6 +18,7 @@ export default function CourseDetailPage() {
   const [enrollment, setEnrollment] = useState<any>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [payRemainingMode, setPayRemainingMode] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -41,7 +42,6 @@ export default function CourseDetailPage() {
     }
 
     if (course.price === 0) {
-      // Free course direct enroll
       setEnrolling(true);
       api.post('/courses/enroll', { courseId: course.id, paymentPlan: 'FREE' })
         .then(() => {
@@ -59,12 +59,11 @@ export default function CourseDetailPage() {
       return;
     }
 
-    // Paid course: open payment modal
+    // Paid course: open payment modal for new enrollment
     let amount = 0;
     if (plan === 'FULL') amount = course.price;
     else if (plan === 'HALF') amount = Math.round(course.price / 2);
     else {
-      // Custom amount: prompt for amount (but now we can let them enter in modal? Currently modal only has amount passed. Could use prompt for simplicity)
       const input = prompt('Enter amount you are paying now (RWF):', String(Math.round(course.price / 2)));
       amount = input ? Number(input) : 0;
     }
@@ -74,7 +73,17 @@ export default function CourseDetailPage() {
       return;
     }
 
+    setPayRemainingMode(false);
     setPaymentAmount(amount);
+    setShowPayment(true);
+  };
+
+  const handlePayRemaining = () => {
+    if (!enrollment) return;
+    const remaining = enrollment.remainingBalance || 0;
+    if (remaining <= 0) return;
+    setPayRemainingMode(true);
+    setPaymentAmount(remaining);
     setShowPayment(true);
   };
 
@@ -133,6 +142,13 @@ export default function CourseDetailPage() {
                 <Link to="/dashboard/enrollments" className="text-primary-600 text-sm font-medium underline mt-1 inline-block">
                   View My Enrollments
                 </Link>
+                {enrollment.remainingBalance > 0 && (
+                  <div className="mt-3">
+                    <Button size="sm" onClick={handlePayRemaining}>
+                      Pay Remaining ({enrollment.remainingBalance.toLocaleString()} RWF)
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -163,12 +179,11 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Payment Modal for paid courses */}
+      {/* Payment Modal */}
       <PaymentModal
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
         onSuccess={() => {
-          // Refresh enrollment and course after successful proof upload
           api.get('/courses/my-enrollments').then(r => {
             const existing = r.data.data.find((e: any) => e.courseId === course.id);
             setEnrollment(existing || null);
@@ -177,8 +192,10 @@ export default function CourseDetailPage() {
         }}
         amount={paymentAmount}
         title={course.title}
-        courseId={course.id}
+        courseId={payRemainingMode ? undefined : course.id}
         paymentPlan={plan}
+        enrollmentId={payRemainingMode ? enrollment?.id : undefined}
+        maxAmount={payRemainingMode ? enrollment?.remainingBalance : undefined}
       />
     </div>
   );
