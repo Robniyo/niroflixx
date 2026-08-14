@@ -28,13 +28,22 @@ export const adminController = {
     }
   },
 
-  updateEnrollmentPayment: async (req: Request, res: Response) => {
+    updateEnrollmentPayment: async (req: Request, res: Response) => {
     try {
       const { paymentStatus, adminNotes } = req.body;
       const enrollment = await prisma.enrollment.update({
         where: { id: req.params.id },
         data: { paymentStatus, notes: adminNotes },
       });
+
+      // Increment course enrollment count when payment is approved
+      if ((paymentStatus === 'PAID' || paymentStatus === 'PARTIALLY_PAID') && enrollment.courseId) {
+        await prisma.course.update({
+          where: { id: enrollment.courseId },
+          data: { enrollmentCount: { increment: 1 } },
+        });
+      }
+
       res.json({ status: 'success', data: enrollment });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });

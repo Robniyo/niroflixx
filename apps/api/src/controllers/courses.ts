@@ -43,7 +43,6 @@ export const coursesController = {
       const slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const course = await prisma.course.create({ data: { ...req.body, slug }, include: { category: true } });
 
-      // Notify all users
       const users = await prisma.user.findMany({ select: { id: true } });
       if (users.length > 0) {
         await prisma.notification.createMany({
@@ -77,37 +76,80 @@ export const coursesController = {
       res.json({ status: 'success', message: 'Course archived' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to delete course', code: 500 }); }
   },
-    enroll: async (req: Request, res: Response) => {
+
+  // Enrollment: requires payment proof for paid courses; status pending until admin approves
+  enroll: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
-      const { courseId, paymentPlan } = req.body; // paymentPlan: FULL, HALF, CUSTOM
+      const { courseId, paymentPlan, amountPaid, proofUrl } = req.body;
 
       const course = await prisma.course.findUnique({ where: { id: courseId } });
       if (!course) return res.status(404).json({ status: 'error', message: 'Course not found', code: 404 });
-
-      const totalAmount = course.price || 0;
-      let remainingBalance = totalAmount;
-      if (paymentPlan === 'HALF') remainingBalance = Math.round(totalAmount / 2);
-      else if (paymentPlan === 'FULL') remainingBalance = totalAmount;
-      // CUSTOM: remainingBalance remains totalAmount – user will pay whatever they can
 
       const existing = await prisma.enrollment.findUnique({
         where: { courseId_userId: { courseId, userId } },
       });
       if (existing) return res.status(400).json({ status: 'error', message: 'Already enrolled', code: 400 });
 
+      // Free course — immediate enrollment
+      if (course.price === 0) {
+        const enrollment = await prisma.enrollment.create({
+          data: {
+            courseId,
+            userId,
+            paymentPlan: 'FREE',
+            totalAmount: 0,
+            amountPaid: 0,
+            remainingBalance: 0,
+            paymentStatus: 'PAID',
+            status: 'active',
+          },
+        });
+        await prisma.course.update({ where: { id: courseId }, data: { enrollmentCount: { increment: 1 } } });
+        return res.status(201).json({ status: 'success', data: enrollment });
+      }
+
+      // Paid course: require payment proof and amount
+      const totalAmount = course.price || 0;
+      let paidNow = Number(amountPaid || 0);
+      let remaining = totalAmount;
+      const plan = paymentPlan || 'CUSTOM';
+
+      if (plan === 'FULL') {
+        paidNow = totalAmount;
+        remaining = 0;
+      } else if (plan === 'HALF') {
+        paidNow = Math.round(totalAmount / 2);
+        remaining = totalAmount - paidNow;
+      } else {
+        paidNow = Math.min(paidNow, totalAmount);
+        remaining = totalAmount - paidNow;
+      }
+
+      if (!proofUrl) {
+        return res.status(400).json({ status: 'error', message: 'Payment proof required', code: 400 });
+      }
+      if (paidNow <= 0) {
+        return res.status(400).json({ status: 'error', message: 'Payment amount required', code: 400 });
+      }
+
+      // Create enrollment with pending verification
       const enrollment = await prisma.enrollment.create({
         data: {
           courseId,
           userId,
-          paymentPlan,
+          paymentPlan: plan,
           totalAmount,
-          amountPaid: 0,
-          remainingBalance,
-          paymentStatus: 'UNPAID',
+          amountPaid: paidNow,
+          remainingBalance: remaining,
+          paymentStatus: 'PENDING_VERIFICATION',
+          paymentProof: proofUrl,
+          lastPaymentDate: new Date(),
           status: 'active',
         },
       });
+
+      // Note: enrollmentCount is NOT incremented yet; admin approves later.
 
       res.status(201).json({ status: 'success', data: enrollment });
     } catch (error) {
@@ -140,7 +182,7 @@ export const coursesController = {
 
       const newAmountPaid = (enrollment.amountPaid || 0) + Number(amount);
       const remaining = Math.max(0, (enrollment.totalAmount || 0) - newAmountPaid);
-      const paymentStatus = remaining === 0 ? 'PAID' : 'PARTIALLY_PAID';
+      const paymentStatus = remaining === 0 ? 'PENDING_VERIFICATION' : 'PARTIALLY_PAID';
 
       const updated = await prisma.enrollment.update({
         where: { id: enrollmentId },
@@ -152,16 +194,6 @@ export const coursesController = {
           paymentProof: proofUrl || undefined,
         },
       });
-
-      // Send confirmation email
-      try {
-        const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, firstName: true } });
-        if (user?.email) {
-          const { emailService } = await import('../services/email');
-          emailService.sendEnrollmentPaymentConfirmation(user.email, user.firstName, enrollment.courseId, amount, remaining)
-            .catch(e => console.error('Payment email failed:', e));
-        }
-      } catch (e) {}
 
       res.json({ status: 'success', data: updated });
     } catch (error) {

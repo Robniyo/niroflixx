@@ -5,6 +5,7 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import PaymentModal from '@/components/ui/PaymentModal';
 
 export default function CourseDetailPage() {
   const { slug } = useParams();
@@ -15,6 +16,8 @@ export default function CourseDetailPage() {
   const [enrolling, setEnrolling] = useState(false);
   const [plan, setPlan] = useState('FULL');
   const [enrollment, setEnrollment] = useState<any>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   useEffect(() => {
     if (!slug) return;
@@ -30,23 +33,49 @@ export default function CourseDetailPage() {
     }
   }, [isAuthenticated, course]);
 
-  const handleEnroll = async () => {
+  const handleEnrollClick = () => {
     if (!isAuthenticated) {
+      sessionStorage.setItem('enrollAfterLogin', JSON.stringify({ courseSlug: course.slug }));
       navigate('/login');
       return;
     }
-    setEnrolling(true);
-    try {
-      await api.post('/courses/enroll', { courseId: course.id, paymentPlan: plan });
-      toast.success('Enrolled! Track your payments in My Enrollments.');
-      const r = await api.get('/courses/my-enrollments');
-      const existing = r.data.data.find((e: any) => e.courseId === course.id);
-      setEnrollment(existing || null);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Enrollment failed');
-    } finally {
-      setEnrolling(false);
+
+    if (course.price === 0) {
+      // Free course direct enroll
+      setEnrolling(true);
+      api.post('/courses/enroll', { courseId: course.id, paymentPlan: 'FREE' })
+        .then(() => {
+          toast.success('Enrolled successfully!');
+          return api.get('/courses/my-enrollments');
+        })
+        .then(r => {
+          const existing = r.data.data.find((e: any) => e.courseId === course.id);
+          setEnrollment(existing || null);
+          return api.get(`/courses/${course.slug}`);
+        })
+        .then(c => setCourse(c.data.data))
+        .catch(err => toast.error(err.response?.data?.message || 'Enrollment failed'))
+        .finally(() => setEnrolling(false));
+      return;
     }
+
+    // Paid course: open payment modal
+    let amount = 0;
+    if (plan === 'FULL') amount = course.price;
+    else if (plan === 'HALF') amount = Math.round(course.price / 2);
+    else {
+      // Custom amount: prompt for amount (but now we can let them enter in modal? Currently modal only has amount passed. Could use prompt for simplicity)
+      const input = prompt('Enter amount you are paying now (RWF):', String(Math.round(course.price / 2)));
+      amount = input ? Number(input) : 0;
+    }
+
+    if (amount <= 0) {
+      toast.error('Payment amount required to enroll');
+      return;
+    }
+
+    setPaymentAmount(amount);
+    setShowPayment(true);
   };
 
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
@@ -82,14 +111,14 @@ export default function CourseDetailPage() {
             )}
             {course.enrollmentCount !== undefined && (
               <div className="text-center">
-                <p className="text-h3 font-bold text-secondary-900 flex items-center gap-1"><Users className="w-5 h-5" /> {course.enrollmentCount}</p>
+                <p className="text-h3 font-bold text-secondary-900 flex items-center gap-1"><Users className="w-5 h-5" /> {course.enrollmentCount || 0}</p>
                 <p className="text-sm text-secondary-500">Enrolled</p>
               </div>
             )}
           </div>
 
           {course.price === 0 ? (
-            <Button size="lg" onClick={handleEnroll} isLoading={enrolling}>
+            <Button size="lg" onClick={handleEnrollClick} isLoading={enrolling}>
               Enroll for Free
             </Button>
           ) : enrollment ? (
@@ -126,13 +155,31 @@ export default function CourseDetailPage() {
                   </button>
                 ))}
               </div>
-              <Button size="lg" onClick={handleEnroll} isLoading={enrolling}>
+              <Button size="lg" onClick={handleEnrollClick}>
                 Enroll Now
               </Button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Payment Modal for paid courses */}
+      <PaymentModal
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+        onSuccess={() => {
+          // Refresh enrollment and course after successful proof upload
+          api.get('/courses/my-enrollments').then(r => {
+            const existing = r.data.data.find((e: any) => e.courseId === course.id);
+            setEnrollment(existing || null);
+          });
+          api.get(`/courses/${course.slug}`).then(c => setCourse(c.data.data));
+        }}
+        amount={paymentAmount}
+        title={course.title}
+        courseId={course.id}
+        paymentPlan={plan}
+      />
     </div>
   );
 }
