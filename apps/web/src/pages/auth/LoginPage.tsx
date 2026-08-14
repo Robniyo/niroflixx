@@ -20,7 +20,17 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const userData = await login(email, password);
-
+            const pendingEnroll = sessionStorage.getItem('enrollAfterLogin');
+      if (pendingEnroll) {
+        sessionStorage.removeItem('enrollAfterLogin');
+        try {
+          const { courseSlug } = JSON.parse(pendingEnroll);
+          navigate(`/academy/${courseSlug}`);
+        } catch {
+          navigate('/');
+        }
+        return;
+      }
       // Redirect after login – check for pending apply intent
       const pendingApply = sessionStorage.getItem('applyAfterLogin');
       if (pendingApply) {
