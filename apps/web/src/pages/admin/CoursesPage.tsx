@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, BookOpen, Upload, Eye, CheckCircle, XCircle, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, X, BookOpen, Upload, Eye, CheckCircle, XCircle, DollarSign, Bell } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import ResponsiveTable from '@/components/ui/ResponsiveTable';
-
 interface Course {
   id: string; title: string; level: string; type: string; status: string; price: number; enrollmentCount: number; category?: { name: string }; thumbnail?: string;
 }
@@ -84,7 +83,14 @@ export default function CoursesPage() {
       fetchEnrollments();
     } catch { toast.error('Failed'); }
   };
-
+    const handleSendReminders = async () => {
+    try {
+      await api.post('/admin/send-reminders');
+      toast.success('Reminders sent!');
+    } catch {
+      toast.error('Failed to send reminders');
+    }
+  };
   if (loading) return <div className="text-center py-16 text-secondary-500">Loading...</div>;
 
   return (
@@ -131,9 +137,18 @@ export default function CoursesPage() {
         </>
       )}
 
-      {/* Enrollments Tab */}
+              {/* Enrollments Tab */}
       {tab === 'enrollments' && (
         <div className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              onClick={handleSendReminders}
+              className="bg-primary-600 text-white hover:bg-primary-700"
+            >
+              <Bell className="w-4 h-4 mr-1" /> Send Payment Reminders
+            </Button>
+          </div>
           {enrollments.length === 0 ? (
             <div className="bg-white rounded-xl border border-dashed border-secondary-200 p-12 text-center">
               <DollarSign className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
