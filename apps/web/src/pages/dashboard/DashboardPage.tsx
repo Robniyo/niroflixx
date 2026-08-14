@@ -15,9 +15,9 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ enrollments: 0, downloads: 0, applications: 0 });
   const [candidateStatus, setCandidateStatus] = useState<any>(null);
 
-  useEffect(() => {
+    useEffect(() => {
     Promise.all([
-      api.get('/enrollments').then(r => r.data.data?.length || 0).catch(() => 0),
+      api.get('/courses/my-enrollments').then(r => r.data.data?.length || 0).catch(() => 0),
       api.get('/applications').then(r => r.data.data?.length || 0).catch(() => 0),
       api.get('/resources').then(r => r.data.pagination?.total || r.data.data?.length || 0).catch(() => 0),
     ]).then(([enrollments, applications, downloads]) => {
