@@ -7,6 +7,7 @@ export default function NewsDetailPage() {
   const { slug } = useParams();
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [imageZoomed, setImageZoomed] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -24,9 +25,36 @@ export default function NewsDetailPage() {
         </Link>
 
         <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden">
-          <div className="h-56 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
-            {article.coverImage ? <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" /> : <Newspaper className="w-16 h-16 text-white/40" />}
-          </div>
+          {/* Image section: no crop, natural size, click to zoom */}
+          {article.coverImage ? (
+            <>
+              <div className="w-full flex justify-center bg-secondary-50">
+                <img
+                  src={article.coverImage}
+                  alt={article.title}
+                  className="cursor-pointer max-h-96 w-auto object-contain"
+                  onClick={() => setImageZoomed(true)}
+                />
+              </div>
+              {imageZoomed && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                  onClick={() => setImageZoomed(false)}
+                >
+                  <img
+                    src={article.coverImage}
+                    alt={article.title}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="h-56 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+              <Newspaper className="w-16 h-16 text-white/40" />
+            </div>
+          )}
+
           <div className="p-8">
             <span className="text-info font-semibold text-sm">{article.category?.name || 'General'}</span>
             <h1 className="text-h2 font-bold mt-2 mb-4">{article.title}</h1>

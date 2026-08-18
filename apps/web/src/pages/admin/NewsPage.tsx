@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Newspaper } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Newspaper, Upload } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -14,11 +14,30 @@ export default function NewsPage() {
   const [editing, setEditing] = useState<string|null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(()=>{fetchItems();},[]);
   const fetchItems = async()=>{try{const r=await api.get('/news');setItems(r.data.data);}catch{}finally{setLoading(false);}};
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
   const openEdit = async(id:string)=>{try{const r=await api.get(`/news/${id}`);const d=r.data.data;setForm({title:d.title||'',summary:d.summary||'',content:d.content||'',categoryId:d.categoryId||'',author:d.author||'Future Scholars Team',coverImage:d.coverImage||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await api.post('/uploads', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm({ ...form, coverImage: res.data.data.url });
+      toast.success('Image uploaded');
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/news/${editing}`,form);toast.success('Updated');}else{await api.post('/news',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
   const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/news/${id}`);toast.success('Archived');fetchItems();}catch{}};
 
@@ -63,6 +82,16 @@ export default function NewsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-sm font-medium text-secondary-700 mb-1">Author</label><input type="text" value={form.author} onChange={e=>setForm({...form,author:e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"/></div>
                 <div><label className="block text-sm font-medium text-secondary-700 mb-1">Cover Image URL</label><input type="url" value={form.coverImage} onChange={e=>setForm({...form,coverImage:e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"/></div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Or Upload from PC</label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg cursor-pointer hover:bg-secondary-100 text-sm text-secondary-600">
+                    <Upload className="w-4 h-4" /> {uploading ? 'Uploading...' : 'Choose Image'}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                  </label>
+                  {form.coverImage && <span className="text-xs text-success truncate max-w-[180px]">Image uploaded ✓</span>}
+                </div>
               </div>
               <div className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={e=>setForm({...form,featured:e.target.checked})}/><label className="text-sm">Featured</label></div>
               <div>
