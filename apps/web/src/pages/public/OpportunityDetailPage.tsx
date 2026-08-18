@@ -10,6 +10,7 @@ export default function OpportunityDetailPage() {
   const [opp, setOpp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showApply, setShowApply] = useState(false);
+  const [imageZoomed, setImageZoomed] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -95,15 +96,32 @@ export default function OpportunityDetailPage() {
             <div>
               <h3 className="text-h4 font-semibold mb-2">Description</h3>
               <div className="clearfix">
-                {opp.coverImage && (
-                  <a href={opp.coverImage} target="_blank" rel="noopener noreferrer" className="float-left mr-4 mb-3 block w-56 md:w-64">
+               {opp.coverImage && (
+                <>
+                  <button
+                    onClick={() => setImageZoomed(true)}
+                    className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
+                  >
                     <img
                       src={opp.coverImage}
                       alt={opp.title}
                       className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
                     />
-                  </a>
-                )}
+                  </button>
+                  {imageZoomed && (
+                    <div
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                      onClick={() => setImageZoomed(false)}
+                    >
+                      <img
+                        src={opp.coverImage}
+                        alt={opp.title}
+                        className="max-w-full max-h-full object-contain cursor-zoom-out"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
                 <p className="text-secondary-600">{opp.description}</p>
               </div>
             </div>
