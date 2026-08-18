@@ -213,57 +213,59 @@ export default function OpportunitiesPage() {
 
                 return (
                   <Link
-                  to={`/opportunities/${opp.id}`}
-                  key={opp.id}
-                  className={`group ${computedStatus === 'CLOSED' ? 'pointer-events-none' : ''}`}
-                >
-                  <div
-                    className={`bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all ${
-                      computedStatus === 'CLOSED' ? 'opacity-60' : ''
-                    }`}
-                  >
-                    {opp.coverImage ? (
-                      <img
-                        src={opp.coverImage}
-                        alt={opp.title}
-                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform"
-                      />
-                    ) : (
-                      <div className="h-40 bg-accent-50 flex items-center justify-center">
-                        <Briefcase className="w-10 h-10 text-accent-400" />
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        <span className="text-caption text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">
-                          {opp.type?.replace('_', ' ')}
-                        </span>
-                        {badge && (
-                          <span className={`text-caption px-2 py-0.5 rounded-full ${badge.color}`}>
-                            {badge.text}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="font-semibold group-hover:text-primary-600 transition-colors">
-                        {opp.title}
-                      </h3>
-                      <p className="text-body-sm text-secondary-500">{opp.organization}</p>
-                      <div className="flex gap-3 mt-3 text-body-sm text-secondary-400">
-                        {opp.country && (
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5" /> {opp.country}
-                          </span>
-                        )}
-                        {opp.deadline && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />{' '}
-                            {new Date(opp.deadline).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+  to={`/opportunities/${opp.id}`}
+  key={opp.id}
+  className={`group ${computedStatus === 'CLOSED' ? 'pointer-events-none' : ''}`}
+>
+  <div
+    className={`bg-white rounded-xl border p-4 transition-all flex gap-4 ${
+      computedStatus === 'CLOSED'
+        ? 'opacity-60'
+        : 'hover:shadow-md'
+    }`}
+  >
+    {opp.coverImage ? (
+      <img
+        src={opp.coverImage}
+        alt={opp.title}
+        className="w-16 h-16 object-contain rounded-lg bg-secondary-50 flex-shrink-0"
+      />
+    ) : (
+      <div className="w-16 h-16 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Briefcase className="w-6 h-6 text-accent-600" />
+      </div>
+    )}
+    <div className="flex-1 min-w-0">
+      <div className="flex flex-wrap gap-1.5 mb-1.5">
+        <span className="text-caption text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">
+          {opp.type?.replace('_', ' ')}
+        </span>
+        {badge && (
+          <span className={`text-caption px-2 py-0.5 rounded-full ${badge.color}`}>
+            {badge.text}
+          </span>
+        )}
+      </div>
+      <h3 className="font-semibold text-sm group-hover:text-primary-600 transition-colors truncate">
+        {opp.title}
+      </h3>
+      <p className="text-body-sm text-secondary-500 truncate">{opp.organization}</p>
+      <div className="flex gap-3 mt-2 text-body-sm text-secondary-400">
+        {opp.country && (
+          <span className="flex items-center gap-1">
+            <MapPin className="w-3.5 h-3.5" /> {opp.country}
+          </span>
+        )}
+        {opp.deadline && (
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5" />{' '}
+            {new Date(opp.deadline).toLocaleDateString()}
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+</Link>
                 );
               })}
             </div>
