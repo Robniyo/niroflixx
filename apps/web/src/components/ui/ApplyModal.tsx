@@ -87,7 +87,7 @@ export default function ApplyModal({ isOpen, onClose, opportunityTitle, opportun
 
   const goToProfile = () => {
     onClose();
-    navigate('/dashboard/candidate-profile');
+   navigate('/dashboard/candidate');
   };
 
   return (
