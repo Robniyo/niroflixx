@@ -73,12 +73,16 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { isAuthenticated } = useAuth();
   const [maintenance, setMaintenance] = useState(false);
   const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
 
   // After Google login redirect, check for pending course/opportunity intent
   useEffect(() => {
+    // Only redirect after the user is authenticated
+    if (!isAuthenticated) return;
+
     const pendingEnroll = sessionStorage.getItem('enrollAfterLogin');
     if (pendingEnroll) {
       sessionStorage.removeItem('enrollAfterLogin');
@@ -97,7 +101,7 @@ export default function App() {
         navigate(`/opportunities/${opportunityId}`);
       } catch {}
     }
-  }, [navigate]);
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     api.get('/admin/maintenance').then(r => {
