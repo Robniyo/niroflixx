@@ -28,23 +28,33 @@ export const adminController = {
     }
   },
 
-    updateEnrollmentPayment: async (req: Request, res: Response) => {
+      updateEnrollmentPayment: async (req: Request, res: Response) => {
     try {
       const { paymentStatus, adminNotes } = req.body;
-      const enrollment = await prisma.enrollment.update({
+      const enrollment = await prisma.enrollment.findUnique({ where: { id: req.params.id } });
+      if (!enrollment) return res.status(404).json({ status: 'error', message: 'Not found', code: 404 });
+
+      // Prevent setting PAID if remainingBalance > 0
+      if (paymentStatus === 'PAID' && enrollment.remainingBalance > 0) {
+        return res.status(400).json({ status: 'error', message: 'Cannot mark as PAID while remaining balance exists', code: 400 });
+      }
+
+      // Only increment enrollment count when first approval happens (from PENDING_VERIFICATION to PAID or PARTIALLY_PAID)
+      const shouldIncrement = enrollment.paymentStatus === 'PENDING_VERIFICATION' && ['PAID','PARTIALLY_PAID'].includes(paymentStatus);
+
+      const updated = await prisma.enrollment.update({
         where: { id: req.params.id },
         data: { paymentStatus, notes: adminNotes },
       });
 
-      // Increment course enrollment count when payment is approved
-      if ((paymentStatus === 'PAID' || paymentStatus === 'PARTIALLY_PAID') && enrollment.courseId) {
+      if (shouldIncrement && updated.courseId) {
         await prisma.course.update({
-          where: { id: enrollment.courseId },
+          where: { id: updated.courseId },
           data: { enrollmentCount: { increment: 1 } },
         });
       }
 
-      res.json({ status: 'success', data: enrollment });
+      res.json({ status: 'success', data: updated });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }

@@ -78,7 +78,7 @@ export const coursesController = {
   },
 
   // Enrollment: requires payment proof for paid courses; status pending until admin approves
-  enroll: async (req: Request, res: Response) => {
+    enroll: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const { courseId, paymentPlan, amountPaid, proofUrl } = req.body;
@@ -91,7 +91,7 @@ export const coursesController = {
       });
       if (existing) return res.status(400).json({ status: 'error', message: 'Already enrolled', code: 400 });
 
-      // Free course — immediate enrollment
+      // Free course: immediate enrollment, increment count
       if (course.price === 0) {
         const enrollment = await prisma.enrollment.create({
           data: {
@@ -109,7 +109,7 @@ export const coursesController = {
         return res.status(201).json({ status: 'success', data: enrollment });
       }
 
-      // Paid course: require payment proof and amount
+      // Paid course: require payment proof and amount, create as pending verification
       const totalAmount = course.price || 0;
       let paidNow = Number(amountPaid || 0);
       let remaining = totalAmount;
@@ -133,7 +133,7 @@ export const coursesController = {
         return res.status(400).json({ status: 'error', message: 'Payment amount required', code: 400 });
       }
 
-      // Create enrollment with pending verification
+      // Create enrollment with PENDING_VERIFICATION (admin will approve later)
       const enrollment = await prisma.enrollment.create({
         data: {
           courseId,
@@ -149,8 +149,7 @@ export const coursesController = {
         },
       });
 
-      // Note: enrollmentCount is NOT incremented yet; admin approves later.
-
+      // Note: enrollmentCount is NOT incremented here. Admin approval will do it.
       res.status(201).json({ status: 'success', data: enrollment });
     } catch (error) {
       console.error('ENROLLMENT ERROR:', error);
