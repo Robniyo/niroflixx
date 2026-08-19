@@ -92,9 +92,14 @@ export default function ResourceDetailPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
-              <iframe src={resource.fileUrl} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
-            </div>
+          <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
+            {resource.fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
+              ? (
+                <img src={resource.fileUrl} alt={resource.title} className="w-full h-full object-contain rounded-xl bg-white" />
+              ) : (
+                <iframe src={resource.fileUrl} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
+              )}
+          </div>
           </div>
         </div>
       )}

@@ -68,21 +68,40 @@ export const resourcesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-  downloadFile: async (req: Request, res: Response) => {
+    downloadFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       if (!resource || !resource.fileUrl) {
         return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
       }
 
-      // Increment download count only on successful download request
+      // Increment download count only when a download is explicitly requested
       await prisma.resource.update({
-        where: { id: req.params.id },
+        where: { id: resource.id },
         data: { downloadCount: { increment: 1 } },
       });
 
-      // Redirect to the actual file URL (Cloudinary or any storage)
-      res.redirect(resource.fileUrl);
+      // Fetch the actual file from Cloudinary or storage
+      const response = await fetch(resource.fileUrl);
+      if (!response.ok) {
+        return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+      }
+
+      const contentType = response.headers.get('content-type') || 'application/octet-stream';
+      const buffer = await response.arrayBuffer();
+
+      // Build a clean filename from the resource title
+      let filename = resource.title || 'document';
+      filename = filename.replace(/[^a-zA-Z0-9]+/g, '_');
+      const url = new URL(resource.fileUrl);
+      const pathname = url.pathname;
+      const ext = pathname.includes('.') ? pathname.split('.').pop()?.toLowerCase() : '';
+      if (ext) filename += '.' + ext;
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', buffer.byteLength);
+      res.send(Buffer.from(buffer));
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
