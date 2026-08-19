@@ -33,9 +33,15 @@ export default function FreeResources() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {resources.map((r) => (
               <Link to={`/resources/${r.slug || r.id}`} key={r.id} className="group">
-                <div className="bg-white rounded-xl border border-secondary-100 p-6 text-center hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4"><BookOpen className="w-5 h-5 text-primary-600" /></div>
-                  <h4 className="font-semibold text-secondary-900 mb-2">{r.title}</h4>
+                <div className="bg-white rounded-xl border border-secondary-100 p-4 text-center hover:shadow-md transition-all">
+                  {r.thumbnail ? (
+                    <img src={r.thumbnail} alt={r.title} className="w-16 h-16 object-contain rounded-lg mx-auto mb-3 bg-secondary-50" />
+                  ) : (
+                    <div className="w-16 h-16 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <BookOpen className="w-6 h-6 text-primary-600" />
+                    </div>
+                  )}
+                  <h4 className="font-semibold text-secondary-900 text-sm mb-1 truncate">{r.title}</h4>
                   <div className="flex items-center justify-center gap-1 text-body-sm text-secondary-400"><Download className="w-3.5 h-3.5" /> {r.downloadCount || 0}</div>
                 </div>
               </Link>
