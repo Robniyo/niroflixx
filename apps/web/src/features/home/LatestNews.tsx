@@ -34,7 +34,7 @@ export default function LatestNews() {
             {news.map((item) => (
               <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
                 <div className="bg-secondary-50 rounded-xl border border-secondary-100 overflow-hidden h-full flex flex-col hover:shadow-md transition-all">
-                  <div className="h-24 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+                  <div className="h-16 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
                   {item.coverImage ? (
                     <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
                   ) : (
