@@ -4,11 +4,6 @@ import { BookOpen, ArrowLeft, Download, Eye, LinkIcon, X } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
-// Resolve file URL
-function resolveFileUrl(url: string) {
-  return url.startsWith('http') ? url : `https://niroflixx.onrender.com${url.startsWith('/') ? url : '/' + url}`;
-}
-
 export default function ResourceDetailPage() {
   const { slug } = useParams();
   const [resource, setResource] = useState<any>(null);
@@ -22,13 +17,6 @@ export default function ResourceDetailPage() {
       setResource(found || null);
     }).catch(() => {}).finally(() => setLoading(false));
   }, [slug]);
-
-  const handleDownload = () => {
-    if (!resource?.fileUrl) return;
-    // Increment count in background
-    api.post(`/resources/${resource.id}/increment`).catch(() => {});
-    window.open(resolveFileUrl(resource.fileUrl), '_blank');
-  };
 
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
   if (!resource) return <div className="pt-32 pb-16 text-center"><h1 className="text-h2">Resource Not Found</h1><Link to="/resources" className="text-primary-600 mt-4 inline-block">Back to Resources</Link></div>;
@@ -64,12 +52,13 @@ export default function ResourceDetailPage() {
 
           {resource.fileUrl ? (
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleDownload}
+              <a
+                href={`https://niroflixx.onrender.com/api/v1/resources/${resource.id}/download`}
+                target="_blank"
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
               >
                 <Download className="w-5 h-5" /> Download Resource
-              </button>
+              </a>
               <button
                 onClick={() => setShowPreview(true)}
                 className="inline-flex items-center gap-2 px-5 py-3.5 bg-secondary-100 text-secondary-700 rounded-xl font-medium hover:bg-secondary-200 transition-colors text-sm"
@@ -104,12 +93,11 @@ export default function ResourceDetailPage() {
               </button>
             </div>
             <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
-              {resolveFileUrl(resource.fileUrl).toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
-                ? (
-                  <img src={resolveFileUrl(resource.fileUrl)} alt={resource.title} className="w-full h-full object-contain rounded-xl bg-white" />
-                ) : (
-                  <iframe src={resolveFileUrl(resource.fileUrl)} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
-                )}
+              <iframe
+                src={`https://niroflixx.onrender.com/api/v1/resources/${resource.id}/preview`}
+                title={resource.title}
+                className="w-full h-full rounded-xl border bg-white"
+              />
             </div>
           </div>
         </div>

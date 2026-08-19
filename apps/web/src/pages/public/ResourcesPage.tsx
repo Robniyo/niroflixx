@@ -5,11 +5,6 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import AdBanner from '@/components/ui/AdBanner';
 
-// Resolve file URL (works for Cloudinary or relative /uploads)
-function resolveFileUrl(url: string) {
-  return url.startsWith('http') ? url : `https://niroflixx.onrender.com${url.startsWith('/') ? url : '/' + url}`;
-}
-
 export default function ResourcesPage() {
   const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,17 +13,6 @@ export default function ResourcesPage() {
   useEffect(() => {
     api.get('/resources').then(r => setResources(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
-
-  const handleDownload = async (e: React.MouseEvent, resource: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    try {
-      // Increment count in background, but don't block opening file
-      api.post(`/resources/${resource.id}/increment`).catch(() => {});
-      const fileUrl = resolveFileUrl(resource.fileUrl);
-      window.open(fileUrl, '_blank');
-    } catch {}
-  };
 
   if (loading) {
     return (
@@ -102,12 +86,13 @@ export default function ResourcesPage() {
                     >
                       <Eye className="w-4 h-4" /> View
                     </button>
-                    <button
-                      onClick={(e) => handleDownload(e, r)}
+                    <a
+                      href={`https://niroflixx.onrender.com/api/v1/resources/${r.id}/download`}
+                      target="_blank"
                       className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
                     >
                       <Download className="w-4 h-4" /> Download
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -129,12 +114,11 @@ export default function ResourcesPage() {
             </div>
             <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
               {selected.fileUrl ? (
-                resolveFileUrl(selected.fileUrl).toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
-                  ? (
-                    <img src={resolveFileUrl(selected.fileUrl)} alt={selected.title} className="w-full h-full object-contain rounded-xl bg-white" />
-                  ) : (
-                    <iframe src={resolveFileUrl(selected.fileUrl)} title={selected.title} className="w-full h-full rounded-xl border bg-white" />
-                  )
+                <iframe
+                  src={`https://niroflixx.onrender.com/api/v1/resources/${selected.id}/preview`}
+                  title={selected.title}
+                  className="w-full h-full rounded-xl border bg-white"
+                />
               ) : (
                 <div className="flex items-center justify-center h-full text-secondary-400">
                   <p>No preview available</p>

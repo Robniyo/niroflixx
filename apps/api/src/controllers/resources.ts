@@ -11,6 +11,11 @@ const cleanData = (data: any) => {
   return cleaned;
 };
 
+// Helper to resolve file URL (handles relative /uploads)
+function resolveFileUrl(url: string) {
+  return url.startsWith('http') ? url : `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${url.startsWith('/') ? url : '/' + url}`;
+}
+
 export const resourcesController = {
   getAll: async (req: Request, res: Response) => {
     try {
@@ -68,7 +73,6 @@ export const resourcesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-  // Increment download count only (called separately by frontend)
   incrementDownload: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
@@ -82,6 +86,71 @@ export const resourcesController = {
       res.json({ status: 'success', data: { downloadCount: resource.downloadCount + 1 } });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
+    }
+  },
+
+  // Preview file inline (for PDF/images)
+  previewFile: async (req: Request, res: Response) => {
+    try {
+      const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
+      if (!resource || !resource.fileUrl) {
+        return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
+      }
+
+      const fileUrl = resolveFileUrl(resource.fileUrl);
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+      }
+
+      const contentType = response.headers.get('content-type') || 'application/pdf';
+      const buffer = await response.arrayBuffer();
+
+      // Set inline disposition so the browser displays it, not downloads
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${resource.title || 'preview'}.pdf"`);
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Preview failed', code: 500 });
+    }
+  },
+
+  // Download file (forces attachment)
+  downloadFile: async (req: Request, res: Response) => {
+    try {
+      const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
+      if (!resource || !resource.fileUrl) {
+        return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
+      }
+
+      const fileUrl = resolveFileUrl(resource.fileUrl);
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+      }
+
+      const contentType = response.headers.get('content-type') || 'application/octet-stream';
+      const buffer = await response.arrayBuffer();
+
+      // Increment download count
+      await prisma.resource.update({
+        where: { id: resource.id },
+        data: { downloadCount: { increment: 1 } },
+      });
+
+      // Build clean filename with proper extension
+      let filename = resource.title || 'document';
+      filename = filename.replace(/[^a-zA-Z0-9]+/g, '_');
+      const url = new URL(fileUrl);
+      const pathname = url.pathname;
+      const ext = pathname.includes('.') ? pathname.split('.').pop()?.toLowerCase() : 'pdf';
+      filename += '.' + ext;
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Download failed', code: 500 });
     }
   },
 };
