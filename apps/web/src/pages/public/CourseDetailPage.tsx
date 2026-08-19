@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Users, Star, DollarSign, BookOpen, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Clock, Users, Star, DollarSign, BookOpen, CheckCircle, X, LogIn } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -19,6 +19,7 @@ export default function CourseDetailPage() {
   const [showPayment, setShowPayment] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [payRemainingMode, setPayRemainingMode] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -34,10 +35,16 @@ export default function CourseDetailPage() {
     }
   }, [isAuthenticated, course]);
 
+  const handleLoginConfirm = () => {
+    if (!course) return;
+    sessionStorage.setItem('enrollAfterLogin', JSON.stringify({ courseSlug: course.slug }));
+    setShowLoginPrompt(false);
+    navigate('/login');
+  };
+
   const handleEnrollClick = () => {
     if (!isAuthenticated) {
-      sessionStorage.setItem('enrollAfterLogin', JSON.stringify({ courseSlug: course.slug }));
-      navigate('/login');
+      setShowLoginPrompt(true);
       return;
     }
 
@@ -59,7 +66,6 @@ export default function CourseDetailPage() {
       return;
     }
 
-    // Paid course: open payment modal for new enrollment
     let amount = 0;
     if (plan === 'FULL') amount = course.price;
     else if (plan === 'HALF') amount = Math.round(course.price / 2);
@@ -179,7 +185,7 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Payment Modal */}
+      {/* Payment Modal for paid courses */}
       <PaymentModal
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
@@ -197,6 +203,50 @@ export default function CourseDetailPage() {
         enrollmentId={payRemainingMode ? enrollment?.id : undefined}
         maxAmount={payRemainingMode ? enrollment?.remainingBalance : undefined}
       />
+
+      {/* Professional Login Prompt Modal */}
+      {showLoginPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowLoginPrompt(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-scale-in">
+            <button
+              onClick={() => setShowLoginPrompt(false)}
+              className="absolute top-4 right-4 p-2 text-secondary-400 hover:text-secondary-600 rounded-lg hover:bg-secondary-50"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogIn className="w-8 h-8 text-primary-600" />
+              </div>
+              <h3 className="text-h4 font-bold text-secondary-900 mb-2">Login Required</h3>
+              <p className="text-body-sm text-secondary-500">
+                You need a Future Scholars account to enroll in this course.
+              </p>
+            </div>
+            <div className="bg-secondary-50 rounded-xl p-5 mb-6 text-sm text-secondary-700 space-y-2">
+              <p>✅ Your enrollment and payment progress will be saved.</p>
+              <p>✅ You can complete your payment after login.</p>
+              <p>✅ Access your courses anytime from your dashboard.</p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowLoginPrompt(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleLoginConfirm}
+              >
+                <LogIn className="w-4 h-4 mr-1" /> Continue to Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
