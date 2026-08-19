@@ -24,18 +24,20 @@ export default function NewsDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to News
         </Link>
 
-        <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden">
-          {/* Image section: no crop, natural size, click to zoom */}
+        <div className="bg-white rounded-2xl border border-secondary-100 p-8">
+          {/* Small left-floated image, click to enlarge */}
           {article.coverImage ? (
             <>
-              <div className="w-full flex justify-center bg-secondary-50">
+              <button
+                onClick={() => setImageZoomed(true)}
+                className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
+              >
                 <img
                   src={article.coverImage}
                   alt={article.title}
-                  className="cursor-pointer max-h-96 w-auto object-contain"
-                  onClick={() => setImageZoomed(true)}
+                  className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
                 />
-              </div>
+              </button>
               {imageZoomed && (
                 <div
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
@@ -44,27 +46,25 @@ export default function NewsDetailPage() {
                   <img
                     src={article.coverImage}
                     alt={article.title}
-                    className="max-w-full max-h-full object-contain"
+                    className="max-w-full max-h-full object-contain cursor-zoom-out"
                   />
                 </div>
               )}
             </>
           ) : (
-            <div className="h-56 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
-              <Newspaper className="w-16 h-16 text-white/40" />
+            <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center mb-6">
+              <Newspaper className="w-12 h-12 text-white/40" />
             </div>
           )}
 
-          <div className="p-8">
-            <span className="text-info font-semibold text-sm">{article.category?.name || 'General'}</span>
-            <h1 className="text-h2 font-bold mt-2 mb-4">{article.title}</h1>
-            <div className="flex items-center gap-4 text-body-sm text-secondary-500 mb-8 pb-8 border-b">
-              {article.author && <span className="flex items-center gap-1"><User className="w-4 h-4" /> {article.author}</span>}
-              <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {new Date(article.publishedAt || article.createdAt).toLocaleDateString()}</span>
-            </div>
-            <div className="prose max-w-none text-secondary-700 leading-relaxed whitespace-pre-line">
-              {article.content}
-            </div>
+          <span className="text-info font-semibold text-sm">{article.category?.name || 'General'}</span>
+          <h1 className="text-h2 font-bold mt-2 mb-4">{article.title}</h1>
+          <div className="flex items-center gap-4 text-body-sm text-secondary-500 mb-8 pb-8 border-b">
+            {article.author && <span className="flex items-center gap-1"><User className="w-4 h-4" /> {article.author}</span>}
+            <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {new Date(article.publishedAt || article.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div className="prose max-w-none text-secondary-700 leading-relaxed whitespace-pre-line">
+            {article.content}
           </div>
         </div>
       </div>
