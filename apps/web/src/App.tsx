@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
 import api from './services/api';
@@ -75,6 +75,29 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   const [maintenance, setMaintenance] = useState(false);
   const [checking, setChecking] = useState(true);
+  const navigate = useNavigate();
+
+  // After Google login redirect, check for pending course/opportunity intent
+  useEffect(() => {
+    const pendingEnroll = sessionStorage.getItem('enrollAfterLogin');
+    if (pendingEnroll) {
+      sessionStorage.removeItem('enrollAfterLogin');
+      try {
+        const { courseSlug } = JSON.parse(pendingEnroll);
+        navigate(`/academy/${courseSlug}`);
+      } catch {}
+      return;
+    }
+
+    const pendingApply = sessionStorage.getItem('applyAfterLogin');
+    if (pendingApply) {
+      sessionStorage.removeItem('applyAfterLogin');
+      try {
+        const { opportunityId } = JSON.parse(pendingApply);
+        navigate(`/opportunities/${opportunityId}`);
+      } catch {}
+    }
+  }, [navigate]);
 
   useEffect(() => {
     api.get('/admin/maintenance').then(r => {
