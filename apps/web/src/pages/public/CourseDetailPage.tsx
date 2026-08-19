@@ -23,15 +23,20 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     if (!slug) return;
-    api.get(`/courses/${slug}`).then(r => setCourse(r.data.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get(`/courses/${slug}`)
+      .then(r => setCourse(r.data.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [slug]);
 
   useEffect(() => {
     if (isAuthenticated && course) {
-      api.get('/courses/my-enrollments').then(r => {
-        const existing = r.data.data.find((e: any) => e.courseId === course.id);
-        setEnrollment(existing || null);
-      }).catch(() => {});
+      api.get('/courses/my-enrollments')
+        .then(r => {
+          const existing = r.data.data.find((e: any) => e.courseId === course.id);
+          setEnrollment(existing || null);
+        })
+        .catch(() => {});
     }
   }, [isAuthenticated, course]);
 
@@ -66,6 +71,7 @@ export default function CourseDetailPage() {
       return;
     }
 
+    // Paid course: open payment modal
     let amount = 0;
     if (plan === 'FULL') amount = course.price;
     else if (plan === 'HALF') amount = Math.round(course.price / 2);
@@ -185,7 +191,7 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Payment Modal for paid courses */}
+      {/* Payment Modal */}
       <PaymentModal
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
@@ -204,7 +210,7 @@ export default function CourseDetailPage() {
         maxAmount={payRemainingMode ? enrollment?.remainingBalance : undefined}
       />
 
-      {/* Professional Login Prompt Modal */}
+      {/* Login Prompt Modal */}
       {showLoginPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowLoginPrompt(false)} />
