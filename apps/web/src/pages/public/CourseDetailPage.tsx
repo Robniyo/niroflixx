@@ -41,11 +41,11 @@ export default function CourseDetailPage() {
   }, [isAuthenticated, course]);
 
   const handleLoginConfirm = () => {
-    if (!course) return;
-    sessionStorage.setItem('enrollAfterLogin', JSON.stringify({ courseSlug: course.slug }));
-    setShowLoginPrompt(false);
-    navigate('/login');
-  };
+  if (!course) return;
+  sessionStorage.setItem('enrollAfterLogin', JSON.stringify({ courseSlug: course.slug }));
+  setShowLoginPrompt(false);
+  window.location.href = '/login';
+};
 
   const handleEnrollClick = () => {
     if (!isAuthenticated) {
