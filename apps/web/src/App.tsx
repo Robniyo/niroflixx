@@ -79,8 +79,7 @@ export default function App() {
   const navigate = useNavigate();
 
   // After Google login redirect, check for pending course/opportunity intent
-  useEffect(() => {
-    // Only redirect after the user is authenticated
+    useEffect(() => {
     if (!isAuthenticated) return;
 
     const pendingEnroll = sessionStorage.getItem('enrollAfterLogin');
@@ -88,7 +87,7 @@ export default function App() {
       sessionStorage.removeItem('enrollAfterLogin');
       try {
         const { courseSlug } = JSON.parse(pendingEnroll);
-        navigate(`/academy/${courseSlug}`);
+        window.location.href = `/academy/${courseSlug}`;
       } catch {}
       return;
     }
@@ -98,10 +97,10 @@ export default function App() {
       sessionStorage.removeItem('applyAfterLogin');
       try {
         const { opportunityId } = JSON.parse(pendingApply);
-        navigate(`/opportunities/${opportunityId}`);
+        window.location.href = `/opportunities/${opportunityId}`;
       } catch {}
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     api.get('/admin/maintenance').then(r => {
