@@ -5,6 +5,11 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import AdBanner from '@/components/ui/AdBanner';
 
+// Helper to resolve file URL (handles relative /uploads paths)
+function resolveFileUrl(url: string) {
+  return url.startsWith('http') ? url : `https://niroflixx.onrender.com${url.startsWith('/') ? url : '/' + url}`;
+}
+
 export default function ResourcesPage() {
   const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +108,8 @@ export default function ResourcesPage() {
         )}
       </div>
 
-            {selected && (
+      {/* Resource View Modal */}
+      {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelected(null)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in">
@@ -115,11 +121,11 @@ export default function ResourcesPage() {
             </div>
             <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
               {selected.fileUrl ? (
-                selected.fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
+                resolveFileUrl(selected.fileUrl).toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
                   ? (
-                    <img src={selected.fileUrl} alt={selected.title} className="w-full h-full object-contain rounded-xl bg-white" />
+                    <img src={resolveFileUrl(selected.fileUrl)} alt={selected.title} className="w-full h-full object-contain rounded-xl bg-white" />
                   ) : (
-                    <iframe src={selected.fileUrl} title={selected.title} className="w-full h-full rounded-xl border bg-white" />
+                    <iframe src={resolveFileUrl(selected.fileUrl)} title={selected.title} className="w-full h-full rounded-xl border bg-white" />
                   )
               ) : (
                 <div className="flex items-center justify-center h-full text-secondary-400">

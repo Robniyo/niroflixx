@@ -4,6 +4,11 @@ import { BookOpen, ArrowLeft, Download, Eye, LinkIcon, X } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
+// Helper to resolve file URL (handles relative /uploads paths)
+function resolveFileUrl(url: string) {
+  return url.startsWith('http') ? url : `https://niroflixx.onrender.com${url.startsWith('/') ? url : '/' + url}`;
+}
+
 export default function ResourceDetailPage() {
   const { slug } = useParams();
   const [resource, setResource] = useState<any>(null);
@@ -92,14 +97,14 @@ export default function ResourceDetailPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-          <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
-            {resource.fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
-              ? (
-                <img src={resource.fileUrl} alt={resource.title} className="w-full h-full object-contain rounded-xl bg-white" />
-              ) : (
-                <iframe src={resource.fileUrl} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
-              )}
-          </div>
+            <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
+              {resolveFileUrl(resource.fileUrl).toLowerCase().match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
+                ? (
+                  <img src={resolveFileUrl(resource.fileUrl)} alt={resource.title} className="w-full h-full object-contain rounded-xl bg-white" />
+                ) : (
+                  <iframe src={resolveFileUrl(resource.fileUrl)} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
+                )}
+            </div>
           </div>
         </div>
       )}

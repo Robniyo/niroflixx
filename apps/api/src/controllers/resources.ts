@@ -68,40 +68,27 @@ export const resourcesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-    downloadFile: async (req: Request, res: Response) => {
+  downloadFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       if (!resource || !resource.fileUrl) {
         return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
       }
 
-      // Increment download count only when a download is explicitly requested
+      // Increment download count
       await prisma.resource.update({
         where: { id: resource.id },
         data: { downloadCount: { increment: 1 } },
       });
 
-      // Fetch the actual file from Cloudinary or storage
-      const response = await fetch(resource.fileUrl);
-      if (!response.ok) {
-        return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+      // Resolve relative file URL to absolute if needed
+      let fileUrl = resource.fileUrl;
+      if (!fileUrl.startsWith('http')) {
+        fileUrl = `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl}`;
       }
 
-      const contentType = response.headers.get('content-type') || 'application/octet-stream';
-      const buffer = await response.arrayBuffer();
-
-      // Build a clean filename from the resource title
-      let filename = resource.title || 'document';
-      filename = filename.replace(/[^a-zA-Z0-9]+/g, '_');
-      const url = new URL(resource.fileUrl);
-      const pathname = url.pathname;
-      const ext = pathname.includes('.') ? pathname.split('.').pop()?.toLowerCase() : '';
-      if (ext) filename += '.' + ext;
-
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.setHeader('Content-Length', buffer.byteLength);
-      res.send(Buffer.from(buffer));
+      // Redirect to the actual file (browser will handle download)
+      res.redirect(fileUrl);
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
