@@ -68,27 +68,18 @@ export const resourcesController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-  downloadFile: async (req: Request, res: Response) => {
+  // Increment download count only (called separately by frontend)
+  incrementDownload: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
-      if (!resource || !resource.fileUrl) {
-        return res.status(404).json({ status: 'error', message: 'File not found', code: 404 });
-      }
+      if (!resource) return res.status(404).json({ status: 'error', message: 'Not found', code: 404 });
 
-      // Increment download count
       await prisma.resource.update({
         where: { id: resource.id },
         data: { downloadCount: { increment: 1 } },
       });
 
-      // Resolve relative file URL to absolute if needed
-      let fileUrl = resource.fileUrl;
-      if (!fileUrl.startsWith('http')) {
-        fileUrl = `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl}`;
-      }
-
-      // Redirect to the actual file (browser will handle download)
-      res.redirect(fileUrl);
+      res.json({ status: 'success', data: { downloadCount: resource.downloadCount + 1 } });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }

@@ -5,7 +5,7 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import AdBanner from '@/components/ui/AdBanner';
 
-// Helper to resolve file URL (handles relative /uploads paths)
+// Resolve file URL (works for Cloudinary or relative /uploads)
 function resolveFileUrl(url: string) {
   return url.startsWith('http') ? url : `https://niroflixx.onrender.com${url.startsWith('/') ? url : '/' + url}`;
 }
@@ -18,6 +18,17 @@ export default function ResourcesPage() {
   useEffect(() => {
     api.get('/resources').then(r => setResources(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  const handleDownload = async (e: React.MouseEvent, resource: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      // Increment count in background, but don't block opening file
+      api.post(`/resources/${resource.id}/increment`).catch(() => {});
+      const fileUrl = resolveFileUrl(resource.fileUrl);
+      window.open(fileUrl, '_blank');
+    } catch {}
+  };
 
   if (loading) {
     return (
@@ -91,15 +102,12 @@ export default function ResourcesPage() {
                     >
                       <Eye className="w-4 h-4" /> View
                     </button>
-                    {r.fileUrl && (
-                      <a
-                        href={`https://niroflixx.onrender.com/api/v1/resources/${r.id}/file`}
-                        target="_blank"
-                        className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
-                      >
-                        <Download className="w-4 h-4" /> Download
-                      </a>
-                    )}
+                    <button
+                      onClick={(e) => handleDownload(e, r)}
+                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
+                    >
+                      <Download className="w-4 h-4" /> Download
+                    </button>
                   </div>
                 </div>
               </div>
