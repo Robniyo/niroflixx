@@ -90,7 +90,7 @@ export const resourcesController = {
   },
 
   // Preview file inline (for PDF/images)
-    previewFile: async (req: Request, res: Response) => {
+     previewFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       if (!resource || !resource.fileUrl) {
@@ -104,13 +104,16 @@ export const resourcesController = {
       }
 
       const buffer = await response.arrayBuffer();
-      // Force PDF content type if resource type is PDF or fileUrl has .pdf
       const isPdf = resource.type === 'PDF' || fileUrl.toLowerCase().includes('.pdf') || resource.fileUrl.toLowerCase().includes('.pdf');
       const contentType = isPdf ? 'application/pdf' : (response.headers.get('content-type') || 'application/octet-stream');
 
       let filename = resource.title || 'preview';
       filename = filename.replace(/[^a-zA-Z0-9]+/g, '_');
       if (isPdf) filename += '.pdf';
+
+      // Allow iframe embedding from Vercel (fixes 'refused to connect')
+      res.removeHeader('X-Frame-Options');
+      res.setHeader('Content-Security-Policy', "frame-ancestors https://niroflixx.vercel.app");
 
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
