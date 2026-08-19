@@ -4,6 +4,7 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import ResponsiveTable from '@/components/ui/ResponsiveTable';
+
 interface Course {
   id: string; title: string; level: string; type: string; status: string; price: number; enrollmentCount: number; category?: { name: string }; thumbnail?: string;
 }
@@ -21,6 +22,7 @@ export default function CoursesPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tab, setTab] = useState<'courses' | 'enrollments'>('courses');
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
 
   useEffect(() => { fetchCourses(); fetchCategories(); fetchEnrollments(); }, []);
 
@@ -48,9 +50,7 @@ export default function CoursesPage() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await api.post('/uploads', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await api.post('/uploads', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm({ ...form, thumbnail: res.data.data.url });
       toast.success('Image uploaded');
     } catch (err: any) {
@@ -81,9 +81,13 @@ export default function CoursesPage() {
       await api.patch(`/admin/enrollments/${enrollmentId}/payment`, { paymentStatus: status });
       toast.success(`Payment ${status}`);
       fetchEnrollments();
-    } catch { toast.error('Failed'); }
+      fetchCourses();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed');
+    }
   };
-    const handleSendReminders = async () => {
+
+  const handleSendReminders = async () => {
     try {
       await api.post('/admin/send-reminders');
       toast.success('Reminders sent!');
@@ -91,6 +95,7 @@ export default function CoursesPage() {
       toast.error('Failed to send reminders');
     }
   };
+
   if (loading) return <div className="text-center py-16 text-secondary-500">Loading...</div>;
 
   return (
@@ -117,35 +122,31 @@ export default function CoursesPage() {
             </div>
           ) : (
             <ResponsiveTable
-            columns={[
-              { key: 'title', label: 'Title', render: (c) => <span className="font-medium text-sm">{c.title}</span> },
-              { key: 'level', label: 'Level', render: (c) => <span className="text-xs text-secondary-600">{c.level}</span> },
-              { key: 'type', label: 'Type', render: (c) => <span className="text-xs text-secondary-600">{c.type?.replace('_',' ')}</span> },
-              { key: 'price', label: 'Price', render: (c) => <span className="text-sm font-medium">{c.price.toLocaleString()} RWF</span> },
-              { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span> },
-              { key: 'actions', label: '', render: (c) => (
-                <div className="flex gap-1">
-                  <button onClick={()=>openEdit(c.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
-                  <button onClick={()=>handleDelete(c.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
-                </div>
-              ), hideOnMobile: true },
-            ]}
-            data={courses}
-            emptyMessage="No courses yet"
-          />
+              columns={[
+                { key: 'title', label: 'Title', render: (c) => <span className="font-medium text-sm">{c.title}</span> },
+                { key: 'level', label: 'Level', render: (c) => <span className="text-xs text-secondary-600">{c.level}</span> },
+                { key: 'type', label: 'Type', render: (c) => <span className="text-xs text-secondary-600">{c.type?.replace('_',' ')}</span> },
+                { key: 'price', label: 'Price', render: (c) => <span className="text-sm font-medium">{c.price.toLocaleString()} RWF</span> },
+                { key: 'status', label: 'Status', render: (c) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{c.status}</span> },
+                { key: 'actions', label: '', render: (c) => (
+                  <div className="flex gap-1">
+                    <button onClick={()=>openEdit(c.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+                    <button onClick={()=>handleDelete(c.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+                  </div>
+                ), hideOnMobile: true },
+              ]}
+              data={courses}
+              emptyMessage="No courses yet"
+            />
           )}
         </>
       )}
 
-              {/* Enrollments Tab */}
+      {/* Enrollments Tab */}
       {tab === 'enrollments' && (
         <div className="space-y-4">
-          <div className="flex justify-end">
-            <Button
-              size="sm"
-              onClick={handleSendReminders}
-              className="bg-primary-600 text-white hover:bg-primary-700"
-            >
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={handleSendReminders} className="bg-primary-600 text-white hover:bg-primary-700">
               <Bell className="w-4 h-4 mr-1" /> Send Payment Reminders
             </Button>
           </div>
@@ -161,8 +162,8 @@ export default function CoursesPage() {
                   <div>
                     <h3 className="font-semibold text-secondary-900">{e.course?.title || 'N/A'}</h3>
                     <p className="text-sm text-secondary-500">{e.user?.firstName} {e.user?.lastName} • {e.user?.email}</p>
-                    <div className="flex gap-4 mt-2">
-                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">{e.paymentPlan || 'Not set'}</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Plan: {e.paymentPlan || 'Not set'}</span>
                       <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Paid: {(e.amountPaid || 0).toLocaleString()} RWF</span>
                       <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Total: {(e.totalAmount || 0).toLocaleString()} RWF</span>
                       <span className="text-xs px-2 py-1 rounded-full bg-secondary-100">Remaining: {(e.remainingBalance || 0).toLocaleString()} RWF</span>
@@ -172,26 +173,51 @@ export default function CoursesPage() {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       e.paymentStatus === 'PAID' ? 'bg-success-light text-success-dark' :
                       e.paymentStatus === 'PARTIALLY_PAID' ? 'bg-accent-100 text-accent-700' :
+                      e.paymentStatus === 'PENDING_VERIFICATION' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-secondary-100 text-secondary-600'
                     }`}>{e.paymentStatus}</span>
-                    {e.paymentStatus !== 'PAID' && (
-                      <Button size="sm" onClick={() => updateEnrollmentPayment(e.id, 'PAID')} className="text-success border-success hover:bg-success-light">
-                        <CheckCircle className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                    {e.paymentProof && (
+                      <button onClick={() => setProofUrl(e.paymentProof)} className="text-xs text-primary-600 hover:underline">
+                        <Eye className="w-3 h-3 inline mr-1" /> View Proof
+                      </button>
+                    )}
+                    {e.paymentStatus === 'PENDING_VERIFICATION' && (
+                      <>
+                        <Button size="sm" onClick={() => updateEnrollmentPayment(e.id, 'PAID')} className="text-green-600 border-green-300 hover:bg-green-50">
+                          <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                        </Button>
+                        <Button size="sm" onClick={() => updateEnrollmentPayment(e.id, 'REJECTED')} className="text-red-600 border-red-300 hover:bg-red-50">
+                          <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                        </Button>
+                      </>
+                    )}
+                    {(e.paymentStatus === 'PARTIALLY_PAID' || e.paymentStatus === 'PAID') && e.remainingBalance > 0 && (
+                      <Button size="sm" onClick={() => updateEnrollmentPayment(e.id, 'PARTIALLY_PAID')} className="text-secondary-600 border-secondary-300 hover:bg-secondary-50">
+                        Mark Partially Paid
                       </Button>
                     )}
                   </div>
                 </div>
-                {e.paymentProof && (
-                  <div className="mt-2">
-                    <a href={e.paymentProof} target="_blank" className="text-xs text-primary-600 underline">View Payment Proof</a>
-                  </div>
-                )}
               </div>
             ))
           )}
         </div>
       )}
 
+      {/* Payment Proof Modal */}
+      {proofUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setProofUrl(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] p-4 animate-scale-in">
+            <button onClick={() => setProofUrl(null)} className="absolute top-4 right-4 p-2 text-secondary-400 hover:text-secondary-600 bg-white rounded-full shadow">
+              <X className="w-5 h-5" />
+            </button>
+            <img src={proofUrl} alt="Payment proof" className="w-full h-auto max-h-[80vh] object-contain rounded-lg" />
+          </div>
+        </div>
+      )}
+
+      {/* Course Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={()=>setShowModal(false)}/>
@@ -237,17 +263,17 @@ export default function CoursesPage() {
                   <label className="block text-sm font-medium text-secondary-700 mb-1">Price (RWF)</label>
                   <input type="number" value={form.price} onChange={e=>setForm({...form,price:Number(e.target.value)})} className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm" />
                 </div>
-               <div>
-  <label className="block text-sm font-medium text-secondary-700 mb-1">Capacity</label>
-  <input type="number" value={form.capacity} onChange={e=>setForm({...form,capacity:Number(e.target.value)})} className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm" />
-</div>
-<div>
-  <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
-  <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm">
-    <option value="DRAFT">Draft</option>
-    <option value="PUBLISHED">Published</option>
-  </select>
-</div>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Capacity</label>
+                  <input type="number" value={form.capacity} onChange={e=>setForm({...form,capacity:Number(e.target.value)})} className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                  <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm">
+                    <option value="DRAFT">Draft</option>
+                    <option value="PUBLISHED">Published</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Thumbnail</label>
