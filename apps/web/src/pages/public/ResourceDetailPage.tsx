@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, ArrowLeft, Download, Eye, LinkIcon } from 'lucide-react';
+import { BookOpen, ArrowLeft, Download, Eye, LinkIcon, X } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -8,6 +8,7 @@ export default function ResourceDetailPage() {
   const { slug } = useParams();
   const [resource, setResource] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -16,18 +17,6 @@ export default function ResourceDetailPage() {
       setResource(found || null);
     }).catch(() => {}).finally(() => setLoading(false));
   }, [slug]);
-
-  const handleDownload = () => {
-    if (!resource) return;
-    const downloadUrl = `https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`;
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setResource({ ...resource, downloadCount: (resource.downloadCount || 0) + 1 });
-  };
 
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
   if (!resource) return <div className="pt-32 pb-16 text-center"><h1 className="text-h2">Resource Not Found</h1><Link to="/resources" className="text-primary-600 mt-4 inline-block">Back to Resources</Link></div>;
@@ -41,9 +30,13 @@ export default function ResourceDetailPage() {
 
         <div className="bg-white rounded-2xl border border-secondary-100 p-8">
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-8 h-8 text-primary-600" />
-            </div>
+            {resource.thumbnail ? (
+              <img src={resource.thumbnail} alt={resource.title} className="w-16 h-16 object-contain rounded-xl bg-secondary-50 flex-shrink-0" />
+            ) : (
+              <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-8 h-8 text-primary-600" />
+              </div>
+            )}
             <div>
               <span className="text-primary-600 font-semibold text-sm">{resource.type || 'Resource'}</span>
               <h1 className="text-h2 font-bold mt-1">{resource.title}</h1>
@@ -59,11 +52,18 @@ export default function ResourceDetailPage() {
 
           {resource.fileUrl ? (
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleDownload}
+              <a
+                href={`https://niroflixx.onrender.com/api/v1/resources/${resource.id}/file`}
+                target="_blank"
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
               >
                 <Download className="w-5 h-5" /> Download Resource
+              </a>
+              <button
+                onClick={() => setShowPreview(true)}
+                className="inline-flex items-center gap-2 px-5 py-3.5 bg-secondary-100 text-secondary-700 rounded-xl font-medium hover:bg-secondary-200 transition-colors text-sm"
+              >
+                <Eye className="w-4 h-4" /> Preview
               </button>
               <button
                 onClick={() => {
@@ -80,6 +80,24 @@ export default function ResourceDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && resource.fileUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowPreview(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b bg-white">
+              <h3 className="font-semibold text-secondary-900">{resource.title}</h3>
+              <button onClick={() => setShowPreview(false)} className="p-1.5 hover:bg-secondary-100 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 bg-secondary-50" style={{ height: 'calc(90vh - 80px)' }}>
+              <iframe src={resource.fileUrl} title={resource.title} className="w-full h-full rounded-xl border bg-white" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

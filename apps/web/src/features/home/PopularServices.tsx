@@ -1,8 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Wrench, ArrowRight } from 'lucide-react';
+import { Wrench, ArrowRight, FileText, Code2, Palette, Briefcase, GraduationCap, PenTool, Video, Megaphone, Globe } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
+
+// Auto-detect icon based on service title/description
+function getServiceIcon(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes('cv') || t.includes('resume') || t.includes('writing') || t.includes('cover')) return FileText;
+  if (t.includes('web') || t.includes('code') || t.includes('development') || t.includes('app')) return Code2;
+  if (t.includes('design') || t.includes('graphic') || t.includes('logo') || t.includes('brand')) return Palette;
+  if (t.includes('business') || t.includes('plan') || t.includes('strategy')) return Briefcase;
+  if (t.includes('education') || t.includes('tutor') || t.includes('course')) return GraduationCap;
+  if (t.includes('video') || t.includes('edit') || t.includes('animation')) return Video;
+  if (t.includes('marketing') || t.includes('social') || t.includes('ads')) return Megaphone;
+  if (t.includes('translation') || t.includes('language')) return Globe;
+  return Wrench;
+}
 
 export default function PopularServices() {
   const [services, setServices] = useState<any[]>([]);
@@ -34,18 +48,21 @@ export default function PopularServices() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {services.map((s) => (
-              <Link to={`/services/${s.slug || s.id}`} key={s.id} className="group">
-                <div className="bg-white rounded-xl border border-secondary-100 p-6 text-center hover:shadow-md transition-all">
-                  <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <Wrench className="w-6 h-6 text-primary-600" />
+            {services.map((s) => {
+              const Icon = getServiceIcon(s.title);
+              return (
+                <Link to={`/services/${s.slug || s.id}`} key={s.id} className="group">
+                  <div className="bg-white rounded-xl border border-secondary-100 p-6 text-center hover:shadow-md transition-all">
+                    <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Icon className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <h4 className="font-semibold text-secondary-900 mb-2">{s.title}</h4>
+                    <p className="text-body-sm text-secondary-500 mb-4 line-clamp-2">{s.description}</p>
+                    <span className="text-primary-600 font-semibold text-body-sm">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</span>
                   </div>
-                  <h4 className="font-semibold text-secondary-900 mb-2">{s.title}</h4>
-                  <p className="text-body-sm text-secondary-500 mb-4 line-clamp-2">{s.description}</p>
-                  <span className="text-primary-600 font-semibold text-body-sm">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

@@ -83,7 +83,7 @@ export const authController = {
     } catch (error) { res.status(400).json({ status: 'error', message: 'Invalid or expired token', code: 400 }); }
   },
 
-  me: async (req: Request, res: Response) => {
+    me: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const user = await prisma.user.findUnique({
@@ -93,6 +93,28 @@ export const authController = {
       if (!user) return res.status(404).json({ status: 'error', message: 'User not found', code: 404 });
       res.json({ status: 'success', data: user });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed to get user', code: 500 }); }
+  },
+
+  updateMe: async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      const { firstName, lastName, phone } = req.body;
+
+      const data: any = {};
+      if (firstName !== undefined) data.firstName = firstName;
+      if (lastName !== undefined) data.lastName = lastName;
+      if (phone !== undefined) data.phone = phone;
+
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data,
+        select: { id: true, firstName: true, lastName: true, email: true, phone: true, role: true, status: true, avatar: true, lastLogin: true, createdAt: true, profile: true },
+      });
+
+      res.json({ status: 'success', data: user });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to update profile', code: 500 });
+    }
   },
 
   googleLogin: async (req: Request, res: Response) => {

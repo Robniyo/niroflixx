@@ -4,24 +4,48 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Save } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import api from '@/services/api';
 
 export default function DashboardSettingsPage() {
   const { user } = useAuth();
-  
+
   if (!user) {
     window.location.href = '/login';
     return null;
   }
+
   const [form, setForm] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
     phone: user?.phone || '',
   });
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Profile updated (coming soon)');
+    setSaving(true);
+    try {
+      const res = await api.put('/auth/me', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+      });
+      // Update local state with returned user data
+      if (res.data?.data) {
+        setForm({
+          firstName: res.data.data.firstName || '',
+          lastName: res.data.data.lastName || '',
+          email: res.data.data.email || '',
+          phone: res.data.data.phone || '',
+        });
+      }
+      toast.success('Profile updated successfully');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -53,7 +77,7 @@ export default function DashboardSettingsPage() {
               <label className="block text-sm font-medium mb-1">Phone</label>
               <input type="text" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
             </div>
-            <Button type="submit" rightIcon={<Save className="w-4 h-4" />}>Save Changes</Button>
+            <Button type="submit" isLoading={saving} rightIcon={<Save className="w-4 h-4" />}>Save Changes</Button>
           </form>
         </div>
       </div>

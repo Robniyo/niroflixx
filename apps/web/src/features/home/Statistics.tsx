@@ -2,17 +2,20 @@ import { useState, useEffect } from 'react';
 import api from '@/services/api';
 
 export default function Statistics() {
-  const [stats, setStats] = useState({ courses: 0, opportunities: 0, resources: 0, services: 0 });
+  const [stats, setStats] = useState({
+    courses: 0,
+    opportunities: 0,
+    users: 0,
+    resources: 0,
+    services: 0,
+    enrollments: 0,
+    servicesDelivered: 0,
+  });
 
   useEffect(() => {
-    Promise.all([
-      api.get('/courses').then(r => r.data.pagination?.total || r.data.data?.length || 0).catch(() => 0),
-      api.get('/opportunities').then(r => r.data.pagination?.total || r.data.data?.length || 0).catch(() => 0),
-      api.get('/resources').then(r => r.data.pagination?.total || r.data.data?.length || 0).catch(() => 0),
-      api.get('/services').then(r => r.data.data?.length || 0).catch(() => 0),
-    ]).then(([courses, opportunities, resources, services]) => {
-      setStats({ courses, opportunities, resources, services });
-    });
+    api.get('/stats/public')
+      .then(r => setStats(r.data.data))
+      .catch(() => {});
   }, []);
 
   return (
@@ -22,8 +25,11 @@ export default function Statistics() {
           {[
             { value: stats.courses, label: 'Courses' },
             { value: stats.opportunities, label: 'Opportunities' },
+            { value: stats.users, label: 'Community Members' },
             { value: stats.resources, label: 'Resources' },
             { value: stats.services, label: 'Services' },
+            { value: stats.enrollments, label: 'Enrollments' },
+            { value: stats.servicesDelivered, label: 'Services Delivered' },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="text-h3 md:text-h2 font-bold text-primary-600 mb-1">{stat.value}</div>

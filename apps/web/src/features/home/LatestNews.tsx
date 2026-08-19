@@ -33,13 +33,22 @@ export default function LatestNews() {
           <div className="grid md:grid-cols-3 gap-6 mb-10">
             {news.map((item) => (
               <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
-                <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-6 h-full flex flex-col hover:shadow-md transition-all">
-                  <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full inline-block w-fit mb-3">{item.category?.name || 'General'}</span>
-                  <h4 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2">{item.title}</h4>
-                  <p className="text-body-sm text-secondary-500 mb-4 flex-1">{item.summary?.slice(0, 100)}...</p>
-                  <div className="flex items-center gap-3 text-caption text-secondary-400 pt-3 border-t border-secondary-200">
-                    {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+                <div className="bg-secondary-50 rounded-xl border border-secondary-100 overflow-hidden h-full flex flex-col hover:shadow-md transition-all">
+                  <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+                    {item.coverImage ? (
+                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <Newspaper className="w-12 h-12 text-white/40" />
+                    )}
+                  </div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full inline-block w-fit mb-3">{item.category?.name || 'General'}</span>
+                    <h4 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2">{item.title}</h4>
+                    <p className="text-body-sm text-secondary-500 mb-4 flex-1">{item.summary?.slice(0, 100)}...</p>
+                    <div className="flex items-center gap-3 text-caption text-secondary-400 pt-3 border-t border-secondary-200">
+                      {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
               </Link>

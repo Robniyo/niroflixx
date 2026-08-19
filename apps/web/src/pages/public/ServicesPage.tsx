@@ -1,9 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Wrench, ArrowRight, Send, User, Mail, Phone } from 'lucide-react';
+import { Wrench, ArrowRight, Send, User, Mail, Phone, FileText, Code2, Palette, Briefcase, GraduationCap, PenTool, Video, Megaphone, Globe } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+
+// Auto-detect icon based on service title
+function getServiceIcon(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes('cv') || t.includes('resume') || t.includes('writing') || t.includes('cover')) return FileText;
+  if (t.includes('web') || t.includes('code') || t.includes('development') || t.includes('app')) return Code2;
+  if (t.includes('design') || t.includes('graphic') || t.includes('logo') || t.includes('brand')) return Palette;
+  if (t.includes('business') || t.includes('plan') || t.includes('strategy')) return Briefcase;
+  if (t.includes('education') || t.includes('tutor') || t.includes('course')) return GraduationCap;
+  if (t.includes('video') || t.includes('edit') || t.includes('animation')) return Video;
+  if (t.includes('marketing') || t.includes('social') || t.includes('ads')) return Megaphone;
+  if (t.includes('translation') || t.includes('language')) return Globe;
+  return Wrench;
+}
 
 export default function ServicesPage() {
   const [services, setServices] = useState<any[]>([]);
@@ -18,7 +32,7 @@ export default function ServicesPage() {
     api.get('/services').then(r => setServices(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-const handleRequest = async (e: React.FormEvent) => {
+  const handleRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
@@ -35,34 +49,31 @@ const handleRequest = async (e: React.FormEvent) => {
     finally { setSubmitting(false); }
   };
 
-if (loading) {
-  return (
-    <div className="pt-32 pb-16">
-      <div className="container-page">
-        {/* Title skeleton */}
-        <div className="text-center mb-12">
-          <div className="h-5 w-20 bg-secondary-200 rounded animate-pulse mx-auto mb-3" />
-          <div className="h-10 w-64 bg-secondary-200 rounded animate-pulse mx-auto mb-4" />
-          <div className="h-5 w-96 max-w-full bg-secondary-200 rounded animate-pulse mx-auto" />
-        </div>
-
-        {/* Cards skeleton */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-2xl border border-secondary-100 p-6 text-center">
-              <div className="w-16 h-16 bg-secondary-100 rounded-2xl animate-pulse mx-auto mb-5" />
-              <div className="h-5 w-3/4 bg-secondary-100 rounded animate-pulse mx-auto mb-2" />
-              <div className="h-4 w-full bg-secondary-100 rounded animate-pulse mx-auto mb-3" />
-              <div className="h-4 w-2/3 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
-              <div className="h-6 w-24 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
-              <div className="h-10 w-full bg-secondary-100 rounded-lg animate-pulse" />
-            </div>
-          ))}
+  if (loading) {
+    return (
+      <div className="pt-32 pb-16">
+        <div className="container-page">
+          <div className="text-center mb-12">
+            <div className="h-5 w-20 bg-secondary-200 rounded animate-pulse mx-auto mb-3" />
+            <div className="h-10 w-64 bg-secondary-200 rounded animate-pulse mx-auto mb-4" />
+            <div className="h-5 w-96 max-w-full bg-secondary-200 rounded animate-pulse mx-auto" />
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-2xl border border-secondary-100 p-6 text-center">
+                <div className="w-16 h-16 bg-secondary-100 rounded-2xl animate-pulse mx-auto mb-5" />
+                <div className="h-5 w-3/4 bg-secondary-100 rounded animate-pulse mx-auto mb-2" />
+                <div className="h-4 w-full bg-secondary-100 rounded animate-pulse mx-auto mb-3" />
+                <div className="h-4 w-2/3 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
+                <div className="h-6 w-24 bg-secondary-100 rounded animate-pulse mx-auto mb-4" />
+                <div className="h-10 w-full bg-secondary-100 rounded-lg animate-pulse" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="pt-32 pb-16">
@@ -75,27 +86,32 @@ if (loading) {
 
         {services.length === 0 ? (
           <div className="max-w-lg mx-auto text-center py-16">
-            <div className="w-20 h-20 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-6"><Wrench className="w-10 h-10 text-success" /></div>
+            <div className="w-20 h-20 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Wrench className="w-10 h-10 text-success" />
+            </div>
             <h3 className="text-h4 font-semibold mb-3">Services Coming Soon</h3>
             <p className="text-secondary-500 mb-8">Our team is setting up services.</p>
             <Link to="/contact"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>Contact Us</Button></Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s) => (
-              <div key={s.id} className="bg-white rounded-2xl border border-secondary-100 p-6 hover:shadow-lg transition-all text-center group">
-                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-                  <Wrench className="w-7 h-7 text-primary-600" />
+            {services.map((s) => {
+              const Icon = getServiceIcon(s.title);
+              return (
+                <div key={s.id} className="bg-white rounded-2xl border border-secondary-100 p-6 hover:shadow-lg transition-all text-center group">
+                  <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+                    <Icon className="w-7 h-7 text-primary-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-secondary-900 mb-2">{s.title}</h3>
+                  <p className="text-body-sm text-secondary-500 mb-4 line-clamp-3">{s.description}</p>
+                  <p className="text-primary-600 font-bold text-lg mb-4">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</p>
+                  {s.estimatedTime && <p className="text-caption text-secondary-400 mb-4">⏱ {s.estimatedTime}</p>}
+                  <Button variant="outline" onClick={() => { setSelectedService(s); setShowRequest(true); }} className="w-full">
+                    Request Service
+                  </Button>
                 </div>
-                <h3 className="font-semibold text-lg text-secondary-900 mb-2">{s.title}</h3>
-                <p className="text-body-sm text-secondary-500 mb-4 line-clamp-3">{s.description}</p>
-                <p className="text-primary-600 font-bold text-lg mb-4">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</p>
-                {s.estimatedTime && <p className="text-caption text-secondary-400 mb-4">⏱ {s.estimatedTime}</p>}
-                <Button variant="outline" onClick={() => { setSelectedService(s); setShowRequest(true); }} className="w-full">
-                  Request Service
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

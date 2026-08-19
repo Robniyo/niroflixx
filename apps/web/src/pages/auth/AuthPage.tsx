@@ -23,11 +23,23 @@ export default function AuthPage() {
   });
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordFeedback, setPasswordFeedback] = useState('');
-  const [counts, setCounts] = useState({ courses: 0, opportunities: 0 });
+  const [counts, setCounts] = useState({
+  courses: 0,
+  opportunities: 0,
+  users: 0,
+  servicesDelivered: 0,
+});
 
   useEffect(() => {
-    api.get('/stats/public').then(r => setCounts(r.data.data)).catch(() => {});
-  }, []);
+  api.get('/stats/public')
+    .then(r => setCounts({
+      courses: r.data.data?.courses || 0,
+      opportunities: r.data.data?.opportunities || 0,
+      users: r.data.data?.users || 0,
+      servicesDelivered: r.data.data?.servicesDelivered || 0,
+    }))
+    .catch(() => {});
+}, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading(true);
@@ -71,7 +83,12 @@ export default function AuthPage() {
           <h1 className="text-display-lg text-white font-bold mb-4">Welcome to Future Scholars</h1>
           <p className="text-white/70 text-body-lg leading-relaxed mb-8">Learn digital skills, discover opportunities, and grow your career — all in one platform.</p>
           <div className="grid grid-cols-2 gap-4 text-center">
-            {[{ value: counts.courses || '—', label: 'Courses' },{ value: counts.opportunities || '—', label: 'Opportunities' }].map((s) => (
+            {[
+            { value: counts.courses || '—', label: 'Courses' },
+            { value: counts.opportunities || '—', label: 'Opportunities' },
+            { value: counts.users || '—', label: 'Community Members' },
+            { value: counts.servicesDelivered || '—', label: 'Services Delivered' },
+          ].map((s) => (
               <div key={s.label} className="bg-white/10 backdrop-blur-sm rounded-xl py-4">
                 <div className="text-white font-bold text-lg">{s.value}</div>
                 <div className="text-white/60 text-xs">{s.label}</div>

@@ -18,8 +18,27 @@ export default function NewsPage() {
 
   useEffect(()=>{fetchItems();},[]);
   const fetchItems = async()=>{try{const r=await api.get('/news');setItems(r.data.data);}catch{}finally{setLoading(false);}};
+
   const openCreate = ()=>{setEditing(null);setForm(emptyForm);setShowModal(true);};
-  const openEdit = async(id:string)=>{try{const r=await api.get(`/news/${id}`);const d=r.data.data;setForm({title:d.title||'',summary:d.summary||'',content:d.content||'',categoryId:d.categoryId||'',author:d.author||'Future Scholars Team',coverImage:d.coverImage||'',status:d.status,featured:d.featured});setEditing(id);setShowModal(true);}catch{}};
+
+  const openEdit = async(id:string)=>{
+    try{
+      const r = await api.get(`/news/id/${id}`);
+      const d = r.data.data;
+      setForm({
+        title:d.title||'',
+        summary:d.summary||'',
+        content:d.content||'',
+        categoryId:d.categoryId||'',
+        author:d.author||'Future Scholars Team',
+        coverImage:d.coverImage||'',
+        status:d.status,
+        featured:d.featured
+      });
+      setEditing(id);
+      setShowModal(true);
+    } catch {}
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,10 +57,36 @@ export default function NewsPage() {
     }
   };
 
-  const handleSave = async(e:React.FormEvent)=>{e.preventDefault();setSaving(true);try{if(editing){await api.put(`/news/${editing}`,form);toast.success('Updated');}else{await api.post('/news',form);toast.success('Created');}setShowModal(false);fetchItems();}catch(err:any){toast.error(err.response?.data?.message||'Failed');}finally{setSaving(false);}};
-  const handleDelete = async(id:string)=>{if(!confirm('Archive?'))return;try{await api.delete(`/news/${id}`);toast.success('Archived');fetchItems();}catch{}};
+  const handleSave = async(e:React.FormEvent)=>{
+    e.preventDefault();
+    setSaving(true);
+    try {
+      if(editing){
+        await api.put(`/news/${editing}`, form);
+        toast.success('Updated');
+      } else {
+        await api.post('/news', form);
+        toast.success('Created');
+      }
+      setShowModal(false);
+      fetchItems();
+    } catch(err:any){
+      toast.error(err.response?.data?.message || 'Failed');
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  if(loading)return<div className="text-center py-16 text-secondary-500">Loading...</div>;
+  const handleDelete = async(id:string)=>{
+    if(!confirm('Archive?')) return;
+    try {
+      await api.delete(`/news/${id}`);
+      toast.success('Archived');
+      fetchItems();
+    } catch {}
+  };
+
+  if(loading) return <div className="text-center py-16 text-secondary-500">Loading...</div>;
 
   return (
     <div>
@@ -49,32 +94,38 @@ export default function NewsPage() {
         <div><h1 className="text-h4 font-bold text-secondary-900">News & Articles</h1><p className="text-secondary-500 text-body-sm mt-1">{items.length} articles</p></div>
         <Button leftIcon={<Plus className="w-4 h-4"/>} onClick={openCreate}>Write Article</Button>
       </div>
-      {items.length===0?(
-        <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200"><Newspaper className="w-12 h-12 text-secondary-300 mx-auto mb-3"/><p className="text-secondary-500">No articles yet.</p></div>
-      ):(
+
+      {items.length===0 ? (
+        <div className="text-center py-16 bg-white rounded-xl border border-dashed border-secondary-200">
+          <Newspaper className="w-12 h-12 text-secondary-300 mx-auto mb-3"/><p className="text-secondary-500">No articles yet.</p>
+        </div>
+      ) : (
         <ResponsiveTable
-  columns={[
-    { key: 'title', label: 'Title', render: (a) => <span className="font-medium text-sm">{a.title}</span> },
-    { key: 'author', label: 'Author', render: (a) => <span className="text-xs text-secondary-600">{a.author||'—'}</span> },
-    { key: 'status', label: 'Status', render: (a) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{a.status}</span> },
-    { key: 'date', label: 'Published', render: (a) => <span className="text-xs">{a.publishedAt?new Date(a.publishedAt).toLocaleDateString():'—'}</span> },
-    { key: 'actions', label: '', render: (a) => (
-      <div className="flex gap-1">
-        <button onClick={()=>openEdit(a.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
-        <button onClick={()=>handleDelete(a.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
-      </div>
-    ), hideOnMobile: true },
-  ]}
-  data={items}
-  emptyMessage="No articles yet"
-/>
+          columns={[
+            { key: 'title', label: 'Title', render: (a) => <span className="font-medium text-sm">{a.title}</span> },
+            { key: 'author', label: 'Author', render: (a) => <span className="text-xs text-secondary-600">{a.author||'—'}</span> },
+            { key: 'status', label: 'Status', render: (a) => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{a.status}</span> },
+            { key: 'date', label: 'Published', render: (a) => <span className="text-xs">{a.publishedAt?new Date(a.publishedAt).toLocaleDateString():'—'}</span> },
+            { key: 'actions', label: '', render: (a) => (
+              <div className="flex gap-1">
+                <button onClick={()=>openEdit(a.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4"/></button>
+                <button onClick={()=>handleDelete(a.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4"/></button>
+              </div>
+            ), hideOnMobile: true },
+          ]}
+          data={items}
+          emptyMessage="No articles yet"
+        />
       )}
 
-      {showModal&&(
+      {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={()=>setShowModal(false)}/>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-scale-in">
-            <div className="sticky top-0 bg-white border-b px-5 py-3.5 flex items-center justify-between rounded-t-2xl"><h3 className="font-semibold">{editing?'Edit':'New'} Article</h3><button onClick={()=>setShowModal(false)} className="p-1.5 hover:bg-secondary-50 rounded-lg"><X className="w-5 h-5"/></button></div>
+            <div className="sticky top-0 bg-white border-b px-5 py-3.5 flex items-center justify-between rounded-t-2xl">
+              <h3 className="font-semibold">{editing?'Edit':'New'} Article</h3>
+              <button onClick={()=>setShowModal(false)} className="p-1.5 hover:bg-secondary-50 rounded-lg"><X className="w-5 h-5"/></button>
+            </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
               <div><label className="block text-sm font-medium text-secondary-700 mb-1">Title *</label><input type="text" required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"/></div>
               <div><label className="block text-sm font-medium text-secondary-700 mb-1">Summary</label><textarea rows={2} value={form.summary} onChange={e=>setForm({...form,summary:e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none"/></div>
@@ -93,15 +144,21 @@ export default function NewsPage() {
                   {form.coverImage && <span className="text-xs text-success truncate max-w-[180px]">Image uploaded ✓</span>}
                 </div>
               </div>
-              <div className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={e=>setForm({...form,featured:e.target.checked})}/><label className="text-sm">Featured</label></div>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked={form.featured} onChange={e=>setForm({...form,featured:e.target.checked})} id="feat"/>
+                <label htmlFor="feat" className="text-sm">Featured</label>
+              </div>
               <div>
-  <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
-  <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
-    <option value="DRAFT">Draft</option>
-    <option value="PUBLISHED">Published</option>
-  </select>
-</div>
-              <div className="flex gap-3 pt-2"><Button type="button" variant="outline" className="flex-1" onClick={()=>setShowModal(false)}>Cancel</Button><Button type="submit" className="flex-1" isLoading={saving}>{editing?'Update':'Publish'}</Button></div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" className="flex-1" onClick={()=>setShowModal(false)}>Cancel</Button>
+                <Button type="submit" className="flex-1" isLoading={saving}>{editing?'Update':'Publish'}</Button>
+              </div>
             </form>
           </div>
         </div>

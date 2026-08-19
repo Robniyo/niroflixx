@@ -39,14 +39,22 @@ export default function FeaturedOpportunities() {
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {items.map((opp) => (
               <Link to={`/opportunities/${opp.id}`} key={opp.id} className="group">
-                <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-6 h-full flex gap-4 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Briefcase className="w-5 h-5 text-accent-600" />
-                  </div>
+                <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-4 h-full flex gap-4 hover:shadow-md transition-all">
+                  {opp.coverImage ? (
+                    <img
+                      src={opp.coverImage}
+                      alt={opp.title}
+                      className="w-16 h-16 object-contain rounded-lg bg-white flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Briefcase className="w-6 h-6 text-accent-600" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">{opp.type?.replace('_', ' ')}</span>
-                    <h3 className="font-semibold text-secondary-900 mt-1.5 group-hover:text-primary-600 transition-colors">{opp.title}</h3>
-                    <p className="text-body-sm text-secondary-500 mt-0.5">{opp.organization}</p>
+                    <h3 className="font-semibold text-secondary-900 mt-1.5 group-hover:text-primary-600 transition-colors truncate">{opp.title}</h3>
+                    <p className="text-body-sm text-secondary-500 mt-0.5 truncate">{opp.organization}</p>
                     <div className="flex items-center gap-3 mt-3 text-body-sm text-secondary-400">
                       {opp.country && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {opp.country}</span>}
                       {opp.deadline && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {new Date(opp.deadline).toLocaleDateString()}</span>}
