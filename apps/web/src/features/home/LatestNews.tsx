@@ -39,25 +39,40 @@ export default function LatestNews() {
             transition="slide"
             autoPlayInterval={10000}
             renderItem={(item) => (
-              <div className="px-2">
+              <div className="px-4 py-2">
                 <Link to={`/news/${item.slug || item.id}`} className="group block">
-                  <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-4 h-full flex gap-4 hover:shadow-md transition-all">
-                    {item.coverImage ? (
-                      <img src={item.coverImage} alt={item.title} className="w-16 h-16 object-contain rounded-lg bg-white flex-shrink-0" />
-                    ) : (
-                      <div className="w-16 h-16 bg-info-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Newspaper className="w-6 h-6 text-info" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full inline-block w-fit mb-2">
+                  <div className="bg-secondary-50 rounded-2xl border border-secondary-100 overflow-hidden shadow-sm hover:shadow-lg transition-all grid md:grid-cols-2">
+                    <div className="h-64 md:h-auto">
+                      {item.coverImage ? (
+                        <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-info-100 flex items-center justify-center">
+                          <Newspaper className="w-20 h-20 text-info" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-8 flex flex-col justify-center">
+                      <span className="text-caption font-medium text-primary-600 bg-primary-50 px-3 py-1 rounded-full inline-block w-fit mb-4">
                         {item.category?.name || 'General'}
                       </span>
-                      <h4 className="font-semibold text-secondary-900 text-sm group-hover:text-primary-600 transition-colors mb-1 truncate">{item.title}</h4>
-                      <p className="text-body-sm text-secondary-500 mb-2 line-clamp-2">{item.summary?.slice(0, 80)}...</p>
-                      <div className="flex items-center gap-3 text-caption text-secondary-400 pt-2 border-t border-secondary-200">
-                        {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+                      <h3 className="text-h3 font-bold text-secondary-900 mb-3 group-hover:text-primary-600 transition-colors">
+                        {item.title}
+                      </h3>
+                      <p className="text-body-lg text-secondary-600 mb-6 line-clamp-3">
+                        {item.summary?.slice(0, 180)}...
+                      </p>
+                      <div className="flex items-center gap-4 text-body-sm text-secondary-400 mb-6">
+                        {item.author && (
+                          <span className="flex items-center gap-1">
+                            <User className="w-4 h-4" /> {item.author}
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-primary-600 font-medium">
+                        Read More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </div>
