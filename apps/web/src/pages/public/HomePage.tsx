@@ -12,11 +12,13 @@ import Newsletter from '@/features/home/Newsletter';
 import AdBanner from '@/components/ui/AdBanner';
 import WelcomeGuide from '@/components/ui/WelcomeGuide';
 import LearningCategories from '@/features/home/LearningCategories';
+import FeaturedRotator from '@/features/home/FeaturedRotator';
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <FeaturedRotator />
       <WelcomeGuide />
       <Statistics />
       <FeaturedCourses />
