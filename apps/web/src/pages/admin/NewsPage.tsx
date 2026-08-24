@@ -72,7 +72,7 @@ export default function NewsPage() {
   useEffect(() => { fetchItems(); }, []);
 
   const fetchItems = async () => {
-    try { const r = await api.get('/news'); setItems(r.data.data); } catch {} finally { setLoading(false); }
+        try { const r = await api.get('/news?limit=100'); setItems(r.data.data); } catch {} finally { setLoading(false); }
   };
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setShowModal(true); };
