@@ -10,6 +10,10 @@ const cleanData = (data: any) => {
   return cleaned;
 };
 
+function generateSlug(title: string) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+}
+
 export const newsController = {
   getAll: async (req: Request, res: Response) => {
     try {
@@ -33,6 +37,7 @@ export const newsController = {
       res.json({ status: 'success', data: article });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   getById: async (req: Request, res: Response) => {
     try {
       const article = await prisma.news.findUnique({ where: { id: req.params.id } });
@@ -40,10 +45,11 @@ export const newsController = {
       res.json({ status: 'success', data: article });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+
   create: async (req: Request, res: Response) => {
     try {
       const data = cleanData(req.body);
-      const slug = data.title ? data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4) : 'article-' + Date.now();
+      const slug = data.title ? generateSlug(data.title) : 'article-' + Date.now();
       const article = await prisma.news.create({ data: { ...data, slug } });
 
       try {
@@ -74,5 +80,37 @@ export const newsController = {
       await prisma.news.update({ where: { id: req.params.id }, data: { status: 'ARCHIVED' } });
       res.json({ status: 'success', message: 'Archived' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+  },
+
+  // Bulk import for multiple news articles
+  bulkImport: async (req: Request, res: Response) => {
+    try {
+      const { articles } = req.body;
+      if (!Array.isArray(articles) || articles.length === 0) {
+        return res.status(400).json({ status: 'error', message: 'articles array required', code: 400 });
+      }
+
+      let imported = 0;
+      const errors: any[] = [];
+
+      for (const item of articles) {
+        try {
+          if (!item.title) {
+            errors.push({ title: item.title || 'Unknown', error: 'Title is required' });
+            continue;
+          }
+          const data = cleanData(item);
+          const slug = generateSlug(item.title);
+          await prisma.news.create({ data: { ...data, slug } });
+          imported++;
+        } catch (err: any) {
+          errors.push({ title: item.title || 'Unknown', error: err.message || 'Failed' });
+        }
+      }
+
+      res.json({ status: 'success', message: `Imported ${imported} articles`, imported, errors });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Bulk import failed', code: 500 });
+    }
   },
 };

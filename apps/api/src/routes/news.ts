@@ -8,6 +8,7 @@ router.get('/', newsController.getAll);
 router.get('/id/:id', newsController.getById);
 router.get('/:slug', newsController.getBySlug);
 router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.create);
+router.post('/bulk', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.bulkImport);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), newsController.update);
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), newsController.delete);
 

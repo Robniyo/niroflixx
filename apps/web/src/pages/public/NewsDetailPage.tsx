@@ -14,6 +14,31 @@ export default function NewsDetailPage() {
     api.get(`/news/${slug}`).then(r => setArticle(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, [slug]);
 
+  // Set SEO meta tags dynamically
+  useEffect(() => {
+    if (!article) return;
+    document.title = article.seoTitle || article.title || 'Future Scholars News';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', article.seoDescription || article.summary || '');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = article.seoDescription || article.summary || '';
+      document.head.appendChild(meta);
+    }
+    if (article.seoKeywords) {
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) metaKeywords.setAttribute('content', article.seoKeywords);
+      else {
+        const meta = document.createElement('meta');
+        meta.name = 'keywords';
+        meta.content = article.seoKeywords;
+        document.head.appendChild(meta);
+      }
+    }
+  }, [article]);
+
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
   if (!article) return <div className="pt-32 pb-16 text-center"><h1 className="text-h2">Article Not Found</h1><Link to="/news" className="text-primary-600 mt-4 inline-block">Back to News</Link></div>;
 
@@ -25,29 +50,14 @@ export default function NewsDetailPage() {
         </Link>
 
         <div className="bg-white rounded-2xl border border-secondary-100 p-8">
-          {/* Small left-floated image, click to enlarge */}
           {article.coverImage ? (
             <>
-              <button
-                onClick={() => setImageZoomed(true)}
-                className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
-              >
-                <img
-                  src={article.coverImage}
-                  alt={article.title}
-                  className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
-                />
+              <button onClick={() => setImageZoomed(true)} className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in">
+                <img src={article.coverImage} alt={article.title} className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity" />
               </button>
               {imageZoomed && (
-                <div
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-                  onClick={() => setImageZoomed(false)}
-                >
-                  <img
-                    src={article.coverImage}
-                    alt={article.title}
-                    className="max-w-full max-h-full object-contain cursor-zoom-out"
-                  />
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setImageZoomed(false)}>
+                  <img src={article.coverImage} alt={article.title} className="max-w-full max-h-full object-contain cursor-zoom-out" />
                 </div>
               )}
             </>

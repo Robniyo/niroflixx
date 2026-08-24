@@ -439,6 +439,7 @@ model News {
   updatedAt      DateTime @updatedAt
   seoTitle       String?
   seoDescription String?
+  seoKeywords    String?
 
   category  Category?   @relation(fields: [categoryId], references: [id])
   tags      Tag[]
