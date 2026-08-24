@@ -11,7 +11,10 @@ export default function FeaturedRotator() {
   useEffect(() => {
     Promise.all([
       api.get('/opportunities', { params: { status: 'PUBLISHED', limit: 3 } })
-        .then(r => r.data.data.map((x: any) => ({ ...x, typeLabel: 'Opportunity', link: `/opportunities/${x.id}`, icon: 'briefcase' })))
+        .then(r => r.data.data
+          .filter((x: any) => x.computedStatus !== 'CLOSED')
+          .map((x: any) => ({ ...x, typeLabel: 'Opportunity', link: `/opportunities/${x.id}`, icon: 'briefcase' }))
+        )
         .catch(() => []),
       api.get('/news', { params: { status: 'PUBLISHED', limit: 3 } })
         .then(r => r.data.data.map((x: any) => ({ ...x, typeLabel: 'News', link: `/news/${x.slug || x.id}`, icon: 'news' })))
