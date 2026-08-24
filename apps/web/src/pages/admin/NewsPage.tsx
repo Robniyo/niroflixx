@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Newspaper, Upload, FileText } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Newspaper, Upload, FileText, Braces } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -66,7 +66,8 @@ export default function NewsPage() {
   const [uploading, setUploading] = useState(false);
   const [bulkImporting, setBulkImporting] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
-  const [csvText, setCsvText] = useState('');
+  const [importMode, setImportMode] = useState<'csv' | 'json'>('json');
+  const [bulkText, setBulkText] = useState('');
 
   useEffect(() => { fetchItems(); }, []);
 
@@ -136,16 +137,28 @@ export default function NewsPage() {
   };
 
   const handleBulkImport = async () => {
-    const articles = parseCSV(csvText);
-    if (articles.length === 0) {
-      toast.error('No valid rows found in CSV');
+    let articles: any[] = [];
+    if (importMode === 'csv') {
+      articles = parseCSV(bulkText);
+    } else {
+      try {
+        articles = JSON.parse(bulkText);
+      } catch {
+        toast.error('Invalid JSON format');
+        return;
+      }
+    }
+
+    if (!Array.isArray(articles) || articles.length === 0) {
+      toast.error('No valid articles found');
       return;
     }
+
     setBulkImporting(true);
     try {
       const res = await api.post('/news/bulk', { articles });
       toast.success(`Imported ${res.data.imported || articles.length} articles`);
-      setCsvText('');
+      setBulkText('');
       setShowBulkImport(false);
       fetchItems();
     } catch (err: any) {
@@ -163,7 +176,8 @@ export default function NewsPage() {
           <p className="text-secondary-500 text-body-sm mt-1">{items.length} articles</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" leftIcon={<FileText className="w-4 h-4" />} onClick={() => setShowBulkImport(true)}>Bulk Import</Button>
+          <Button variant="outline" leftIcon={<FileText className="w-4 h-4" />} onClick={() => { setImportMode('csv'); setShowBulkImport(true); }}>Bulk CSV</Button>
+          <Button variant="outline" leftIcon={<Braces className="w-4 h-4" />} onClick={() => { setImportMode('json'); setShowBulkImport(true); }}>Bulk JSON</Button>
           <Button leftIcon={<Plus className="w-4 h-4" />} onClick={openCreate}>Write Article</Button>
         </div>
       </div>
@@ -198,15 +212,19 @@ export default function NewsPage() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowBulkImport(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-scale-in">
             <button onClick={() => setShowBulkImport(false)} className="absolute top-4 right-4 p-2 hover:bg-secondary-50 rounded-lg"><X className="w-5 h-5" /></button>
-            <h3 className="text-h4 font-bold mb-2">Bulk Import Articles</h3>
+            <h3 className="text-h4 font-bold mb-2">Bulk Import Articles ({importMode.toUpperCase()})</h3>
             <p className="text-sm text-secondary-500 mb-4">
-              Paste CSV rows below. Headers: title,summary,content,author,categoryId,coverImage,seoTitle,seoDescription,seoKeywords
+              {importMode === 'csv'
+                ? 'Paste CSV rows. Headers: title,summary,content,author,categoryId,coverImage,seoTitle,seoDescription,seoKeywords,status'
+                : 'Paste a JSON array of article objects. Example: [{"title":"...","summary":"...","content":"...","author":"...","status":"PUBLISHED"}]'}
             </p>
             <textarea
-              rows={10}
-              value={csvText}
-              onChange={e => setCsvText(e.target.value)}
-              placeholder="title,summary,content,author,categoryId,coverImage,seoTitle,seoDescription,seoKeywords"
+              rows={12}
+              value={bulkText}
+              onChange={e => setBulkText(e.target.value)}
+              placeholder={importMode === 'csv'
+                ? 'title,summary,content,author,status'
+                : '[\n  {\n    "title": "Article title",\n    "summary": "Short summary",\n    "content": "Full content...",\n    "author": "Future Scholars Team",\n    "status": "PUBLISHED"\n  }\n]'}
               className="w-full px-4 py-3 bg-secondary-50 border rounded-lg text-sm font-mono resize-none"
             />
             <div className="flex gap-3 mt-4">
