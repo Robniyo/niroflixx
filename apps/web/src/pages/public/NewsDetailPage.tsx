@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Newspaper, ArrowLeft, Calendar, User } from 'lucide-react';
 import api from '@/services/api';
-
+import DOMPurify from 'dompurify';
 export default function NewsDetailPage() {
   const { slug } = useParams();
   const [article, setArticle] = useState<any>(null);
@@ -73,9 +73,10 @@ export default function NewsDetailPage() {
             {article.author && <span className="flex items-center gap-1"><User className="w-4 h-4" /> {article.author}</span>}
             <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {new Date(article.publishedAt || article.createdAt).toLocaleDateString()}</span>
           </div>
-          <div className="prose max-w-none text-secondary-700 leading-relaxed whitespace-pre-line">
-            {article.content}
-          </div>
+          <div
+            className="prose max-w-none text-secondary-700 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
+          />
         </div>
       </div>
     </div>
