@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { Newspaper, ArrowRight, Calendar, User } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
+import Carousel from '@/components/ui/Carousel';
 
 export default function LatestNews() {
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/news', { params: { status: 'PUBLISHED', limit: 3 } }).then(r => setNews(r.data.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/news', { params: { status: 'PUBLISHED', limit: 8 } }).then(r => setNews(r.data.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <section className="section-padding bg-white"><div className="container-page text-center py-16"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div></section>;
@@ -33,40 +34,37 @@ export default function LatestNews() {
             <Link to="/news"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>Visit News Page</Button></Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-            {news.map((item) => (
-              <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
-                <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-4 h-full flex gap-4 hover:shadow-md transition-all">
-                  {item.coverImage ? (
-                    <img
-                      src={item.coverImage}
-                      alt={item.title}
-                      className="w-16 h-16 object-contain rounded-lg bg-white flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-info-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Newspaper className="w-6 h-6 text-info" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full inline-block w-fit mb-2">
-                      {item.category?.name || 'General'}
-                    </span>
-                    <h4 className="font-semibold text-secondary-900 text-sm group-hover:text-primary-600 transition-colors mb-1 truncate">
-                      {item.title}
-                    </h4>
-                    <p className="text-body-sm text-secondary-500 mb-2 line-clamp-2">
-                      {item.summary?.slice(0, 80)}...
-                    </p>
-                    <div className="flex items-center gap-3 text-caption text-secondary-400 pt-2 border-t border-secondary-200">
-                      {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+          <Carousel
+            items={news}
+            transition="slide"
+            autoPlayInterval={10000}
+            renderItem={(item) => (
+              <div className="px-2">
+                <Link to={`/news/${item.slug || item.id}`} className="group block">
+                  <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-4 h-full flex gap-4 hover:shadow-md transition-all">
+                    {item.coverImage ? (
+                      <img src={item.coverImage} alt={item.title} className="w-16 h-16 object-contain rounded-lg bg-white flex-shrink-0" />
+                    ) : (
+                      <div className="w-16 h-16 bg-info-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Newspaper className="w-6 h-6 text-info" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full inline-block w-fit mb-2">
+                        {item.category?.name || 'General'}
+                      </span>
+                      <h4 className="font-semibold text-secondary-900 text-sm group-hover:text-primary-600 transition-colors mb-1 truncate">{item.title}</h4>
+                      <p className="text-body-sm text-secondary-500 mb-2 line-clamp-2">{item.summary?.slice(0, 80)}...</p>
+                      <div className="flex items-center gap-3 text-caption text-secondary-400 pt-2 border-t border-secondary-200">
+                        {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              </div>
+            )}
+          />
         )}
       </div>
     </section>
