@@ -4,6 +4,7 @@ import { Briefcase, ArrowLeft, Calendar, MapPin, Globe } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import ApplyModal from '@/components/ui/ApplyModal';
+import DOMPurify from 'dompurify';
 
 export default function OpportunityDetailPage() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export default function OpportunityDetailPage() {
       </div>
     );
 
-  const computedStatus = opp.computedStatus; // from API
+  const computedStatus = opp.computedStatus;
   const isClosed = computedStatus === 'CLOSED';
   const badge = isClosed
     ? { text: 'Closed', color: 'bg-red-100 text-red-700' }
@@ -54,21 +55,21 @@ export default function OpportunityDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Opportunities
         </Link>
 
-      <div
-  className={`bg-white rounded-2xl border border-secondary-100 p-8 ${
-    isClosed ? 'opacity-80' : ''
-  }`}
->
-  <div className="flex flex-wrap items-center gap-2 mb-3">
-    <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
-      {opp.type?.replace('_', ' ')}
-    </span>
-    {badge && (
-      <span className={`text-sm px-3 py-1 rounded-full font-medium ${badge.color}`}>
-        {badge.text}
-      </span>
-    )}
-  </div>
+        <div
+          className={`bg-white rounded-2xl border border-secondary-100 p-8 ${
+            isClosed ? 'opacity-80' : ''
+          }`}
+        >
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
+              {opp.type?.replace('_', ' ')}
+            </span>
+            {badge && (
+              <span className={`text-sm px-3 py-1 rounded-full font-medium ${badge.color}`}>
+                {badge.text}
+              </span>
+            )}
+          </div>
           <h1 className="text-h2 font-bold mt-2 mb-2">{opp.title}</h1>
           <p className="text-body-lg text-secondary-600 mb-6">{opp.organization}</p>
 
@@ -96,45 +97,56 @@ export default function OpportunityDetailPage() {
             <div>
               <h3 className="text-h4 font-semibold mb-2">Description</h3>
               <div className="clearfix">
-               {opp.coverImage && (
-                <>
-                  <button
-                    onClick={() => setImageZoomed(true)}
-                    className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
-                  >
-                    <img
-                      src={opp.coverImage}
-                      alt={opp.title}
-                      className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
-                    />
-                  </button>
-                  {imageZoomed && (
-                    <div
-                      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-                      onClick={() => setImageZoomed(false)}
+                {opp.coverImage && (
+                  <>
+                    <button
+                      onClick={() => setImageZoomed(true)}
+                      className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
                     >
                       <img
                         src={opp.coverImage}
                         alt={opp.title}
-                        className="max-w-full max-h-full object-contain cursor-zoom-out"
+                        className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
                       />
-                    </div>
-                  )}
-                </>
-              )}
-                <p className="text-secondary-600">{opp.description}</p>
+                    </button>
+                    {imageZoomed && (
+                      <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                        onClick={() => setImageZoomed(false)}
+                      >
+                        <img
+                          src={opp.coverImage}
+                          alt={opp.title}
+                          className="max-w-full max-h-full object-contain cursor-zoom-out"
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+                <div
+                  className="text-secondary-600"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
+                />
               </div>
             </div>
+
             {opp.requirements && (
               <div>
                 <h3 className="text-h4 font-semibold mb-2">Requirements</h3>
-                <p className="text-secondary-600">{opp.requirements}</p>
+                <div
+                  className="text-secondary-600"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
+                />
               </div>
             )}
+
             {opp.benefits && (
               <div>
                 <h3 className="text-h4 font-semibold mb-2">Benefits</h3>
-                <p className="text-secondary-600">{opp.benefits}</p>
+                <div
+                  className="text-secondary-600"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
+                />
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin, Upload } from 'lucide-react';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -349,35 +350,29 @@ export default function OpportunitiesPage() {
                 <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Description
                 </label>
-                <textarea
-                  rows={3}
+                <RichTextEditor
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none"
+                  onChange={(html) => setForm({ ...form, description: html })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Requirements
-                </label>
-                <textarea
-                  rows={2}
-                  value={form.requirements}
-                  onChange={(e) => setForm({ ...form, requirements: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none"
-                />
-              </div>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">
+                Requirements
+              </label>
+              <RichTextEditor
+                value={form.requirements}
+                onChange={(html) => setForm({ ...form, requirements: html })}
+              />
+            </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Benefits
-                </label>
-                <textarea
-                  rows={2}
-                  value={form.benefits}
-                  onChange={(e) => setForm({ ...form, benefits: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none"
-                />
-              </div>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">
+                Benefits
+              </label>
+              <RichTextEditor
+                value={form.benefits}
+                onChange={(html) => setForm({ ...form, benefits: html })}
+              />
+            </div>
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Official Link
