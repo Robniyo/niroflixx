@@ -4,6 +4,14 @@ import { Briefcase, Newspaper, BookOpen, Wrench, ArrowRight } from 'lucide-react
 import api from '@/services/api';
 import Carousel from '@/components/ui/Carousel';
 
+// Simple function to strip HTML tags and decode basic entities
+function stripHtml(html: string | undefined | null): string {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
 export default function FeaturedRotator() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +45,7 @@ export default function FeaturedRotator() {
     }).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <section className="section-padding bg-secondary-50"><div className="container-page text-center py-10"><div className="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto" /></div></section>;
+  if (loading) return <section className="section-padding-sm bg-secondary-50"><div className="container-page text-center py-10"><div className="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto" /></div></section>;
 
   if (items.length === 0) return null;
 
@@ -53,44 +61,44 @@ export default function FeaturedRotator() {
           items={items}
           transition="slide"
           autoPlayInterval={6000}
-          renderItem={(item) => (
-            <div className="px-2">
-              <Link to={item.link} className="group block">
-                <div className="bg-white rounded-xl border border-secondary-100 shadow-sm hover:shadow-md transition-all flex items-center h-32 md:h-36 overflow-hidden">
-                  {/* Small thumbnail */}
-                  <div className="w-24 h-full md:w-32 bg-secondary-100 flex-shrink-0">
-                    {item.coverImage ? (
-                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-secondary-300">
-                        {item.icon === 'briefcase' && <Briefcase className="w-6 h-6" />}
-                        {item.icon === 'news' && <Newspaper className="w-6 h-6" />}
-                        {item.icon === 'course' && <BookOpen className="w-6 h-6" />}
-                        {item.icon === 'service' && <Wrench className="w-6 h-6" />}
-                      </div>
-                    )}
+          renderItem={(item) => {
+            // Determine preview text (strip HTML)
+            const previewText = stripHtml(item.summary || item.description || item.content).slice(0, 140);
+            return (
+              <div className="px-2">
+                <Link to={item.link} className="group block">
+                  <div className="bg-white rounded-xl border border-secondary-100 shadow-sm hover:shadow-md transition-all flex items-center h-32 md:h-36 overflow-hidden">
+                    <div className="w-24 h-full md:w-32 bg-secondary-100 flex-shrink-0">
+                      {item.coverImage ? (
+                        <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-secondary-300">
+                          {item.icon === 'briefcase' && <Briefcase className="w-6 h-6" />}
+                          {item.icon === 'news' && <Newspaper className="w-6 h-6" />}
+                          {item.icon === 'course' && <BookOpen className="w-6 h-6" />}
+                          {item.icon === 'service' && <Wrench className="w-6 h-6" />}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 px-4 py-3 flex flex-col justify-center">
+                      <span className="text-caption font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full inline-block w-fit mb-1">
+                        {item.typeLabel}
+                      </span>
+                      <h3 className="font-semibold text-secondary-900 text-sm md:text-base group-hover:text-primary-600 transition-colors truncate">
+                        {item.title}
+                      </h3>
+                      <p className="text-body-sm text-secondary-500 line-clamp-1 md:line-clamp-2 mt-0.5">
+                        {previewText}
+                      </p>
+                    </div>
+                    <div className="pr-4 flex-shrink-0">
+                      <ArrowRight className="w-4 h-4 text-secondary-300 group-hover:text-primary-600 group-hover:translate-x-0.5 transition-all" />
+                    </div>
                   </div>
-
-                  {/* Text content */}
-                  <div className="flex-1 min-w-0 px-4 py-3 flex flex-col justify-center">
-                    <span className="text-caption font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full inline-block w-fit mb-1">
-                      {item.typeLabel}
-                    </span>
-                    <h3 className="font-semibold text-secondary-900 text-sm md:text-base group-hover:text-primary-600 transition-colors truncate">
-                      {item.title}
-                    </h3>
-                    <p className="text-body-sm text-secondary-500 line-clamp-1 md:line-clamp-2 mt-0.5">
-                      {item.summary || item.description || item.content?.slice(0, 120)}
-                    </p>
-                  </div>
-
-                  <div className="pr-4 flex-shrink-0">
-                    <ArrowRight className="w-4 h-4 text-secondary-300 group-hover:text-primary-600 group-hover:translate-x-0.5 transition-all" />
-                  </div>
-                </div>
-              </Link>
-            </div>
-          )}
+                </Link>
+              </div>
+            );
+          }}
         />
       </div>
     </section>
