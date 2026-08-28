@@ -209,7 +209,7 @@ export const authController = {
     try {
       const { code } = req.query;
       if (!code) {
-        return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=google_failed`);
+        return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=google_failed`);
       }
 
       const { OAuth2Client } = require('google-auth-library');
@@ -227,7 +227,7 @@ export const authController = {
 
       const payload = ticket.getPayload();
       if (!payload || !payload.email) {
-        return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=invalid_token`);
+        return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=invalid_token`);
       }
 
       const { email, given_name, family_name, picture, sub: googleId } = payload;
@@ -282,10 +282,10 @@ export const authController = {
         path: '/',
       });
 
-      return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}`);
     } catch (error) {
       console.error('GOOGLE CALLBACK ERROR:', error);
-      return res.redirect(`${process.env.FRONTEND_URL || 'https://niroflixx.vercel.app'}/login?error=google_failed`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=google_failed`);
     }
   },
 };

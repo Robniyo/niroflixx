@@ -113,7 +113,7 @@ export const resourcesController = {
 
       // Allow iframe embedding from Vercel (fixes 'refused to connect')
       res.removeHeader('X-Frame-Options');
-      res.setHeader('Content-Security-Policy', "frame-ancestors https://niroflixx.vercel.app");
+      res.setHeader('Content-Security-Policy', "frame-ancestors https://fscholars.online");
 
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="${filename}"`);

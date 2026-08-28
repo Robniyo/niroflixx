@@ -29,7 +29,7 @@ export const emailService = {
             <h2 style="color: #1E293B; margin: 0 0 12px;">Welcome, ${name}!</h2>
             <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px;">Your Future Scholars account has been created successfully. You can now access digital courses, find opportunities, and request professional services.</p>
             <div style="text-align: center; margin: 32px 0;">
-              <a href="https://niroflixx.vercel.app/login" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">Go to Your Dashboard</a>
+              <a href="https://fscholars.online/login" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">Go to Your Dashboard</a>
             </div>
             <p style="color: #64748B; font-size: 14px;">If you have any questions, reply to this email or contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a>.</p>
             ${footer}
@@ -41,7 +41,7 @@ export const emailService = {
 
   sendPasswordReset: async (to: string, token: string) => {
     try {
-      const resetUrl = `https://niroflixx.vercel.app/reset-password?token=${token}`;
+      const resetUrl = `https://fscholars.online/reset-password?token=${token}`;
       await sgMail.send({
         to,
         from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Security' },
@@ -77,7 +77,7 @@ export const emailService = {
             <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 8px;">Hi ${name},</p>
             <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px;">You've successfully enrolled in <strong style="color: #2563EB;">${courseName}</strong>. Your instructor will share class details soon.</p>
             <div style="text-align: center; margin: 32px 0;">
-              <a href="https://niroflixx.vercel.app/dashboard" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">View My Courses</a>
+              <a href="https://fscholars.online/dashboard" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">View My Courses</a>
             </div>
             ${footer}
           </div>
