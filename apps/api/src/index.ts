@@ -38,7 +38,7 @@ app.use(cors({
     'http://localhost:5000',
     'https://fscholars.online',
     'https://www.fscholars.online',
-    'https://niroflixx.vercel.app'
+    'https://fscholars.online'
   ], 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
