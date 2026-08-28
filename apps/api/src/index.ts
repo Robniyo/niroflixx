@@ -33,7 +33,12 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({ 
-  origin: ['http://localhost:5173', 'http://localhost:5000', 'https://fscholars.online', 'https://fscholars.online'], 
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5000',
+    'https://fscholars.online',
+    'https://niroflixx.vercel.app'
+  ], 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
