@@ -10,7 +10,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-h4 font-semibold mb-3">1. Acceptance of Terms</h2>
             <p className="text-secondary-600 leading-relaxed">
-              By accessing or using Niroflixx ("the Platform"), you agree to be bound by these Terms of Service. 
+              By accessing or using Future Scholars ("the Platform"), you agree to be bound by these Terms of Service. 
               If you do not agree, please do not use the Platform.
             </p>
           </section>
@@ -30,7 +30,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-h4 font-semibold mb-3">3. Platform Services</h2>
             <p className="text-secondary-600 leading-relaxed">
-              Niroflixx provides digital learning courses, opportunity listings, professional services, 
+              Future Scholars provides digital learning courses, opportunity listings, professional services, 
               and digital resources. We reserve the right to modify, suspend, or discontinue any service 
               with reasonable notice.
             </p>
@@ -53,7 +53,7 @@ export default function TermsPage() {
             <h2 className="text-h4 font-semibold mb-3">5. Intellectual Property</h2>
             <p className="text-secondary-600 leading-relaxed">
               All content on the Platform including text, graphics, logos, icons, and software is the property 
-              of Niroflixx and is protected by applicable intellectual property laws. You may not reproduce, 
+              of Future Scholars and is protected by applicable intellectual property laws. You may not reproduce, 
               distribute, or create derivative works without permission.
             </p>
           </section>
@@ -70,7 +70,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-h4 font-semibold mb-3">7. Limitation of Liability</h2>
             <p className="text-secondary-600 leading-relaxed">
-              Niroflixx is provided "as is." We do not guarantee uninterrupted or error-free service. 
+              Future Scholars is provided "as is." We do not guarantee uninterrupted or error-free service. 
               We are not liable for any indirect, incidental, or consequential damages arising from the use 
               of the Platform.
             </p>

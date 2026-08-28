@@ -10,9 +10,9 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-h4 font-semibold mb-3">1. Introduction</h2>
             <p className="text-secondary-600 leading-relaxed">
-              Niroflixx ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy 
+              Future Scholars ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy 
               explains how we collect, use, disclose, and safeguard your information when you use our platform, 
-              accessible at niroflixx.com and related services.
+              accessible at fscholars.online and related services.
             </p>
           </section>
 

@@ -72,7 +72,7 @@ export default function SearchPage() {
                   {results.news.map((n: any) => (
                     <Link key={n.id} to={`/news/${n.slug || n.id}`} className="bg-white rounded-xl border p-4 hover:shadow-md transition-all">
                       <p className="font-medium">{n.title}</p>
-                      <p className="text-body-sm text-secondary-500">{n.author || 'Niroflixx'}</p>
+                      <p className="text-body-sm text-secondary-500">{n.author || 'Future Scholars'}</p>
                     </Link>
                   ))}
                 </div>

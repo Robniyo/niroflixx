@@ -14,7 +14,7 @@ export default function AboutPage() {
             <span className="text-primary-600 font-semibold text-label uppercase tracking-wider">About Us</span>
             <h1 className="text-h1 mt-3 mb-6">Building the world's Future Through Technology</h1>
             <p className="text-body-lg text-secondary-600 leading-relaxed">
-              Niroflixx is a unified digital platform connecting learning, career opportunities, 
+              Future Scholars is a unified digital platform connecting learning, career opportunities, 
               professional services, and technology resources for students and professionals shouldn't need.
             </p>
           </div>
@@ -68,12 +68,12 @@ export default function AboutPage() {
             <div>
               <h2 className="text-h2 mb-6">Our Story</h2>
               <p className="text-secondary-600 mb-4 leading-relaxed">
-                Niroflixx was founded with a simple but powerful idea: students and professionals 
+                Future Scholars was founded with a simple but powerful idea: students and professionals 
                 shouldn't need to visit multiple websites to learn skills, find opportunities, and get 
                 professional services. Everything should be in one place.
               </p>
               <p className="text-secondary-600 mb-4 leading-relaxed">
-                Founded by ROBERT NIYONKURU, a passionate technology professional, Niroflixx started as a vision 
+                Founded by ROBERT NIYONKURU, a passionate technology professional, Future Scholars started as a vision 
                 to bridge the gap between education and employment in the world. The platform combines digital 
                 skills training, scholarship and job listings, professional document services, and technology 
                 consulting under one roof.
@@ -145,7 +145,7 @@ export default function AboutPage() {
             <p className="text-primary-600 font-semibold mb-4">Founder & CEO</p>
             <p className="text-secondary-600 leading-relaxed">
               A passionate technology professional and student dedicated to building digital solutions 
-              that empower the next generation of global innovators. Niroflixx is the realization of 
+              that empower the next generation of global innovators. Future Scholars is the realization of 
               a vision to make technology education and career opportunities accessible to everyone.
             </p>
           </div>
