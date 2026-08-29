@@ -46,7 +46,7 @@ export const newsController = {
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
 
-  create: async (req: Request, res: Response) => {
+    create: async (req: Request, res: Response) => {
     try {
       const data = cleanData(req.body);
       const slug = data.title ? generateSlug(data.title) : 'article-' + Date.now();
@@ -57,14 +57,27 @@ export const newsController = {
         if (users.length > 0) {
           await prisma.notification.createMany({
             data: users.map(u => ({
-              userId: u.id, title: 'New Article!', message: `${req.body.title} — Read now!`, link: `/news/${slug}`, type: 'NEWS',
+              userId: u.id,
+              title: 'New Article!',
+              message: `${req.body.title} — Read now!`,
+              link: `/news/${slug}`,
+              type: 'NEWS',
             })),
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('NOTIFICATION ERROR:', e);
+      }
 
       res.status(201).json({ status: 'success', data: article });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+    } catch (error: any) {
+      console.error('NEWS CREATE ERROR:', error);
+      res.status(500).json({
+        status: 'error',
+        message: error?.message || 'Failed to create news',
+        code: 500,
+      });
+    }
   },
 
   update: async (req: Request, res: Response) => {
