@@ -85,7 +85,10 @@ export const newsController = {
       const data = cleanData(req.body);
       const article = await prisma.news.update({ where: { id: req.params.id }, data });
       res.json({ status: 'success', data: article });
-    } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
+    } catch (error: any) {
+      console.error('NEWS UPDATE ERROR:', error);
+      res.status(500).json({ status: 'error', message: error?.message || 'Failed', code: 500 });
+    }
   },
 
   delete: async (req: Request, res: Response) => {
