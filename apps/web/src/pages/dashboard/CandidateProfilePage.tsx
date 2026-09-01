@@ -7,8 +7,21 @@ import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 
 export default function CandidateProfilePage() {
-  const { user } = useAuth();
-  
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    window.location.href = '/login';
+    return null;
+  }
+    
   if (!user) {
     window.location.href = '/login';
     return null;
