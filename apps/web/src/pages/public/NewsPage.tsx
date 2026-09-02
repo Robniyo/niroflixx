@@ -67,7 +67,13 @@ if (loading) {
               <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
                 <div className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-all h-full flex flex-col">
                   <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
-                    {item.coverImage ? <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" /> : <Newspaper className="w-12 h-12 text-white/40" />}
+                  {item.coverImage ? (
+                    <img src={item.coverImage} alt={item.title} className="w-full h-40 object-cover" />
+                  ) : (
+                    <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+                      <Newspaper className="w-12 h-12 text-white/40" />
+                    </div>
+                  )}
                   </div>
                   <div className="p-5 flex flex-col flex-1">
                     <span className="text-caption text-info font-medium">{item.category?.name || 'General'}</span>
