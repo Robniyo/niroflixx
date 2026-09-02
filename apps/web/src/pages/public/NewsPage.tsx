@@ -9,42 +9,13 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/news', { params: { status: 'PUBLISHED' } }).then(r => setNews(r.data.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/news', { params: { status: 'PUBLISHED' } })
+      .then(r => setNews(r.data.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-if (loading) {
-  return (
-    <div className="pt-32 pb-16">
-      <div className="container-page">
-        {/* Title skeleton */}
-        <div className="text-center mb-12">
-          <div className="h-5 w-16 bg-secondary-200 rounded animate-pulse mx-auto mb-3" />
-          <div className="h-10 w-64 bg-secondary-200 rounded animate-pulse mx-auto mb-4" />
-          <div className="h-5 w-96 max-w-full bg-secondary-200 rounded animate-pulse mx-auto" />
-        </div>
-
-        {/* Cards skeleton */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl border overflow-hidden h-full flex flex-col">
-              <div className="h-40 bg-secondary-100 animate-pulse" />
-              <div className="p-5 flex flex-col flex-1 space-y-3">
-                <div className="h-4 w-16 bg-secondary-100 rounded animate-pulse" />
-                <div className="h-5 w-3/4 bg-secondary-100 rounded animate-pulse" />
-                <div className="h-4 w-full bg-secondary-100 rounded animate-pulse" />
-                <div className="h-4 w-2/3 bg-secondary-100 rounded animate-pulse" />
-                <div className="flex gap-3 pt-3 border-t border-secondary-100">
-                  <div className="h-3 w-24 bg-secondary-100 rounded animate-pulse" />
-                  <div className="h-3 w-24 bg-secondary-100 rounded animate-pulse" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+  if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
 
   return (
     <div className="pt-32 pb-16">
@@ -56,7 +27,9 @@ if (loading) {
         </div>
         {news.length === 0 ? (
           <div className="max-w-lg mx-auto text-center py-16">
-            <div className="w-20 h-20 bg-info-light rounded-2xl flex items-center justify-center mx-auto mb-6"><Newspaper className="w-10 h-10 text-info" /></div>
+            <div className="w-20 h-20 bg-info-light rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Newspaper className="w-10 h-10 text-info" />
+            </div>
             <h3 className="text-h4 font-semibold mb-3">Articles Coming Soon</h3>
             <p className="text-secondary-500 mb-8">Stay tuned.</p>
             <Link to="/register"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>Subscribe</Button></Link>
@@ -67,13 +40,11 @@ if (loading) {
               <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
                 <div className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-all h-full flex flex-col">
                   <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
-                  {item.coverImage ? (
-                    <img src={item.coverImage} alt={item.title} className="w-full h-40 object-cover" />
-                  ) : (
-                    <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+                    {item.coverImage ? (
+                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                    ) : (
                       <Newspaper className="w-12 h-12 text-white/40" />
-                    </div>
-                  )}
+                    )}
                   </div>
                   <div className="p-5 flex flex-col flex-1">
                     <span className="text-caption text-info font-medium">{item.category?.name || 'General'}</span>
