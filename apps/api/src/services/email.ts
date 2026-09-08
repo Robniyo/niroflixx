@@ -21,7 +21,7 @@ export const emailService = {
     try {
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars' },
         subject: `Welcome to Future Scholars, ${name}! 🚀`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -31,7 +31,7 @@ export const emailService = {
             <div style="text-align: center; margin: 32px 0;">
               <a href="https://fscholars.online/login" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">Go to Your Dashboard</a>
             </div>
-            <p style="color: #64748B; font-size: 14px;">If you have any questions, reply to this email or contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a>.</p>
+            <p style="color: #64748B; font-size: 14px;">If you have any questions, reply to this email or contact us at <a href="mailto:no-reply@fscholars.online" style="color: #2563EB;">no-reply@fscholars.online</a>.</p>
             ${footer}
           </div>
         `,
@@ -44,7 +44,7 @@ export const emailService = {
       const resetUrl = `https://fscholars.online/reset-password?token=${token}`;
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Security' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars Security' },
         subject: 'Reset Your Future Scholars Password',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -68,7 +68,7 @@ export const emailService = {
     try {
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Academy' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars Academy' },
         subject: `You're Enrolled: ${courseName}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -90,7 +90,7 @@ export const emailService = {
     try {
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Services' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars Services' },
         subject: `Service Request Received: ${serviceName}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -102,7 +102,7 @@ export const emailService = {
               <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Your Message:</strong></p>
               <p style="color: #475569; font-size: 14px; margin: 0;">${message || 'No details provided'}</p>
             </div>
-            <p style="color: #64748B; font-size: 14px; margin: 0 0 24px;">If you have urgent questions, contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a> or call <strong>+250 795 064 502</strong>.</p>
+            <p style="color: #64748B; font-size: 14px; margin: 0 0 24px;">If you have urgent questions, contact us at <a href="mailto:no-reply@fscholars.online" style="color: #2563EB;">no-reply@fscholars.online</a> or call <strong>+250 795 064 502</strong>.</p>
             ${footer}
           </div>
         `,
@@ -123,7 +123,7 @@ export const emailService = {
 
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars' },
         subject,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -134,7 +134,7 @@ export const emailService = {
               <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Admin Notes:</strong></p>
               <p style="color: #475569; font-size: 14px; margin: 0;">${adminNotes || 'None'}</p>
             </div>
-            <p style="color: #64748B; font-size: 14px;">If you have any questions, contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a>.</p>
+            <p style="color: #64748B; font-size: 14px;">If you have any questions, contact us at <a href="mailto:no-reply@fscholars.online" style="color: #2563EB;">no-reply@fscholars.online</a>.</p>
             ${footer}
           </div>
         `,
@@ -148,7 +148,7 @@ export const emailService = {
 
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Academy' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars Academy' },
         subject: `Payment Received for ${courseName}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
@@ -160,7 +160,7 @@ export const emailService = {
               <p style="color: #1E293B; font-size: 14px; margin: 0 0 4px;"><strong>Remaining Balance:</strong></p>
               <p style="color: #2563EB; font-size: 24px; font-weight: bold; margin: 0;">${remainingBalance.toLocaleString()} RWF</p>
             </div>
-            <p style="color: #64748B; font-size: 14px;">Continue your learning journey! If you have any questions, contact us at <a href="mailto:robertniyonkuru001@gmail.com" style="color: #2563EB;">robertniyonkuru001@gmail.com</a>.</p>
+            <p style="color: #64748B; font-size: 14px;">Continue your learning journey! If you have any questions, contact us at <a href="mailto:no-reply@fscholars.online" style="color: #2563EB;">no-reply@fscholars.online</a>.</p>
             ${footer}
           </div>
         `,
@@ -171,7 +171,7 @@ export const emailService = {
     try {
       await sgMail.send({
         to,
-        from: { email: 'robertniyonkuru001@gmail.com', name: 'Future Scholars Academy' },
+        from: { email: 'no-reply@fscholars.online', name: 'Future Scholars Academy' },
         subject: `Payment Reminder for ${courseName}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
