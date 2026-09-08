@@ -12,7 +12,7 @@ export default function SettingsPage() {
   const [form, setForm] = useState({
     siteName: 'Future Scholars',
     siteDescription: 'Learn, Grow, Succeed',
-    contactEmail: 'robertniyonkuru001@gmail.com',
+    contactEmail: 'info@fscholars.online',
     contactPhone: '+250795064502',
     contactAddress: 'Kigali, Rwanda',
     facebook: 'https://facebook.com/niroflixx',

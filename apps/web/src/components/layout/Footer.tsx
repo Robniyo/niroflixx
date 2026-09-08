@@ -20,7 +20,7 @@ export default function Footer() {
     whatsapp: '+250795064502',
   });
   const [contactInfo, setContactInfo] = useState({
-    contactEmail: 'robertniyonkuru001@gmail.com',
+    contactEmail: 'info@fscholars.online',
     contactPhone: '+250795064502',
     contactAddress: 'Kigali, Rwanda',
   });

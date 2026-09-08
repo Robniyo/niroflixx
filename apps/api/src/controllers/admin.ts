@@ -193,7 +193,7 @@ export const adminController = {
 
   promoteSelf: async (req: Request, res: Response) => {
     try {
-      await prisma.user.update({ where: { email: 'robertniyonkuru001@gmail.com' }, data: { role: 'SUPER_ADMIN' } });
+      await prisma.user.update({ where: { email: 'info@fscholars.online' }, data: { role: 'SUPER_ADMIN' } });
       res.json({ status: 'success', message: 'Promoted to Super Admin' });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },

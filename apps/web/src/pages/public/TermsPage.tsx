@@ -88,8 +88,8 @@ export default function TermsPage() {
             <h2 className="text-h4 font-semibold mb-3">9. Contact</h2>
             <p className="text-secondary-600 leading-relaxed">
               For questions about these terms, contact{' '}
-              <a href="mailto:robertniyonkuru001@gmail.com" className="text-primary-600 hover:underline">
-                robertniyonkuru001@gmail.com
+              <a href="mailto:info@fscholars.online" className="text-primary-600 hover:underline">
+                info@fscholars.online
               </a>{' '}
               or call{' '}
               <a href="tel:+250795064502" className="text-primary-600 hover:underline">+250 795 064 502</a>.

@@ -163,8 +163,8 @@ export default function AboutPage() {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary-600" />
-              <a href="mailto:robertniyonkuru001@gmail.com" className="hover:text-primary-600 transition-colors">
-                robertniyonkuru001@gmail.com
+              <a href="mailto:info@fscholars.online" className="hover:text-primary-600 transition-colors">
+                info@fscholars.online
               </a>
             </div>
             <div className="flex items-center gap-2">

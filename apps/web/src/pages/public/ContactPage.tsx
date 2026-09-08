@@ -61,7 +61,7 @@ useEffect(() => {
                 <div className="w-12 h-12 bg-success rounded-lg flex items-center justify-center flex-shrink-0"><Mail className="w-5 h-5 text-white" /></div>
                 <div>
                   <h4 className="font-semibold text-secondary-900 mb-1">Email</h4>
-                  <a href="mailto:robertniyonkuru001@gmail.com" className="text-body-sm text-primary-600 hover:underline break-all">robertniyonkuru001@gmail.com</a>
+                  <a href="mailto:info@fscholars.online" className="text-body-sm text-primary-600 hover:underline break-all">info@fscholars.online</a>
                   <p className="text-body-sm text-secondary-500 mt-0.5">Response within 24 hours</p>
                 </div>
               </div>
@@ -105,7 +105,7 @@ useEffect(() => {
                       </div>
                       <div>
                         <label className="block text-label text-secondary-700 mb-1.5">Email Address *</label>
-                        <input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="robertniyonkuru001@gmail.com" className="w-full px-4 py-3 bg-white border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-secondary-900" />
+                        <input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="info@fscholars.online" className="w-full px-4 py-3 bg-white border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-secondary-900" />
                       </div>
                     </div>
                     <div>

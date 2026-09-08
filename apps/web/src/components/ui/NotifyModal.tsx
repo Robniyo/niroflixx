@@ -77,7 +77,7 @@ export default function NotifyModal({ isOpen, onClose }: NotifyModalProps) {
                 <label className="block text-label text-secondary-700 mb-1.5">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="robertniyonkuru001@gmail.com" className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 text-secondary-900 text-body-sm" />
+                  <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="info@fscholars.online" className="w-full pl-10 pr-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg focus:outline-none focus:border-primary-500 text-secondary-900 text-body-sm" />
                 </div>
               </div>
               <div>
