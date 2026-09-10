@@ -68,10 +68,7 @@ export default function CandidatesPage() {
 
   return (
     <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div>
-            return (
-    <div>
+      {/* Preview Document Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setPreviewDoc(null)} />
@@ -107,7 +104,10 @@ export default function CandidatesPage() {
           </div>
         </div>
       )}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"></div>
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
           <h1 className="text-h4 font-bold text-secondary-900">Candidates</h1>
           <p className="text-secondary-500 text-body-sm mt-1">{filtered.length} candidates</p>
         </div>
@@ -305,7 +305,7 @@ export default function CandidatesPage() {
                   ) : <p className="text-sm text-secondary-400">None</p>}
                 </div>
 
-                  {/* Documents */}
+                {/* Documents */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-1"><FileText className="w-4 h-4" /> Documents</h4>
                   {selected.documents?.length > 0 ? (
