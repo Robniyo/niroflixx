@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/', coursesController.getAll);
 router.get('/:slug', coursesController.getBySlug);
+router.get('/byid/:id', coursesController.getById);
 router.post('/', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), coursesController.create);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN', 'CONTENT_MANAGER'), coursesController.update);
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), coursesController.delete);
