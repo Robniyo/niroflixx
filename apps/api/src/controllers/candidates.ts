@@ -234,4 +234,74 @@ export const candidatesController = {
       res.json({ status: 'success', data: { exists: true, ...candidate } });
     } catch (error) { res.status(500).json({ status: 'error', message: 'Failed', code: 500 }); }
   },
+    previewDocument: async (req: Request, res: Response) => {
+    try {
+      const doc = await prisma.candidateDocument.findUnique({ where: { id: req.params.id } });
+      if (!doc || !doc.fileUrl) return res.status(404).json({ status: 'error', message: 'Not found', code: 404 });
+
+      let fileUrl = doc.fileUrl;
+      if (!fileUrl.startsWith('http')) {
+        fileUrl = `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl}`;
+      }
+
+      const response = await fetch(fileUrl);
+      if (!response.ok) return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+
+      const buffer = await response.arrayBuffer();
+      const fileName = doc.fileName || 'document';
+      const ext = fileName.split('.').pop()?.toLowerCase() || '';
+      const isPdf = ext === 'pdf';
+      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+      const contentType = isPdf
+        ? 'application/pdf'
+        : isImage
+        ? `image/${ext === 'jpg' ? 'jpeg' : ext}`
+        : response.headers.get('content-type') || 'application/octet-stream';
+
+      res.removeHeader('X-Frame-Options');
+      res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://fscholars.online https://www.fscholars.online");
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Preview failed', code: 500 });
+    }
+  },
+
+  downloadDocument: async (req: Request, res: Response) => {
+    try {
+      const doc = await prisma.candidateDocument.findUnique({
+        where: { id: req.params.id },
+        include: { candidate: { include: { user: { select: { firstName: true, lastName: true } } } } },
+      });
+      if (!doc || !doc.fileUrl) return res.status(404).json({ status: 'error', message: 'Not found', code: 404 });
+
+      let fileUrl = doc.fileUrl;
+      if (!fileUrl.startsWith('http')) {
+        fileUrl = `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl}`;
+      }
+
+      const response = await fetch(fileUrl);
+      if (!response.ok) return res.status(404).json({ status: 'error', message: 'File not accessible', code: 404 });
+
+      const buffer = await response.arrayBuffer();
+      const ext = (doc.fileName || 'document').split('.').pop()?.toLowerCase() || 'pdf';
+      const candidateName = `${doc.candidate?.user?.firstName || 'Candidate'}_${doc.candidate?.user?.lastName || ''}`.trim().replace(/\s+/g, '_');
+      const cleanName = `${candidateName}_${(doc.type || 'document').replace(/\s+/g, '_')}.${ext}`;
+
+      const isPdf = ext === 'pdf';
+      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+      const contentType = isPdf
+        ? 'application/pdf'
+        : isImage
+        ? `image/${ext === 'jpg' ? 'jpeg' : ext}`
+        : response.headers.get('content-type') || 'application/octet-stream';
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${cleanName}"`);
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Download failed', code: 500 });
+    }
+  },
 };

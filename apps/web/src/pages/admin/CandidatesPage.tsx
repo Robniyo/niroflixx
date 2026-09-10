@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, XCircle, User, Mail, Phone, Award, BookOpen, Briefcase, Wrench, FileText, Clock, Bell } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, XCircle, User, Mail, Phone, Award, BookOpen, Briefcase, Wrench, FileText, Clock, Bell, Download, X } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ export default function CandidatesPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<any>(null);
   const [sendingReminders, setSendingReminders] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,44 @@ export default function CandidatesPage() {
     <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
+            return (
+    <div>
+      {previewDoc && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setPreviewDoc(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b bg-white">
+              <div className="min-w-0">
+                <h3 className="font-semibold text-secondary-900 capitalize">{previewDoc.type}</h3>
+                <p className="text-xs text-secondary-500 truncate">{previewDoc.fileName}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <a
+                  href={`https://niroflixx.onrender.com/api/v1/candidates/documents/${previewDoc.id}/download`}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
+                >
+                  <Download className="w-4 h-4" /> Download
+                </a>
+                <button onClick={() => setPreviewDoc(null)} className="p-2 hover:bg-secondary-100 rounded-lg">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 bg-secondary-50 overflow-auto" style={{ minHeight: '60vh' }}>
+              {(() => {
+                const ext = (previewDoc.fileName || '').split('.').pop()?.toLowerCase() || '';
+                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+                const previewUrl = `https://niroflixx.onrender.com/api/v1/candidates/documents/${previewDoc.id}/preview`;
+                if (isImage) {
+                  return <img src={previewUrl} alt={previewDoc.fileName} className="w-full h-auto object-contain mx-auto" />;
+                }
+                return <iframe src={previewUrl} title={previewDoc.fileName} className="w-full h-full border-0" style={{ minHeight: '60vh' }} />;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"></div>
           <h1 className="text-h4 font-bold text-secondary-900">Candidates</h1>
           <p className="text-secondary-500 text-body-sm mt-1">{filtered.length} candidates</p>
         </div>
@@ -266,14 +305,30 @@ export default function CandidatesPage() {
                   ) : <p className="text-sm text-secondary-400">None</p>}
                 </div>
 
-                {/* Documents */}
+                  {/* Documents */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-1"><FileText className="w-4 h-4" /> Documents</h4>
                   {selected.documents?.length > 0 ? (
                     selected.documents.map((doc: any) => (
-                      <div key={doc.id} className="text-sm flex justify-between py-1 border-b last:border-0">
-                        <span>{doc.type} — {doc.fileName}</span>
-                        <a href={doc.fileUrl} target="_blank" className="text-primary-600 hover:underline">View</a>
+                      <div key={doc.id} className="text-sm flex justify-between items-center py-2 border-b last:border-0">
+                        <div>
+                          <span className="capitalize font-medium">{doc.type}</span>
+                          <span className="text-secondary-400"> — {doc.fileName}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setPreviewDoc(doc)}
+                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-xs font-medium"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View
+                          </button>
+                          <a
+                            href={`https://niroflixx.onrender.com/api/v1/candidates/documents/${doc.id}/download`}
+                            className="inline-flex items-center gap-1 text-secondary-600 hover:text-secondary-800 text-xs font-medium"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Download
+                          </a>
+                        </div>
                       </div>
                     ))
                   ) : <p className="text-sm text-secondary-400">None</p>}

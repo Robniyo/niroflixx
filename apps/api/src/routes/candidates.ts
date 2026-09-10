@@ -4,6 +4,8 @@ import { authenticate, authorize } from '../middlewares/auth';
 
 const router = Router();
 router.get('/status', authenticate, candidatesController.checkStatus);
+router.get('/documents/:id/preview', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), candidatesController.previewDocument);
+router.get('/documents/:id/download', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), candidatesController.downloadDocument);
 router.get('/me', authenticate, candidatesController.getMyProfile);
 router.put('/me', authenticate, candidatesController.updateProfile);
 router.post('/education', authenticate, candidatesController.addEducation);
