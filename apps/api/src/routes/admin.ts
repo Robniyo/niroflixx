@@ -22,4 +22,5 @@ router.get('/settings/:key', adminController.getSetting);
 router.get('/enrollments', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.getEnrollments);
 router.patch('/enrollments/:id/payment', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.updateEnrollmentPayment);
 router.post('/send-reminders', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.sendPaymentReminders);
+router.post('/send-profile-reminders', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), adminController.sendProfileReminders);
 export default router;

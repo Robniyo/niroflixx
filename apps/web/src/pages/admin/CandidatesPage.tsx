@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, XCircle, User, Mail, Phone, Award, BookOpen, Briefcase, Wrench, FileText, Clock } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, XCircle, User, Mail, Phone, Award, BookOpen, Briefcase, Wrench, FileText, Clock, Bell } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ export default function CandidatesPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [sendingReminders, setSendingReminders] = useState(false);
 
   useEffect(() => {
     fetchCandidates();
@@ -41,6 +42,19 @@ export default function CandidatesPage() {
     } catch { toast.error('Failed'); }
   };
 
+  const handleSendReminders = async () => {
+    if (!confirm('Send profile completion reminders to all candidates with incomplete profiles (below 70%)? Users reminded in the last 3 days will be skipped.')) return;
+    setSendingReminders(true);
+    try {
+      const r = await api.post('/admin/send-profile-reminders');
+      toast.success(r.data.message || 'Reminders sent');
+    } catch {
+      toast.error('Failed to send reminders');
+    } finally {
+      setSendingReminders(false);
+    }
+  };
+
   const filtered = candidates.filter(c => {
     const name = `${c.user?.firstName} ${c.user?.lastName}`.toLowerCase();
     const email = c.user?.email?.toLowerCase() || '';
@@ -53,9 +67,19 @@ export default function CandidatesPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-h4 font-bold text-secondary-900">Candidates</h1>
-        <p className="text-secondary-500 text-body-sm mt-1">{filtered.length} candidates</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h1 className="text-h4 font-bold text-secondary-900">Candidates</h1>
+          <p className="text-secondary-500 text-body-sm mt-1">{filtered.length} candidates</p>
+        </div>
+        <Button
+          size="sm"
+          onClick={handleSendReminders}
+          isLoading={sendingReminders}
+          className="bg-primary-600 text-white hover:bg-primary-700"
+        >
+          <Bell className="w-4 h-4 mr-2" /> Send Profile Reminders
+        </Button>
       </div>
 
       {/* Filters */}

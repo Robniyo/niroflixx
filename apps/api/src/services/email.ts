@@ -191,4 +191,39 @@ export const emailService = {
       });
     } catch (e) { console.error('Payment reminder email failed:', e); }
   },
+    sendProfileReminder: async (to: string, name: string, score: number) => {
+    try {
+      await sgMail.send({
+        to,
+        from: { email: 'info@fscholars.online', name: 'Future Scholars' },
+        subject: `Complete your profile and unlock more opportunities`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px;">
+            ${branding}
+            <h2 style="color: #1E293B; margin: 0 0 12px;">Hi ${name},</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+              Your Future Scholars profile is currently <strong>${score}%</strong> complete.
+              A complete profile helps us match you with scholarships, jobs, and internships much faster.
+            </p>
+            <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin: 0 0 24px;">
+              <p style="color: #1E293B; font-size: 14px; margin: 0 0 8px;"><strong>What to complete:</strong></p>
+              <p style="color: #475569; font-size: 14px; margin: 0;">
+                • Headline<br/>
+                • Summary<br/>
+                • Education<br/>
+                • Experience<br/>
+                • Skills<br/>
+                • Documents (CV, National ID, certificates)
+              </p>
+            </div>
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="https://fscholars.online/dashboard/candidate" style="display: inline-block; padding: 14px 32px; background: #2563EB; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">Complete My Profile</a>
+            </div>
+            <p style="color: #64748B; font-size: 14px;">If you have any questions, contact us at <a href="mailto:info@fscholars.online" style="color: #2563EB;">info@fscholars.online</a> or call +250 795 064 502.</p>
+            ${footer}
+          </div>
+        `,
+      });
+    } catch (e) { console.error('Profile reminder email failed:', e); }
+  },
 };

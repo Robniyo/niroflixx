@@ -96,6 +96,7 @@ model Candidate {
   experienceYears    Int      @default(0)
   availability       String?
   completionScore    Int      @default(0)
+  lastProfileReminderAt DateTime?
   status             String   @default("active")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

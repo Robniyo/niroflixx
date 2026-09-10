@@ -112,7 +112,49 @@ export const adminController = {
       res.status(500).json({ status: 'error', message: 'Failed', code: 500 });
     }
   },
+    sendProfileReminders: async (_req: Request, res: Response) => {
+    try {
+      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 
+      const candidates = await prisma.candidate.findMany({
+        where: {
+          completionScore: { lt: 70 },
+          OR: [
+            { lastProfileReminderAt: null },
+            { lastProfileReminderAt: { lt: threeDaysAgo } },
+          ],
+        },
+        include: {
+          user: { select: { email: true, firstName: true } },
+        },
+      });
+
+      let sent = 0;
+      for (const c of candidates) {
+        if (c.user?.email) {
+          try {
+            await emailService.sendProfileReminder(
+              c.user.email,
+              c.user.firstName || 'Student',
+              c.completionScore || 0
+            );
+            await prisma.candidate.update({
+              where: { id: c.id },
+              data: { lastProfileReminderAt: new Date() },
+            });
+            sent++;
+          } catch (err) {
+            console.error(`Failed to send profile reminder to ${c.user.email}:`, err);
+          }
+        }
+      }
+
+      res.json({ status: 'success', message: `Reminders sent to ${sent} candidates.`, sent });
+    } catch (error) {
+      console.error('SEND PROFILE REMINDERS ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Failed to send reminders', code: 500 });
+    }
+  },
   updateUserStatus: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
