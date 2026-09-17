@@ -79,7 +79,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2">
             <Link to="/" className="flex flex-col items-center gap-0.5 mb-4">
-              <img src="/flogo.png" alt="Future Scholars" className="h-9 w-auto" />
+              <img src="/flogo.png" alt="Future Scholars" className="h-9 max-w-[160px] w-auto object-contain" />
               <span className="text-xs font-semibold text-white">Future Scholars</span>
             </Link>
             <p className="text-secondary-400 text-body-sm mb-6 max-w-sm">

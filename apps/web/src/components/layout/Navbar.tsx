@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="container-page">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex flex-col items-center gap-0.5 group">
-            <img src="/flogo.png" alt="Future Scholars" className="h-8 w-auto transition-transform group-hover:scale-105" />
+            <img src="/flogo.png" alt="Future Scholars" className="h-8 max-w-[140px] w-auto object-contain transition-transform group-hover:scale-105" />
             <span className="text-xs font-semibold text-secondary-700 whitespace-nowrap">Future Scholars</span>
           </Link>
           <div className="hidden lg:flex items-center gap-1">
