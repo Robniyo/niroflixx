@@ -5,7 +5,17 @@ import { emailService } from '../services/email';
 export const adminController = {
   getUsers: async (req: Request, res: Response) => {
     try {
+      const requesterId = (req as any).userId;
+      const requester = await prisma.user.findUnique({ where: { id: requesterId }, select: { role: true } });
+
+      const where: any = {};
+      // Super Admins are hidden unless the requester is a Super Admin themselves
+      if (requester?.role !== 'SUPER_ADMIN') {
+        where.role = { not: 'SUPER_ADMIN' };
+      }
+
       const users = await prisma.user.findMany({
+        where,
         select: { id: true, firstName: true, lastName: true, email: true, phone: true, role: true, status: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
       });
