@@ -46,8 +46,26 @@ export default function OpportunityDetailPage() {
     : null;
 
   return (
-    <div className="pt-32 pb-16 overflow-x-hidden">
-      <div className="mx-auto px-4" style={{ maxWidth: '896px' }}>
+    <div className="pt-32 pb-16" style={{ overflowX: 'hidden' }}>
+      <style>{`
+        .opp-content, .opp-content * {
+          max-width: 100% !important;
+          word-wrap: break-word !important;
+          overflow-wrap: anywhere !important;
+          word-break: break-word !important;
+          box-sizing: border-box !important;
+          white-space: normal !important;
+        }
+        .opp-content p { margin-bottom: 1rem; }
+        .opp-content ul { list-style: disc !important; padding-left: 1.5rem !important; margin-bottom: 1rem; }
+        .opp-content ol { list-style: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1rem; }
+        .opp-content li { margin-bottom: 0.25rem; }
+        .opp-content h1, .opp-content h2, .opp-content h3 { font-weight: 600; margin-bottom: 0.5rem; margin-top: 1rem; }
+        .opp-content a { color: #2563EB; text-decoration: underline; }
+        .opp-content strong { font-weight: 600; }
+      `}</style>
+
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 16px' }}>
         <Link
           to="/opportunities"
           className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"
@@ -67,8 +85,12 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          <h1 className="text-h2 font-bold mt-2 mb-2" style={{ wordBreak: 'break-word' }}>{opp.title}</h1>
-          <p className="text-body-lg text-secondary-600 mb-6" style={{ wordBreak: 'break-word' }}>{opp.organization}</p>
+          <h1 className="text-h2 font-bold mt-2 mb-2" style={{ wordBreak: 'break-word' }}>
+            {opp.title}
+          </h1>
+          <p className="text-body-lg text-secondary-600 mb-6" style={{ wordBreak: 'break-word' }}>
+            {opp.organization}
+          </p>
 
           <div className="flex flex-wrap gap-4 text-body-sm text-secondary-500 mb-8">
             {opp.country && (
@@ -90,43 +112,43 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          {/* Description - image on top, text below (no flex layout issues) */}
+          {/* Description: image on side, text constrained */}
           <div className="mb-8">
             <h3 className="text-h4 font-semibold mb-3">Description</h3>
-            {opp.coverImage && (
-              <button
-                onClick={() => setImageZoomed(true)}
-                className="block w-full mb-5 cursor-zoom-in"
-              >
-                <img
-                  src={opp.coverImage}
-                  alt={opp.title}
-                  className="w-full rounded-lg shadow-sm hover:opacity-90 transition-opacity bg-secondary-50"
-                  style={{ maxHeight: '300px', objectFit: 'contain' }}
-                />
-              </button>
-            )}
             <div
-              className="text-secondary-600 leading-relaxed"
               style={{
-                wordBreak: 'break-word',
-                overflowWrap: 'anywhere',
-                whiteSpace: 'pre-wrap',
+                display: 'grid',
+                gridTemplateColumns: opp.coverImage ? 'minmax(0, 260px) minmax(0, 1fr)' : '1fr',
+                gap: '24px',
+                alignItems: 'start',
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
-            />
+            >
+              {opp.coverImage && (
+                <button
+                  onClick={() => setImageZoomed(true)}
+                  style={{ width: '100%', padding: 0, border: 'none', background: 'none', cursor: 'zoom-in' }}
+                >
+                  <img
+                    src={opp.coverImage}
+                    alt={opp.title}
+                    style={{ width: '100%', borderRadius: '8px', display: 'block' }}
+                  />
+                </button>
+              )}
+              <div
+                className="opp-content text-secondary-600"
+                style={{ minWidth: 0, overflow: 'hidden' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
+              />
+            </div>
           </div>
 
           {opp.requirements && (
             <div className="mb-8">
               <h3 className="text-h4 font-semibold mb-3">Requirements</h3>
               <div
-                className="text-secondary-600 leading-relaxed"
-                style={{
-                  wordBreak: 'break-word',
-                  overflowWrap: 'anywhere',
-                  whiteSpace: 'pre-wrap',
-                }}
+                className="opp-content text-secondary-600"
+                style={{ minWidth: 0, overflow: 'hidden' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
               />
             </div>
@@ -136,12 +158,8 @@ export default function OpportunityDetailPage() {
             <div className="mb-8">
               <h3 className="text-h4 font-semibold mb-3">Benefits</h3>
               <div
-                className="text-secondary-600 leading-relaxed"
-                style={{
-                  wordBreak: 'break-word',
-                  overflowWrap: 'anywhere',
-                  whiteSpace: 'pre-wrap',
-                }}
+                className="opp-content text-secondary-600"
+                style={{ minWidth: 0, overflow: 'hidden' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
               />
             </div>
