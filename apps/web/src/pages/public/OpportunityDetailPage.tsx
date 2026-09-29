@@ -48,21 +48,33 @@ export default function OpportunityDetailPage() {
   return (
     <div className="pt-32 pb-16" style={{ overflowX: 'hidden' }}>
       <style>{`
-        .opp-content, .opp-content * {
+        .opp-content {
+          overflow: hidden;
+          word-wrap: break-word;
+          overflow-wrap: anywhere;
+        }
+        .opp-content * {
           max-width: 100% !important;
           word-wrap: break-word !important;
           overflow-wrap: anywhere !important;
-          word-break: break-word !important;
           box-sizing: border-box !important;
-          white-space: normal !important;
         }
-        .opp-content p { margin-bottom: 1rem; }
-        .opp-content ul { list-style: disc !important; padding-left: 1.5rem !important; margin-bottom: 1rem; }
-        .opp-content ol { list-style: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1rem; }
+        .opp-content p { margin-bottom: 0.85rem; }
+        .opp-content ul { list-style: disc !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
+        .opp-content ol { list-style: decimal !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
         .opp-content li { margin-bottom: 0.25rem; }
-        .opp-content h1, .opp-content h2, .opp-content h3 { font-weight: 600; margin-bottom: 0.5rem; margin-top: 1rem; }
+        .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 { font-weight: 600; margin: 1rem 0 0.5rem 0; }
         .opp-content a { color: #2563EB; text-decoration: underline; }
         .opp-content strong { font-weight: 600; }
+        .opp-float-img {
+          float: left;
+          margin: 0 24px 16px 0;
+          width: 260px;
+          max-width: 45%;
+        }
+        @media (max-width: 640px) {
+          .opp-float-img { float: none; width: 100%; max-width: 100%; margin: 0 0 16px 0; }
+        }
       `}</style>
 
       <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 16px' }}>
@@ -112,21 +124,15 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          {/* Description: image on side, text constrained */}
+          {/* Description with float-left image so text wraps and flows underneath */}
           <div className="mb-8">
             <h3 className="text-h4 font-semibold mb-3">Description</h3>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: opp.coverImage ? 'minmax(0, 260px) minmax(0, 1fr)' : '1fr',
-                gap: '24px',
-                alignItems: 'start',
-              }}
-            >
+            <div className="opp-content text-secondary-600">
               {opp.coverImage && (
                 <button
                   onClick={() => setImageZoomed(true)}
-                  style={{ width: '100%', padding: 0, border: 'none', background: 'none', cursor: 'zoom-in' }}
+                  className="opp-float-img cursor-zoom-in"
+                  style={{ padding: 0, border: 'none', background: 'none', display: 'block' }}
                 >
                   <img
                     src={opp.coverImage}
@@ -136,8 +142,6 @@ export default function OpportunityDetailPage() {
                 </button>
               )}
               <div
-                className="opp-content text-secondary-600"
-                style={{ minWidth: 0, overflow: 'hidden' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
               />
             </div>
@@ -148,7 +152,6 @@ export default function OpportunityDetailPage() {
               <h3 className="text-h4 font-semibold mb-3">Requirements</h3>
               <div
                 className="opp-content text-secondary-600"
-                style={{ minWidth: 0, overflow: 'hidden' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
               />
             </div>
@@ -159,13 +162,12 @@ export default function OpportunityDetailPage() {
               <h3 className="text-h4 font-semibold mb-3">Benefits</h3>
               <div
                 className="opp-content text-secondary-600"
-                style={{ minWidth: 0, overflow: 'hidden' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
               />
             </div>
           )}
 
-          <div className="mt-8 pt-8 border-t flex flex-wrap gap-3">
+          <div className="mt-8 pt-8 border-t flex flex-wrap gap-3" style={{ clear: 'both' }}>
             {opp.officialLink && (
               <a href={opp.officialLink} target="_blank" rel="noopener noreferrer">
                 <Button rightIcon={<Globe className="w-4 h-4" />}>Official Website</Button>
