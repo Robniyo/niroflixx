@@ -46,26 +46,60 @@ export default function OpportunityDetailPage() {
     : null;
 
   return (
-    <div className="pt-32 pb-16" style={{ overflowX: 'hidden' }}>
+    <div className="pt-32 pb-16">
       <style>{`
+        .opp-page-wrap {
+          width: 100%;
+          max-width: 896px;
+          margin: 0 auto;
+          padding: 0 16px;
+          box-sizing: border-box;
+          overflow-x: hidden;
+        }
+        .opp-card {
+          background: white;
+          border-radius: 16px;
+          border: 1px solid #E2E8F0;
+          padding: 24px;
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
+        }
         .opp-content {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
           overflow: hidden;
           word-wrap: break-word;
           overflow-wrap: anywhere;
+          word-break: break-word;
+          white-space: normal;
         }
         .opp-content * {
           max-width: 100% !important;
+          min-width: 0 !important;
+          width: auto !important;
+          white-space: normal !important;
           word-wrap: break-word !important;
           overflow-wrap: anywhere !important;
+          word-break: break-word !important;
           box-sizing: border-box !important;
         }
         .opp-content p { margin-bottom: 0.85rem; }
         .opp-content ul { list-style: disc !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
         .opp-content ol { list-style: decimal !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
         .opp-content li { margin-bottom: 0.25rem; }
-        .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 { font-weight: 600; margin: 1rem 0 0.5rem 0; }
+        .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 {
+          font-weight: 600; margin: 1rem 0 0.5rem 0;
+        }
         .opp-content a { color: #2563EB; text-decoration: underline; }
         .opp-content strong { font-weight: 600; }
+        .opp-content img { max-width: 100% !important; height: auto !important; }
+        .opp-content table { width: 100% !important; table-layout: fixed !important; }
+        .opp-content pre { white-space: pre-wrap !important; word-break: break-word !important; }
+
         .opp-float-img {
           float: left;
           margin: 0 24px 16px 0;
@@ -77,7 +111,7 @@ export default function OpportunityDetailPage() {
         }
       `}</style>
 
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 16px' }}>
+      <div className="opp-page-wrap">
         <Link
           to="/opportunities"
           className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"
@@ -85,7 +119,7 @@ export default function OpportunityDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Opportunities
         </Link>
 
-        <div className={`bg-white rounded-2xl border border-secondary-100 p-6 ${isClosed ? 'opacity-80' : ''}`}>
+        <div className={`opp-card ${isClosed ? 'opacity-80' : ''}`}>
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
               {opp.type?.replace('_', ' ')}
@@ -124,7 +158,7 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          {/* Description with float-left image so text wraps and flows underneath */}
+          {/* Description with float-left image, text flows beside and under */}
           <div className="mb-8">
             <h3 className="text-h4 font-semibold mb-3">Description</h3>
             <div className="opp-content text-secondary-600">
