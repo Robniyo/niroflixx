@@ -47,7 +47,7 @@ export default function OpportunityDetailPage() {
 
   return (
     <div className="pt-32 pb-16">
-      <div className="container-content">
+      <div className="container-content max-w-4xl">
         <Link
           to="/opportunities"
           className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"
@@ -56,7 +56,7 @@ export default function OpportunityDetailPage() {
         </Link>
 
         <div
-          className={`bg-white rounded-2xl border border-secondary-100 p-8 ${
+          className={`bg-white rounded-2xl border border-secondary-100 p-6 md:p-8 ${
             isClosed ? 'opacity-80' : ''
           }`}
         >
@@ -70,8 +70,9 @@ export default function OpportunityDetailPage() {
               </span>
             )}
           </div>
-          <h1 className="text-h2 font-bold mt-2 mb-2">{opp.title}</h1>
-          <p className="text-body-lg text-secondary-600 mb-6">{opp.organization}</p>
+
+          <h1 className="text-h2 font-bold mt-2 mb-2 break-words">{opp.title}</h1>
+          <p className="text-body-lg text-secondary-600 mb-6 break-words">{opp.organization}</p>
 
           <div className="flex flex-wrap gap-4 text-body-sm text-secondary-500 mb-8">
             {opp.country && (
@@ -93,63 +94,48 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          <div className="prose max-w-none space-y-6">
-            <div>
-              <h3 className="text-h4 font-semibold mb-2">Description</h3>
-              <div className="clearfix">
-                {opp.coverImage && (
-                  <>
-                    <button
-                      onClick={() => setImageZoomed(true)}
-                      className="float-left mr-4 mb-3 block w-56 md:w-64 cursor-zoom-in"
-                    >
-                      <img
-                        src={opp.coverImage}
-                        alt={opp.title}
-                        className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
-                      />
-                    </button>
-                    {imageZoomed && (
-                      <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-                        onClick={() => setImageZoomed(false)}
-                      >
-                        <img
-                          src={opp.coverImage}
-                          alt={opp.title}
-                          className="max-w-full max-h-full object-contain cursor-zoom-out"
-                        />
-                      </div>
-                    )}
-                  </>
-                )}
-                <div
-                  className="text-secondary-600"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
-                />
-              </div>
+          {/* Description with image on side */}
+          <div className="mb-8">
+            <h3 className="text-h4 font-semibold mb-3">Description</h3>
+            <div className="flex flex-col md:flex-row gap-6">
+              {opp.coverImage && (
+                <button
+                  onClick={() => setImageZoomed(true)}
+                  className="flex-shrink-0 w-full md:w-64 cursor-zoom-in"
+                >
+                  <img
+                    src={opp.coverImage}
+                    alt={opp.title}
+                    className="w-full aspect-video object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                  />
+                </button>
+              )}
+              <div
+                className="flex-1 min-w-0 text-secondary-600 break-words leading-relaxed whitespace-pre-line"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
+              />
             </div>
-
-            {opp.requirements && (
-              <div>
-                <h3 className="text-h4 font-semibold mb-2">Requirements</h3>
-                <div
-                  className="text-secondary-600"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
-                />
-              </div>
-            )}
-
-            {opp.benefits && (
-              <div>
-                <h3 className="text-h4 font-semibold mb-2">Benefits</h3>
-                <div
-                  className="text-secondary-600"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
-                />
-              </div>
-            )}
           </div>
+
+          {opp.requirements && (
+            <div className="mb-8">
+              <h3 className="text-h4 font-semibold mb-3">Requirements</h3>
+              <div
+                className="text-secondary-600 break-words leading-relaxed whitespace-pre-line"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
+              />
+            </div>
+          )}
+
+          {opp.benefits && (
+            <div className="mb-8">
+              <h3 className="text-h4 font-semibold mb-3">Benefits</h3>
+              <div
+                className="text-secondary-600 break-words leading-relaxed whitespace-pre-line"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
+              />
+            </div>
+          )}
 
           <div className="mt-8 pt-8 border-t flex flex-wrap gap-3">
             {opp.officialLink && (
@@ -168,6 +154,20 @@ export default function OpportunityDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Image zoom modal */}
+      {imageZoomed && opp.coverImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setImageZoomed(false)}
+        >
+          <img
+            src={opp.coverImage}
+            alt={opp.title}
+            className="max-w-full max-h-full object-contain cursor-zoom-out"
+          />
+        </div>
+      )}
 
       <ApplyModal
         isOpen={showApply}
