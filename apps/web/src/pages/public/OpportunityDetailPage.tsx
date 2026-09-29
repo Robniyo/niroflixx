@@ -47,7 +47,7 @@ export default function OpportunityDetailPage() {
 
   return (
     <div className="pt-32 pb-16">
-      <style>{`
+            <style>{`
         .opp-page-wrap {
           width: 100%;
           max-width: 896px;
@@ -63,19 +63,18 @@ export default function OpportunityDetailPage() {
           box-sizing: border-box;
           width: 100%;
           max-width: 100%;
+        }
+
+        /* Clearfix wrapper contains the float */
+        .opp-desc-wrap {
           overflow: hidden;
         }
 
-        /* WRAPPER that contains the float + text */
-        .opp-desc-wrap {
-          overflow: hidden; /* clearfix so float is contained */
-        }
-
-        /* Small floating image — outside .opp-content so width:auto rules don't hit it */
+        /* Small floating image */
         .opp-float-img {
           float: left;
           margin: 0 20px 12px 0;
-          width: 240px;
+          width: 220px;
           max-width: 45%;
           display: block;
           padding: 0;
@@ -98,38 +97,49 @@ export default function OpportunityDetailPage() {
           }
         }
 
-        /* Text rules — applied ONLY to .opp-content (not to the image) */
+        /* IMPORTANT: no overflow here — text must be a normal block so it wraps beside float */
         .opp-content {
-          width: 100%;
-          max-width: 100%;
           min-width: 0;
-          overflow: hidden;
+          word-wrap: break-word;
+          overflow-wrap: anywhere;
+        }
+
+        /* Apply overflow protection only to children, not the container */
+        .opp-content p,
+        .opp-content ul,
+        .opp-content ol,
+        .opp-content h1,
+        .opp-content h2,
+        .opp-content h3,
+        .opp-content h4,
+        .opp-content blockquote,
+        .opp-content pre {
+          max-width: 100%;
           word-wrap: break-word;
           overflow-wrap: anywhere;
           word-break: break-word;
-          white-space: normal;
         }
-        .opp-content * {
-          max-width: 100% !important;
-          min-width: 0 !important;
-          white-space: normal !important;
-          word-wrap: break-word !important;
-          overflow-wrap: anywhere !important;
-          word-break: break-word !important;
-          box-sizing: border-box !important;
+        .opp-content a {
+          word-break: break-all;
         }
+        .opp-content img {
+          max-width: 100%;
+          height: auto;
+        }
+        .opp-content table {
+          width: 100%;
+          table-layout: fixed;
+        }
+
         .opp-content p { margin-bottom: 0.85rem; }
-        .opp-content ul { list-style: disc !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
-        .opp-content ol { list-style: decimal !important; padding-left: 1.5rem !important; margin-bottom: 0.85rem; }
+        .opp-content ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.85rem; }
+        .opp-content ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.85rem; }
         .opp-content li { margin-bottom: 0.25rem; }
         .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 {
           font-weight: 600; margin: 1rem 0 0.5rem 0;
         }
         .opp-content a { color: #2563EB; text-decoration: underline; }
         .opp-content strong { font-weight: 600; }
-        .opp-content img { max-width: 100% !important; height: auto !important; }
-        .opp-content table { width: 100% !important; table-layout: fixed !important; }
-        .opp-content pre { white-space: pre-wrap !important; word-break: break-word !important; }
       `}</style>
 
       <div className="opp-page-wrap">
