@@ -54,7 +54,6 @@ export default function OpportunityDetailPage() {
           margin: 0 auto;
           padding: 0 16px;
           box-sizing: border-box;
-          overflow-x: hidden;
         }
         .opp-card {
           background: white;
@@ -64,10 +63,43 @@ export default function OpportunityDetailPage() {
           box-sizing: border-box;
           width: 100%;
           max-width: 100%;
-          overflow-x: hidden;
+          overflow: hidden;
         }
-        .opp-content {
+
+        /* WRAPPER that contains the float + text */
+        .opp-desc-wrap {
+          overflow: hidden; /* clearfix so float is contained */
+        }
+
+        /* Small floating image — outside .opp-content so width:auto rules don't hit it */
+        .opp-float-img {
+          float: left;
+          margin: 0 20px 12px 0;
+          width: 240px;
+          max-width: 45%;
           display: block;
+          padding: 0;
+          border: none;
+          background: none;
+          cursor: zoom-in;
+        }
+        .opp-float-img img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 8px;
+        }
+        @media (max-width: 640px) {
+          .opp-float-img {
+            float: none;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 0 16px 0;
+          }
+        }
+
+        /* Text rules — applied ONLY to .opp-content (not to the image) */
+        .opp-content {
           width: 100%;
           max-width: 100%;
           min-width: 0;
@@ -80,7 +112,6 @@ export default function OpportunityDetailPage() {
         .opp-content * {
           max-width: 100% !important;
           min-width: 0 !important;
-          width: auto !important;
           white-space: normal !important;
           word-wrap: break-word !important;
           overflow-wrap: anywhere !important;
@@ -99,16 +130,6 @@ export default function OpportunityDetailPage() {
         .opp-content img { max-width: 100% !important; height: auto !important; }
         .opp-content table { width: 100% !important; table-layout: fixed !important; }
         .opp-content pre { white-space: pre-wrap !important; word-break: break-word !important; }
-
-        .opp-float-img {
-          float: left;
-          margin: 0 24px 16px 0;
-          width: 260px;
-          max-width: 45%;
-        }
-        @media (max-width: 640px) {
-          .opp-float-img { float: none; width: 100%; max-width: 100%; margin: 0 0 16px 0; }
-        }
       `}</style>
 
       <div className="opp-page-wrap">
@@ -158,24 +179,21 @@ export default function OpportunityDetailPage() {
             )}
           </div>
 
-          {/* Description with float-left image, text flows beside and under */}
+          {/* Description: float image is OUTSIDE .opp-content */}
           <div className="mb-8">
             <h3 className="text-h4 font-semibold mb-3">Description</h3>
-            <div className="opp-content text-secondary-600">
+            <div className="opp-desc-wrap text-secondary-600">
               {opp.coverImage && (
                 <button
                   onClick={() => setImageZoomed(true)}
-                  className="opp-float-img cursor-zoom-in"
-                  style={{ padding: 0, border: 'none', background: 'none', display: 'block' }}
+                  className="opp-float-img"
+                  aria-label="Zoom image"
                 >
-                  <img
-                    src={opp.coverImage}
-                    alt={opp.title}
-                    style={{ width: '100%', borderRadius: '8px', display: 'block' }}
-                  />
+                  <img src={opp.coverImage} alt={opp.title} />
                 </button>
               )}
               <div
+                className="opp-content"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
               />
             </div>
