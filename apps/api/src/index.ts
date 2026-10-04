@@ -28,6 +28,7 @@ import reportsRoutes from './routes/reports';
 import statsRoutes from './routes/stats';
 import contactRoutes from './routes/contact';
 import notificationsRoutes from './routes/notifications';
+import { sitemapController } from './controllers/sitemap';
 
 const app = express();
 
@@ -88,6 +89,9 @@ app.use('/api/v1/reports', reportsRoutes);
 app.use('/api/v1/stats', statsRoutes);
 app.use('/api/v1/contact', contactRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
+
+// Dynamic sitemap (served at root so it's accessible as /sitemap.xml via Vercel rewrite)
+app.get('/sitemap.xml', sitemapController.get);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
