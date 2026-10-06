@@ -61,6 +61,7 @@ import MyRequests from '@/pages/dashboard/MyRequests';
 
 import ScrollToTop from './components/ui/ScrollToTop';
 //import ChatBot from './components/ui/ChatBot';
+import { Analytics } from './components/Analytics';
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -118,6 +119,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <Analytics />
       <Toaster position="top-right" toastOptions={{ duration: 4000, style: { borderRadius: '12px', background: '#1E293B', color: '#F8FAFC', fontSize: '14px' } }} />
       <Routes>
         <Route path="/login" element={<AuthPage />} />
