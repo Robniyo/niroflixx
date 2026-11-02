@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Briefcase, Calendar, MapPin, Upload, Youtube } from 'lucide-react';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
@@ -24,12 +24,12 @@ const emptyForm = {
   requirements: '',
   benefits: '',
   officialLink: '',
+  youtubeLink: '', // <--- ONGERAHO IYI
   coverImage: '',
   status: 'DRAFT',
   featured: false,
 };
 
-// Helper to compute status based on deadline (duplicated here for admin table)
 function getComputedStatus(deadline: string | null) {
   if (!deadline) return 'OPEN';
   const now = new Date();
@@ -89,6 +89,7 @@ export default function OpportunitiesPage() {
         requirements: d.requirements || '',
         benefits: d.benefits || '',
         officialLink: d.officialLink || '',
+        youtubeLink: d.youtubeLink || '', // <--- ONGERAHO IYI
         coverImage: d.coverImage || '',
         status: d.status,
         featured: d.featured,
@@ -168,72 +169,22 @@ export default function OpportunitiesPage() {
       ) : (
         <ResponsiveTable
           columns={[
-            {
-              key: 'title',
-              label: 'Title',
-              render: (o) => <span className="font-medium text-sm">{o.title}</span>,
-            },
-            {
-              key: 'type',
-              label: 'Type',
-              render: (o) => <span className="text-xs text-secondary-600">{o.type}</span>,
-            },
-            {
-              key: 'org',
-              label: 'Organization',
-              render: (o) => (
-                <span className="text-xs text-secondary-600">{o.organization || '—'}</span>
-              ),
-            },
-            {
-              key: 'deadline',
-              label: 'Deadline',
-              render: (o) => (
-                <span className="text-xs">
-                  {o.deadline ? new Date(o.deadline).toLocaleDateString() : '—'}
-                </span>
-              ),
-            },
-            {
-              key: 'status',
-              label: 'Status',
-              render: (o) => {
+            { key: 'title', label: 'Title', render: (o) => <span className="font-medium text-sm">{o.title}</span> },
+            { key: 'type', label: 'Type', render: (o) => <span className="text-xs text-secondary-600">{o.type}</span> },
+            { key: 'org', label: 'Organization', render: (o) => <span className="text-xs text-secondary-600">{o.organization || '—'}</span> },
+            { key: 'deadline', label: 'Deadline', render: (o) => <span className="text-xs">{o.deadline ? new Date(o.deadline).toLocaleDateString() : '—'}</span> },
+            { key: 'status', label: 'Status', render: (o) => {
                 const cs = o.computedStatus;
                 if (!cs) return <span className="text-xs">{o.status}</span>;
-                const color =
-                  cs === 'CLOSED'
-                    ? 'bg-red-100 text-red-700'
-                    : cs === 'CLOSING_SOON'
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-green-100 text-green-700';
-                return (
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>
-                    {cs === 'OPEN' ? 'Open' : cs === 'CLOSING_SOON' ? 'Closing Soon' : 'Closed'}
-                  </span>
-                );
-              },
-            },
-            {
-              key: 'actions',
-              label: '',
-              render: (o) => (
+                const color = cs === 'CLOSED' ? 'bg-red-100 text-red-700' : cs === 'CLOSING_SOON' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700';
+                return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{cs === 'OPEN' ? 'Open' : cs === 'CLOSING_SOON' ? 'Closing Soon' : 'Closed'}</span>;
+            }},
+            { key: 'actions', label: '', render: (o) => (
                 <div className="flex gap-1">
-                  <button
-                    onClick={() => openEdit(o.id)}
-                    className="p-1 text-secondary-400 hover:text-primary-600"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(o.id)}
-                    className="p-1 text-secondary-400 hover:text-danger"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <button onClick={() => openEdit(o.id)} className="p-1 text-secondary-400 hover:text-primary-600"><Edit className="w-4 h-4" /></button>
+                  <button onClick={() => handleDelete(o.id)} className="p-1 text-secondary-400 hover:text-danger"><Trash2 className="w-4 h-4" /></button>
                 </div>
-              ),
-              hideOnMobile: true,
-            },
+            ), hideOnMobile: true },
           ]}
           data={items}
           emptyMessage="No opportunities yet"
@@ -243,151 +194,81 @@ export default function OpportunitiesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowModal(false)}
-          />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-scale-in">
             <div className="sticky top-0 bg-white border-b px-5 py-3.5 flex items-center justify-between rounded-t-2xl z-10">
               <h3 className="font-semibold">{editing ? 'Edit' : 'New'} Opportunity</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1.5 hover:bg-secondary-50 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-secondary-50 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="e.g. Mastercard Scholarship 2027"
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm focus:outline-none focus:border-primary-500"
-                />
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Title *</label>
+                <input type="text" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Mastercard Scholarship 2027" className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm focus:outline-none focus:border-primary-500" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Type
-                  </label>
-                  <select
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  >
-                    {types.map((t) => (
-                      <option key={t} value={t}>
-                        {t.replace('_', ' ')}
-                      </option>
-                    ))}
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Type</label>
+                  <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
+                    {types.map((t) => (<option key={t} value={t}>{t.replace('_', ' ')}</option>))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Organization
-                  </label>
-                  <input
-                    type="text"
-                    value={form.organization}
-                    onChange={(e) => setForm({ ...form, organization: e.target.value })}
-                    placeholder="e.g. Mastercard Foundation"
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  />
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Organization</label>
+                  <input type="text" value={form.organization} onChange={(e) => setForm({ ...form, organization: e.target.value })} placeholder="e.g. Mastercard Foundation" className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Country
-                  </label>
-                  <input
-                    type="text"
-                    value={form.country}
-                    onChange={(e) => setForm({ ...form, country: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  />
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Country</label>
+                  <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  />
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">City</label>
+                  <input type="text" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Deadline
-                  </label>
-                  <input
-                    type="date"
-                    value={form.deadline}
-                    onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  />
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Deadline</label>
+                  <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Education Level
-                  </label>
-                  <input
-                    type="text"
-                    value={form.educationLevel}
-                    onChange={(e) => setForm({ ...form, educationLevel: e.target.value })}
-                    placeholder="e.g. Bachelor"
-                    className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                  />
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Education Level</label>
+                  <input type="text" value={form.educationLevel} onChange={(e) => setForm({ ...form, educationLevel: e.target.value })} placeholder="e.g. Bachelor" className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
                 </div>
               </div>
+              
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Description
-                </label>
-                <RichTextEditor
-                  value={form.description}
-                  onChange={(html) => setForm({ ...form, description: html })}
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Description</label>
+                <RichTextEditor value={form.description} onChange={(html) => setForm({ ...form, description: html })} />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Requirements</label>
+                <RichTextEditor value={form.requirements} onChange={(html) => setForm({ ...form, requirements: html })} />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Benefits</label>
+                <RichTextEditor value={form.benefits} onChange={(html) => setForm({ ...form, benefits: html })} />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Official Link</label>
+                <input type="url" value={form.officialLink} onChange={(e) => setForm({ ...form, officialLink: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
+              </div>
+
+              {/* YOUTUBE LINK INPUT */}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">YouTube Video Link (Optional)</label>
+                <input 
+                  type="url" 
+                  value={form.youtubeLink} 
+                  onChange={(e) => setForm({ ...form, youtubeLink: e.target.value })} 
+                  placeholder="e.g. https://www.youtube.com/watch?v=..." 
+                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" 
                 />
+                <span className="text-xs text-secondary-500 mt-1 block">Paste the link to the specific video guide here. Leave empty if there is no video.</span>
               </div>
+
               <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">
-                Requirements
-              </label>
-              <RichTextEditor
-                value={form.requirements}
-                onChange={(html) => setForm({ ...form, requirements: html })}
-              />
-            </div>
-              <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">
-                Benefits
-              </label>
-              <RichTextEditor
-                value={form.benefits}
-                onChange={(html) => setForm({ ...form, benefits: html })}
-              />
-            </div>
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Official Link
-                </label>
-                <input
-                  type="url"
-                  value={form.officialLink}
-                  onChange={(e) => setForm({ ...form, officialLink: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Cover Image
-                </label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Cover Image</label>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2 px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg cursor-pointer hover:bg-secondary-100 text-sm text-secondary-600">
                     <Upload className="w-4 h-4" /> {uploading ? 'Uploading...' : 'Choose Image'}
@@ -396,42 +277,23 @@ export default function OpportunitiesPage() {
                   {form.coverImage && <span className="text-xs text-success truncate max-w-[200px]">Uploaded ✓</span>}
                 </div>
               </div>
+              
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.featured}
-                  onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                  id="feat"
-                />
-                <label htmlFor="feat" className="text-sm">
-                  Featured on homepage
-                </label>
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} id="feat" />
+                <label htmlFor="feat" className="text-sm">Featured on homepage</label>
               </div>
+              
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Status
-                </label>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"
-                >
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
                   <option value="DRAFT">Draft</option>
                   <option value="PUBLISHED">Published</option>
                 </select>
               </div>
+              
               <div className="flex gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" className="flex-1" isLoading={saving}>
-                  {editing ? 'Update' : 'Create'}
-                </Button>
+                <Button type="button" variant="outline" className="flex-1" onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button type="submit" className="flex-1" isLoading={saving}>{editing ? 'Update' : 'Create'}</Button>
               </div>
             </form>
           </div>

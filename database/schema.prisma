@@ -326,8 +326,9 @@ model Opportunity {
   description     String
   requirements    String?
   benefits        String?
-  coverImage     String?
+  coverImage      String?
   officialLink    String?
+  youtubeLink     String?  // <--- ADD THIS LINE HERE
   contact         String?
   featured        Boolean  @default(false)
   views           Int      @default(0)

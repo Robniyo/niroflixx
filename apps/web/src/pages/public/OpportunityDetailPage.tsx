@@ -166,6 +166,10 @@ export default function OpportunityDetailPage() {
                 <Users className="w-5 h-5" />
                 <span className="font-semibold text-sm">Follow WhatsApp Channel</span>
               </a>
+              <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors border border-red-200 sm:col-span-2">
+                <Youtube className="w-5 h-5" />
+                <span className="font-semibold text-sm">Subscribe to our YouTube Channel</span>
+              </a>
             </div>
           </div>
 
@@ -195,19 +199,21 @@ export default function OpportunityDetailPage() {
             </div>
           )}
 
-          {/* YOUTUBE VIDEO LINK KURI SIDE */}
-          <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
-             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <Youtube className="w-5 h-5 text-white" />
-             </div>
-             <div>
-               <h4 className="font-bold text-red-900 text-sm">Find the Video on Youtube</h4>
-               <p className="text-red-700 text-xs mt-1 mb-2">Just search it and see what we have said on it.</p>
-               <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-red-700 hover:underline inline-block">
-                 Click to Go &rarr;
-               </a>
-             </div>
-          </div>
+          {/* YOUTUBE VIDEO LINK (Iyo ihari gusa) */}
+          {opp.youtubeLink && (
+            <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+               <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Youtube className="w-5 h-5 text-white" />
+               </div>
+               <div>
+                 <h4 className="font-bold text-red-900 text-sm">Watch how to apply</h4>
+                 <p className="text-red-700 text-xs mt-1 mb-2">See our step-by-step guide on YouTube before applying.</p>
+                 <a href={opp.youtubeLink} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-red-700 hover:underline inline-block">
+                   Watch Video &rarr;
+                 </a>
+               </div>
+            </div>
+          )}
 
           <div className="mt-8 pt-8 border-t border-secondary-100 flex flex-wrap gap-3" style={{ clear: 'both' }}>
             {opp.officialLink && (
