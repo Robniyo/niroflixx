@@ -143,7 +143,11 @@ export default function OpportunitiesPage() {
 
             <select
               value={educationLevelFilter}
-              onChange={(e) => setEducationLevelFilter(e.target.value)}
+              onChange={(e) => {
+                setEducationLevelFilter(e.target.value);
+                setComputedStatusFilter(''); // Ibi bituma "Closed" na "Open" byose bigaragara iyo uhisemo Level
+                setPagination(prev => ({ ...prev, page: 1 }));
+              }}
               className="w-full px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm font-medium text-secondary-700 focus:outline-none focus:border-primary-400"
             >
               <option value="">All Study Levels</option>
