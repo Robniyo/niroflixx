@@ -12,10 +12,8 @@ export default function Footer() {
   const [socials, setSocials] = useState({
     github: 'https://github.com/Robniyo/',
     youtube: 'https://www.youtube.com/@FUTURESCHOLAR_S',
-    twitter: '', // Twitter/X ntabwo wayitanze, ndayisize ubusa
     instagram: 'https://instagram.com/futurescholars',
     tiktok: '', // TikTok yakuweho
-    facebook: '',
     linkedin: 'https://linkedin.com/in/robertniyonkuru',
     whatsapp: '+250795064502',
   });
