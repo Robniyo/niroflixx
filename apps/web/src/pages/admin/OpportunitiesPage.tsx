@@ -24,7 +24,7 @@ const emptyForm = {
   requirements: '',
   benefits: '',
   officialLink: '',
-  youtubeLink: '', // <--- ONGERAHO IYI
+  youtubeLink: '',
   coverImage: '',
   status: 'DRAFT',
   featured: false,
@@ -89,7 +89,7 @@ export default function OpportunitiesPage() {
         requirements: d.requirements || '',
         benefits: d.benefits || '',
         officialLink: d.officialLink || '',
-        youtubeLink: d.youtubeLink || '', // <--- ONGERAHO IYI
+        youtubeLink: d.youtubeLink || '',
         coverImage: d.coverImage || '',
         status: d.status,
         featured: d.featured,
@@ -236,17 +236,30 @@ export default function OpportunitiesPage() {
               
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Description</label>
-                <RichTextEditor value={form.description} onChange={(html) => setForm({ ...form, description: html })} />
+                {/* HANO: Twongeyeho KEY itandukanye kuri RichTextEditor */}
+                <RichTextEditor 
+                  key={`desc-${editing || 'new'}-${showModal}`}
+                  value={form.description} 
+                  onChange={(html) => setForm({ ...form, description: html })} 
+                />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Requirements</label>
-                <RichTextEditor value={form.requirements} onChange={(html) => setForm({ ...form, requirements: html })} />
+                <RichTextEditor 
+                  key={`req-${editing || 'new'}-${showModal}`}
+                  value={form.requirements} 
+                  onChange={(html) => setForm({ ...form, requirements: html })} 
+                />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Benefits</label>
-                <RichTextEditor value={form.benefits} onChange={(html) => setForm({ ...form, benefits: html })} />
+                <RichTextEditor 
+                  key={`ben-${editing || 'new'}-${showModal}`}
+                  value={form.benefits} 
+                  onChange={(html) => setForm({ ...form, benefits: html })} 
+                />
               </div>
               
               <div>
