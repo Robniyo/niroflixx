@@ -12,7 +12,7 @@ const TYPES = [
 
 export default function OpportunitiesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [items, setItems] = useState<any[]>([]);
+  const [allItems, setAllItems] = useState<any[]>([]); // Tuzabitsa byose hano
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
 
@@ -20,22 +20,21 @@ export default function OpportunitiesPage() {
   const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || '');
   const [countryFilter, setCountryFilter] = useState(searchParams.get('dest') || searchParams.get('country') || '');
   const [educationLevelFilter, setEducationLevelFilter] = useState(searchParams.get('level') || '');
-  const [computedStatusFilter, setComputedStatusFilter] = useState(''); // Default is empty (View All)
+  const [computedStatusFilter, setComputedStatusFilter] = useState(''); 
   const [search, setSearch] = useState(searchParams.get('q') || '');
 
+  // Fetch all data from API (turi gukoresha limit nini kugira ngo tubone byose)
   const fetchOpportunities = async () => {
     setLoading(true);
     try {
-      const params: any = { status: 'PUBLISHED', page: pagination.page, limit: 12 };
+      const params: any = { status: 'PUBLISHED', limit: 100 }; // Fata byose
       if (typeFilter) params.type = typeFilter;
       if (countryFilter) params.country = countryFilter;
-      if (educationLevelFilter) params.educationLevel = educationLevelFilter;
       if (computedStatusFilter) params.computedStatus = computedStatusFilter;
       if (search) params.search = search;
 
       const r = await api.get('/opportunities', { params });
-      setItems(r.data.data);
-      setPagination(r.data.pagination);
+      setAllItems(r.data.data || []);
     } catch {
       // Handle error
     } finally {
@@ -45,14 +44,30 @@ export default function OpportunitiesPage() {
 
   useEffect(() => {
     fetchOpportunities();
-  }, [typeFilter, countryFilter, educationLevelFilter, computedStatusFilter, search, pagination.page]);
+  }, [typeFilter, countryFilter, computedStatusFilter, search]);
+
+  // Frontend Filtering (Gushakisha imbere mu buryo bwa "Includes")
+  const filteredItems = allItems.filter(item => {
+    if (!educationLevelFilter) return true;
+    const itemLevel = item.educationLevel || '';
+    // Niba educationLevel irimo ijambo twashakishije (nka "Undergraduate" cyangwa "Masters")
+    return itemLevel.toLowerCase().includes(educationLevelFilter.toLowerCase()) || 
+           (educationLevelFilter === "Undergraduate" && itemLevel.toLowerCase().includes("bachelor"));
+  });
+
+  // Pagination logic (Kuri Frontend)
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const paginatedItems = filteredItems.slice(
+    (pagination.page - 1) * itemsPerPage,
+    pagination.page * itemsPerPage
+  );
 
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // RESET FILTERS FUNCTION
   const handleReset = () => {
     setSearch('');
     setTypeFilter('');
@@ -85,23 +100,21 @@ export default function OpportunitiesPage() {
         {/* FILTER BOX */}
         <div className="bg-white rounded-2xl border border-secondary-100 p-4 sm:p-6 mb-8 shadow-sm">
           
-          {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
             <input
               type="text"
               placeholder="Search by title, organization, or keyword..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPagination({ page: 1, totalPages: 1 }); }}
               className="w-full pl-12 pr-4 py-3.5 bg-secondary-50 border border-secondary-200 rounded-xl text-secondary-900 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all"
             />
           </div>
 
-          {/* Dropdowns */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <select
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
+              onChange={(e) => { setTypeFilter(e.target.value); setPagination({ page: 1, totalPages: 1 }); }}
               className="w-full px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm font-medium text-secondary-700 focus:outline-none focus:border-primary-400"
             >
               <option value="">All Types</option>
@@ -114,27 +127,27 @@ export default function OpportunitiesPage() {
               type="text"
               placeholder="Destination / Country"
               value={countryFilter}
-              onChange={(e) => setCountryFilter(e.target.value)}
+              onChange={(e) => { setCountryFilter(e.target.value); setPagination({ page: 1, totalPages: 1 }); }}
               className="w-full px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm font-medium text-secondary-700 focus:outline-none focus:border-primary-400"
             />
 
-                        <select
+            {/* STUDY LEVEL - Turi gukoresha "Undergraduate" gusa hano kuko turi gushakisha imbere */}
+            <select
               value={educationLevelFilter}
               onChange={(e) => {
                 setEducationLevelFilter(e.target.value);
-                setComputedStatusFilter(''); // Reset status so results show up
-                setPagination(prev => ({ ...prev, page: 1 }));
+                setComputedStatusFilter(''); 
+                setPagination({ page: 1, totalPages: 1 });
               }}
               className="w-full px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm font-medium text-secondary-700 focus:outline-none focus:border-primary-400"
             >
               <option value="">All Study Levels</option>
-              <option value="Undergraduate (Bachelor's Degree)">Undergraduate</option>
-              <option value="Master's Degree">Masters</option>
+              <option value="Undergraduate">Undergraduate</option>
+              <option value="Master">Masters</option>
               <option value="PhD">PhD</option>
             </select>
           </div>
 
-          {/* Status Tabs */}
           <div className="flex items-center gap-2 flex-wrap pt-4 border-t border-secondary-100">
             <span className="text-sm font-semibold text-secondary-500 mr-2">Status:</span>
             {[
@@ -147,7 +160,7 @@ export default function OpportunitiesPage() {
                 key={tab.value}
                 onClick={() => {
                   setComputedStatusFilter(tab.value);
-                  setPagination(prev => ({ ...prev, page: 1 }));
+                  setPagination({ page: 1, totalPages: 1 });
                 }}
                 className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors ${
                   computedStatusFilter === tab.value
@@ -159,7 +172,6 @@ export default function OpportunitiesPage() {
               </button>
             ))}
             
-            {/* Reset Button (Iyo hari filter yashyizweho) */}
             {(search || typeFilter || countryFilter || educationLevelFilter || computedStatusFilter) && (
               <button onClick={handleReset} className="ml-auto text-sm text-danger hover:underline">
                 Clear Filters
@@ -168,12 +180,12 @@ export default function OpportunitiesPage() {
           </div>
         </div>
 
-        {/* RESULTS GRID */}
+        {/* RESULTS */}
         {loading ? (
           <div className="text-center py-20">
             <div className="animate-spin w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" />
           </div>
-        ) : items.length === 0 ? (
+        ) : paginatedItems.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-secondary-100">
             <Briefcase className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-secondary-900 mb-2">No Opportunities Found</h3>
@@ -185,7 +197,7 @@ export default function OpportunitiesPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {items.map((opp) => {
+              {paginatedItems.map((opp) => {
                 const isClosed = opp.computedStatus === 'CLOSED';
                 const isClosingSoon = opp.computedStatus === 'CLOSING_SOON';
 
@@ -197,21 +209,13 @@ export default function OpportunitiesPage() {
                       isClosed ? 'opacity-70 grayscale-[30%]' : 'hover:shadow-lg'
                     }`}
                   >
-                    {/* IMAGE SECTION */}
                     <div className="relative h-48 w-full bg-secondary-50 overflow-hidden flex-shrink-0">
                       {opp.coverImage ? (
-                        <img
-                          src={opp.coverImage}
-                          alt={opp.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                        <img src={opp.coverImage} alt={opp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Briefcase className="w-10 h-10 text-secondary-300" />
-                        </div>
+                        <div className="w-full h-full flex items-center justify-center"><Briefcase className="w-10 h-10 text-secondary-300" /></div>
                       )}
                       
-                      {/* BADGES (Type and Status) */}
                       <div className="absolute top-3 left-3 right-3 flex justify-between items-start pointer-events-none">
                         <span className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm uppercase tracking-wide truncate max-w-[120px]">
                           {opp.type?.replace('_', ' ')}
@@ -230,7 +234,6 @@ export default function OpportunitiesPage() {
                       </div>
                     </div>
 
-                    {/* CONTENT SECTION */}
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="font-bold text-lg text-secondary-900 leading-tight group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
                         {opp.title}
@@ -253,10 +256,9 @@ export default function OpportunitiesPage() {
               })}
             </div>
 
-            {/* PAGINATION */}
-            {pagination.totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="flex justify-center mt-12 gap-2">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(p => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                   <button
                     key={p}
                     onClick={() => handlePageChange(p)}
