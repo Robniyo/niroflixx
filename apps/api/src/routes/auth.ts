@@ -15,9 +15,9 @@ router.post('/google', authController.googleLogin);
 
 // UPDATED GOOGLE LOGIN ROUTE
 router.get('/google', (req, res) => {
-  // Ibi bituma Google ibona fscholars.online gusa, atari niroflixx.onrender.com
-  const frontendUrl = process.env.FRONTEND_URL || 'https://fscholars.online';
-  const redirectUri = `${frontendUrl}/api/v1/auth/google/callback`;
+  // GARUKA kuri BACKEND (Render) kugira ngo ibone code
+  const backendUrl = process.env.BACKEND_URL || 'https://niroflixx.onrender.com';
+  const redirectUri = `${backendUrl}/api/v1/auth/google/callback`;
   
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('email profile')}`;
   

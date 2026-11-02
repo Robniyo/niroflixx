@@ -6,8 +6,8 @@ import { config } from '../config';
 import { emailService } from '../services/email';
 
 const generateTokens = (userId: string) => {
-const token = jwt.sign({ userId }, config.jwtSecret, { expiresIn: config.jwtExpiresIn as any });
-const refreshToken = jwt.sign({ userId }, config.jwtRefreshSecret, { expiresIn: config.jwtRefreshExpiresIn as any });
+  const token = jwt.sign({ userId }, config.jwtSecret, { expiresIn: config.jwtExpiresIn as any });
+  const refreshToken = jwt.sign({ userId }, config.jwtRefreshSecret, { expiresIn: config.jwtRefreshExpiresIn as any });
   return { token, refreshToken };
 };
 
@@ -83,7 +83,7 @@ export const authController = {
     } catch (error) { res.status(400).json({ status: 'error', message: 'Invalid or expired token', code: 400 }); }
   },
 
-    me: async (req: Request, res: Response) => {
+  me: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const user = await prisma.user.findUnique({
@@ -204,21 +204,25 @@ export const authController = {
     }
   },
 
-  // Server-side OAuth callback (used when client script doesn't load)
   googleCallback: async (req: Request, res: Response) => {
     try {
       const { code } = req.query;
+      // Koresha FRONTEND_URL cyangwa fscholars.online
+      const frontendUrl = process.env.FRONTEND_URL || 'https://fscholars.online';
+
       if (!code) {
-        return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=google_failed`);
+        return res.redirect(`${frontendUrl}/login?error=google_failed`);
       }
 
       const { OAuth2Client } = require('google-auth-library');
       
-      // HANO: Twahinduye iyi URL ngo ibe fscholars.online
+      // HANO: Koresha BACKEND_URL kuko code iboneka kuri server
+      const backendUrl = process.env.BACKEND_URL || 'https://niroflixx.onrender.com';
+      
       const client = new OAuth2Client(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        `https://fscholars.online/api/v1/auth/google/callback` 
+        `${backendUrl}/api/v1/auth/google/callback`
       );
 
       const { tokens } = await client.getToken(code as string);
@@ -229,7 +233,7 @@ export const authController = {
 
       const payload = ticket.getPayload();
       if (!payload || !payload.email) {
-        return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=invalid_token`);
+        return res.redirect(`${frontendUrl}/login?error=invalid_token`);
       }
 
       const { email, given_name, family_name, picture, sub: googleId } = payload;
@@ -284,7 +288,8 @@ export const authController = {
         path: '/',
       });
 
-      return res.redirect(`https://fscholars.online`);
+      // Subiza kuri FRONTEND_URL gusa
+      return res.redirect(`${frontendUrl}`);
     } catch (error) {
       console.error('GOOGLE CALLBACK ERROR:', error);
       return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=google_failed`);
