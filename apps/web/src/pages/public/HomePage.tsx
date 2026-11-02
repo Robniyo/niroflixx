@@ -150,6 +150,14 @@ export default function HomePage() {
         <Partners />
         <CTASection />
         <Newsletter />
+              {/* MONETAG IN-PAGE PUSH AD */}
+      <div className="flex justify-center w-full py-8">
+         <script 
+           dangerouslySetInnerHTML={{ 
+             __html: `(function(s){s.dataset.zone='12178377',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+           }} 
+         />
+      </div>
 
         {/* FAQs */}
         <section className="max-w-4xl mx-auto pt-8 border-t border-secondary-200">

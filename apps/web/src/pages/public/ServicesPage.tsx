@@ -5,7 +5,6 @@ import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 
-// Auto-detect icon based on service title
 function getServiceIcon(title: string) {
   const t = title.toLowerCase();
   if (t.includes('cv') || t.includes('resume') || t.includes('writing') || t.includes('cover')) return FileText;
@@ -94,29 +93,51 @@ export default function ServicesPage() {
             <Link to="/contact"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>Contact Us</Button></Link>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s) => {
-              const Icon = getServiceIcon(s.title);
-              return (
-                <div key={s.id} className="bg-white rounded-2xl border border-secondary-100 p-6 hover:shadow-lg transition-all text-center group">
-                  <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-                    <Icon className="w-7 h-7 text-primary-600" />
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((s) => {
+                const Icon = getServiceIcon(s.title);
+                return (
+                  <div key={s.id} className="bg-white rounded-2xl border border-secondary-100 p-6 hover:shadow-lg transition-all text-center group">
+                    <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+                      <Icon className="w-7 h-7 text-primary-600" />
+                    </div>
+                    <h3 className="font-semibold text-lg text-secondary-900 mb-2">{s.title}</h3>
+                    <p className="text-body-sm text-secondary-500 mb-4 line-clamp-3">{s.description}</p>
+                    <p className="text-primary-600 font-bold text-lg mb-4">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</p>
+                    {s.estimatedTime && <p className="text-caption text-secondary-400 mb-4">⏱ {s.estimatedTime}</p>}
+                    <Button variant="outline" onClick={() => { setSelectedService(s); setShowRequest(true); }} className="w-full">
+                      Request Service
+                    </Button>
                   </div>
-                  <h3 className="font-semibold text-lg text-secondary-900 mb-2">{s.title}</h3>
-                  <p className="text-body-sm text-secondary-500 mb-4 line-clamp-3">{s.description}</p>
-                  <p className="text-primary-600 font-bold text-lg mb-4">{s.startingPrice === 0 ? 'Free' : `From ${s.startingPrice.toLocaleString()} RWF`}</p>
-                  {s.estimatedTime && <p className="text-caption text-secondary-400 mb-4">⏱ {s.estimatedTime}</p>}
-                  <Button variant="outline" onClick={() => { setSelectedService(s); setShowRequest(true); }} className="w-full">
-                    Request Service
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+
+            {/* MONETAG ADS - 2 ADS */}
+            <div className="mt-12 space-y-6">
+              {/* Ad 1: In-Page Push */}
+              <div className="flex justify-center w-full">
+                 <script 
+                   dangerouslySetInnerHTML={{ 
+                     __html: `(function(s){s.dataset.zone='12178377',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+                   }} 
+                 />
+              </div>
+              
+              {/* Ad 2: Vignette */}
+              <div className="flex justify-center w-full">
+                 <script 
+                   dangerouslySetInnerHTML={{ 
+                     __html: `(function(s){s.dataset.zone='12178379',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+                   }} 
+                 />
+              </div>
+            </div>
+          </>
         )}
       </div>
 
-      {/* Request Modal */}
       {showRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowRequest(false)} />

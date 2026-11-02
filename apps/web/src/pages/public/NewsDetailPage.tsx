@@ -9,8 +9,6 @@ export default function NewsDetailPage() {
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [imageZoomed, setImageZoomed] = useState<string | null>(null);
-  
-  // State zo gukoresha muri Gallery (Slider)
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -44,7 +42,6 @@ export default function NewsDetailPage() {
       </div>
     );
 
-  // Gutandukanya amafoto ya gallery niba ari string itandukanyijwe na comma
   const galleryImages = article.galleryImages 
     ? article.galleryImages.split(',').filter((url: string) => url.trim() !== '') 
     : [];
@@ -67,8 +64,6 @@ export default function NewsDetailPage() {
           box-sizing: border-box;
         }
         .news-desc-wrap { overflow: hidden; }
-        
-        /* Iyi ni float image nka kuri Opportunity */
         .news-float-img {
           float: left;
           margin: 0 20px 12px 0;
@@ -94,17 +89,8 @@ export default function NewsDetailPage() {
             margin: 0 0 16px 0;
           }
         }
-        .news-content {
-          min-width: 0;
-          word-wrap: break-word;
-          overflow-wrap: anywhere;
-        }
-        .news-content p, .news-content ul, .news-content ol, .news-content h1, .news-content h2, .news-content h3, .news-content h4, .news-content blockquote, .news-content pre {
-          max-width: 100%;
-          word-wrap: break-word;
-          overflow-wrap: anywhere;
-          word-break: break-word;
-        }
+        .news-content { min-width: 0; word-wrap: break-word; overflow-wrap: anywhere; }
+        .news-content p, .news-content ul, .news-content ol, .news-content h1, .news-content h2, .news-content h3, .news-content h4, .news-content blockquote, .news-content pre { max-width: 100%; word-wrap: break-word; overflow-wrap: anywhere; word-break: break-word; }
         .news-content a { word-break: break-all; color: #2563EB; text-decoration: underline; }
         .news-content img { max-width: 100%; height: auto; }
       `}</style>
@@ -136,7 +122,6 @@ export default function NewsDetailPage() {
             </span>
           </div>
 
-          {/* Description: Ifoto iri kuri float, amagambo arayikikije */}
           <div className="mb-8">
             <div className="news-desc-wrap text-secondary-600">
               {article.coverImage && (
@@ -153,7 +138,27 @@ export default function NewsDetailPage() {
             </div>
           </div>
 
-          {/* GALLERY (CAROUSEL) - Amafoto menshi muri card imwe */}
+          {/* MONETAG ADS - 2 ADS */}
+          <div className="my-8 space-y-6">
+            {/* Ad 1: In-Page Push */}
+            <div className="flex justify-center w-full">
+               <script 
+                 dangerouslySetInnerHTML={{ 
+                   __html: `(function(s){s.dataset.zone='12178377',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+                 }} 
+               />
+            </div>
+            
+            {/* Ad 2: Vignette */}
+            <div className="flex justify-center w-full">
+               <script 
+                 dangerouslySetInnerHTML={{ 
+                   __html: `(function(s){s.dataset.zone='12178379',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+                 }} 
+               />
+            </div>
+          </div>
+
           {galleryImages.length > 0 && (
             <div className="mt-8 pt-8 border-t border-secondary-100" style={{ clear: 'both' }}>
               <h3 className="text-lg font-bold text-secondary-900 mb-4 flex items-center gap-2">
@@ -161,7 +166,6 @@ export default function NewsDetailPage() {
               </h3>
               
               <div className="relative bg-secondary-900 rounded-2xl overflow-hidden group">
-                {/* Ifoto nini iri kuri slider */}
                 <div className="relative h-64 sm:h-96 w-full flex items-center justify-center">
                   <img
                     src={galleryImages[currentImageIndex]}
@@ -171,7 +175,6 @@ export default function NewsDetailPage() {
                   />
                 </div>
 
-                {/* Controls (Previous/Next) */}
                 {galleryImages.length > 1 && (
                   <>
                     <button
@@ -187,7 +190,6 @@ export default function NewsDetailPage() {
                       <ChevronRight className="w-6 h-6" />
                     </button>
                     
-                    {/* Counter (1 / 3) */}
                     <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md">
                       {currentImageIndex + 1} / {galleryImages.length}
                     </div>
@@ -199,7 +201,6 @@ export default function NewsDetailPage() {
         </div>
       </div>
 
-      {/* Lightbox (Zoom) */}
       {imageZoomed && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setImageZoomed(null)}>
           <img src={imageZoomed} alt="Zoomed" className="max-w-full max-h-full object-contain cursor-zoom-out rounded-lg shadow-2xl" />

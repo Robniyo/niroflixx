@@ -264,7 +264,7 @@ export default function OpportunitiesPage() {
               </div>
             )}
 
-            {/* MONETAG IN-PAGE PUSH AD CODE */}
+            {/* MONETAG IN-PAGE PUSH AD */}
             <div className="mt-12 flex justify-center w-full">
                <script 
                  dangerouslySetInnerHTML={{ 
