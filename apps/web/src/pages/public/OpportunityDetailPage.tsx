@@ -204,7 +204,7 @@ export default function OpportunityDetailPage() {
                <h4 className="font-bold text-red-900 text-sm">Find the Video on Youtube</h4>
                <p className="text-red-700 text-xs mt-1 mb-2">Just search it and see what we have said on it.</p>
                <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-red-700 hover:underline inline-block">
-                 Watch Video &rarr;
+                 Click to Go &rarr;
                </a>
              </div>
           </div>
