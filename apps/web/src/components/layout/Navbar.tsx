@@ -6,7 +6,6 @@ import { navLinks } from '@/constants/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationBell from '@/components/ui/NotificationBell';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,13 +24,14 @@ export default function Navbar() {
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'CONTENT_MANAGER';
 
   return (
-          <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full max-w-[100vw]', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
+    <nav className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full max-w-[100vw]', scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-secondary-100' : 'bg-transparent')}>
       <div className="container-page">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex flex-col items-center gap-0.5 group">
             <img src="/flogo.png" alt="Future Scholars" className="h-8 max-w-[140px] w-auto object-contain transition-transform group-hover:scale-105" />
             <span className="text-xs font-semibold text-secondary-700 whitespace-nowrap">Future Scholars</span>
           </Link>
+          
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} className={cn('px-3 py-2 rounded-md text-body-sm font-medium transition-colors', location.pathname === link.href ? (scrolled ? 'text-primary-600 bg-primary-50' : 'text-white bg-white/10') : (scrolled ? 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50' : 'text-white/80 hover:text-white hover:bg-white/10'))}>
@@ -41,7 +41,6 @@ export default function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            <ThemeToggle />
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
@@ -57,7 +56,6 @@ export default function Navbar() {
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
-            <ThemeToggle />
             {isAuthenticated && <NotificationBell />}
             <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-secondary-600 hover:text-secondary-900 rounded-md">
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

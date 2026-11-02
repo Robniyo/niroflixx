@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, GraduationCap, ArrowRight } from 'lucide-react';
+import { Search, MapPin, GraduationCap, ArrowRight, ChevronDown } from 'lucide-react';
 
 // Ibice wari usanzwe ufite
 import FeaturedCourses from '@/features/home/FeaturedCourses';
@@ -18,6 +18,7 @@ import LearningCategories from '@/features/home/LearningCategories';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <div className="bg-secondary-50/30">
@@ -156,6 +157,42 @@ export default function HomePage() {
         <Partners />
         <CTASection />
         <Newsletter />
+
+        {/* 8. FREQUENTLY ASKED QUESTIONS (FAQs) */}
+        <section className="max-w-4xl mx-auto pt-10 border-t border-secondary-200">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-secondary-900 mb-3">Frequently Asked Questions</h2>
+            <p className="text-secondary-500">Everything you need to know about Future Scholars and applying for opportunities.</p>
+          </div>
+          <div className="space-y-4">
+            {[
+              { q: 'What is Future Scholars?', a: 'Future Scholars is a unified education and opportunities platform offering scholarships, jobs, courses, and professional services to help you achieve your academic and career goals.' },
+              { q: 'How do I apply for Scholarships?', a: 'Browse our Opportunities page, find a scholarship that matches your profile, and click "Apply Now". You may need to create an account or complete your candidate profile first.' },
+              { q: 'Who can use Future Scholars?', a: 'Anyone! Whether you are a student looking for scholarships, a professional seeking services, or a lifelong learner looking for courses, our platform is built for you.' },
+              { q: 'Is Future Scholars free to use?', a: 'Yes, creating an account and browsing opportunities is completely free. Some professional services (like CV writing or web development) have a fee, which is clearly stated.' },
+              { q: 'How do I create an account?', a: 'Click the "Get Started" button at the top right of the page. You can register using your email address or sign in with Google.' },
+              { q: 'How do I update my profile information?', a: 'Once logged in, go to your Dashboard and click on "My Profile" or "Settings" to update your personal information, academic details, and documents.' },
+              { q: 'How do I search for Scholarships?', a: 'Use the search bar on our Homepage or Opportunities page. You can filter by destination, study level, or type of opportunity to find exactly what you need.' },
+              { q: 'Who do I contact if I need help?', a: 'You can reach us through the Contact page, email us at info@fscholars.online, or call our helpline at +250 795 064 502.' },
+            ].map((faq, index) => (
+              <div key={index} className="bg-white border border-secondary-100 rounded-2xl overflow-hidden shadow-sm">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                >
+                  <span className="font-semibold text-secondary-900 text-lg">{faq.q}</span>
+                  <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`} />
+                </button>
+                {openFaq === index && (
+                  <div className="px-6 pb-6 text-secondary-600 text-sm leading-relaxed border-t border-secondary-50 pt-4">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
       </div>
     </div>
   );
