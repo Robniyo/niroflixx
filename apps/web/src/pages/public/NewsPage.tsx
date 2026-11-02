@@ -18,41 +18,42 @@ export default function NewsPage() {
   if (loading) return <div className="pt-32 pb-16 text-center"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
 
   return (
-    <div className="pt-32 pb-16">
-      <div className="container-page">
+    <div className="pt-32 pb-16 bg-secondary-50/30 min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <span className="text-info font-semibold text-label uppercase tracking-wider">News</span>
-          <h1 className="text-h1 mt-3 mb-4">Technology News & Updates</h1>
-          <p className="text-body-lg text-secondary-600 max-w-2xl mx-auto">Stay updated with technology trends, educational news, and opportunity alerts.</p>
+          <h1 className="text-3xl md:text-5xl font-bold text-secondary-900 mt-3 mb-4">Technology News & Updates</h1>
+          <p className="text-secondary-500 text-lg max-w-2xl mx-auto">Stay updated with technology trends, educational news, and opportunity alerts.</p>
         </div>
+        
         {news.length === 0 ? (
-          <div className="max-w-lg mx-auto text-center py-16">
-            <div className="w-20 h-20 bg-info-light rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Newspaper className="w-10 h-10 text-info" />
-            </div>
-            <h3 className="text-h4 font-semibold mb-3">Articles Coming Soon</h3>
-            <p className="text-secondary-500 mb-8">Stay tuned.</p>
+          <div className="text-center py-16 bg-white rounded-2xl border border-secondary-100">
+            <Newspaper className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-2">Articles Coming Soon</h3>
+            <p className="text-secondary-500 mb-6">Stay tuned for updates.</p>
             <Link to="/register"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>Subscribe</Button></Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-6">
             {news.map((item) => (
-              <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group">
-                <div className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-all h-full flex flex-col">
-                  <div className="h-40 bg-gradient-to-br from-info to-blue-700 flex items-center justify-center">
+              <Link to={`/news/${item.slug || item.id}`} key={item.id} className="group block bg-white rounded-2xl border border-secondary-100 overflow-hidden hover:shadow-lg transition-all">
+                <div className="flex flex-col sm:flex-row">
+                  {/* Ifoto nto ku ruhande */}
+                  <div className="sm:w-1/3 h-56 sm:h-auto bg-secondary-50 relative overflow-hidden flex-shrink-0">
                     {item.coverImage ? (
-                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
-                      <Newspaper className="w-12 h-12 text-white/40" />
+                      <div className="w-full h-full flex items-center justify-center"><Newspaper className="w-10 h-10 text-secondary-300" /></div>
                     )}
                   </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <span className="text-caption text-info font-medium">{item.category?.name || 'General'}</span>
-                    <h3 className="font-semibold mt-1 mb-2 group-hover:text-primary-600 transition-colors">{item.title}</h3>
-                    <p className="text-body-sm text-secondary-500 mb-4 flex-1">{item.summary?.slice(0, 120)}...</p>
-                    <div className="flex items-center gap-3 text-caption text-secondary-400 pt-3 border-t">
-                      {item.author && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.author}</span>}
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
+                  {/* Amakuru */}
+                  <div className="p-6 flex flex-col justify-center flex-1">
+                    <span className="text-xs font-bold text-info uppercase tracking-wider mb-2">{item.category?.name || 'General'}</span>
+                    <h3 className="text-xl font-bold text-secondary-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">{item.title}</h3>
+                    <p className="text-secondary-500 text-sm mb-4 line-clamp-2">{item.summary}</p>
+                    <div className="flex items-center gap-4 text-xs font-medium text-secondary-400 mt-auto pt-4 border-t border-secondary-50">
+                      {item.author && <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {item.author}</span>}
+                      <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>

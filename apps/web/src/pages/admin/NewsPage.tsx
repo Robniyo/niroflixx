@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Plus, Edit, Trash2, X, Newspaper, Upload, PlusCircle, FileText, Braces, Trash,
+  Plus, Edit, Trash2, X, Newspaper, Upload, PlusCircle, FileText, Braces, Trash, Image as ImageIcon
 } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
@@ -15,6 +15,7 @@ const emptyArticle = {
   author: 'Future Scholars Team',
   categoryId: '',
   coverImage: '',
+  galleryImages: '', // Tuzabika amafoto menshi nka string itandukanyijwe na comma
   status: 'PUBLISHED',
   featured: false,
   seoTitle: '',
@@ -92,6 +93,7 @@ export default function NewsPage() {
         categoryId: d.categoryId || '',
         author: d.author || 'Future Scholars Team',
         coverImage: d.coverImage || '',
+        galleryImages: d.galleryImages || '', // Tuzahita tuyihindura nyuma
         status: d.status,
         featured: d.featured,
         seoTitle: d.seoTitle || '',
@@ -103,18 +105,37 @@ export default function NewsPage() {
     } catch {}
   };
 
+  // Uburyo bwo gushyiraho amafoto menshi
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await api.post('/uploads', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setForm({ ...form, coverImage: res.data.data.url });
-      toast.success('Image uploaded');
+      const uploadedUrls = [];
+      for (let i = 0; i < files.length; i++) {
+        const fd = new FormData();
+        fd.append('file', files[i]);
+        const res = await api.post('/uploads', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedUrls.push(res.data.data.url);
+      }
+      
+      // Niba ari coverImage ya mbere, tuyishyire kuri coverImage
+      if (!form.coverImage && uploadedUrls.length > 0) {
+        setForm({ ...form, coverImage: uploadedUrls[0], galleryImages: uploadedUrls.slice(1).join(',') });
+      } else {
+        // Niba hari izindi, zongere kuri galleryImages
+        const currentGallery = form.galleryImages ? form.galleryImages.split(',').filter(Boolean) : [];
+        setForm({ ...form, galleryImages: [...currentGallery, ...uploadedUrls].join(',') });
+      }
+      toast.success('Images uploaded');
     } catch { toast.error('Upload failed'); }
     finally { setUploading(false); }
+  };
+
+  const removeGalleryImage = (urlToRemove: string) => {
+    const currentGallery = form.galleryImages.split(',').filter(url => url !== urlToRemove);
+    setForm({ ...form, galleryImages: currentGallery.join(',') });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -219,7 +240,7 @@ export default function NewsPage() {
         />
       )}
 
-      {/* Bulk Import Modal */}
+      {/* Bulk Import Modal (Ntacyo nahinduye hano) */}
       {showBulkImport && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowBulkImport(false)} />
@@ -257,10 +278,7 @@ export default function NewsPage() {
                       </div>
                       <div className="sm:col-span-2">
                         <label className="block text-sm font-medium mb-1">Content *</label>
-                        <RichTextEditor
-                          value={row.content}
-                          onChange={(html) => updateBulkRow(index, 'content', html)}
-                        />
+                        <RichTextEditor value={row.content} onChange={(html) => updateBulkRow(index, 'content', html)} />
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">Author</label>
@@ -303,12 +321,12 @@ export default function NewsPage() {
         </div>
       )}
 
-      {/* Single Create/Edit Modal */}
+      {/* SINGLE CREATE/EDIT MODAL - HANO HARI AMAFOTO MENSHI */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[3vh] p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-scale-in">
-            <div className="sticky top-0 bg-white border-b px-5 py-3.5 flex items-center justify-between rounded-t-2xl">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[92vh] overflow-y-auto animate-scale-in">
+            <div className="sticky top-0 bg-white border-b px-5 py-3.5 flex items-center justify-between rounded-t-2xl z-10">
               <h3 className="font-semibold">{editing ? 'Edit' : 'New'} Article</h3>
               <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-secondary-50 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
@@ -317,23 +335,66 @@ export default function NewsPage() {
               <div><label className="block text-sm font-medium text-secondary-700 mb-1">Summary</label><textarea rows={2} value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none" /></div>
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Content *</label>
-                <RichTextEditor
-                  value={form.content}
-                  onChange={(html) => setForm({ ...form, content: html })}
-                />
+                <RichTextEditor value={form.content} onChange={(html) => setForm({ ...form, content: html })} />
               </div>
+              
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-sm font-medium text-secondary-700 mb-1">Author</label><input type="text" value={form.author} onChange={e => setForm({ ...form, author: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" /></div>
-                <div><label className="block text-sm font-medium text-secondary-700 mb-1">Cover Image URL</label><input type="url" value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" /></div>
+                <div><label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                  <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
+                    <option value="DRAFT">Draft</option>
+                    <option value="PUBLISHED">Published</option>
+                  </select>
+                </div>
               </div>
+
+              {/* COVER IMAGE */}
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Upload Cover Image</label>
-                <label className="flex items-center gap-2 px-4 py-2.5 bg-secondary-50 border rounded-lg cursor-pointer hover:bg-secondary-100 text-sm">
-                  <Upload className="w-4 h-4" /> {uploading ? 'Uploading...' : 'Choose Image'}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
-                </label>
-                {form.coverImage && <span className="text-xs text-success">Uploaded ✓</span>}
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Cover Image (Primary)</label>
+                <div className="flex gap-2">
+                  <input type="url" value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
+                  <label className="px-4 py-2.5 bg-primary-50 text-primary-700 border border-primary-200 rounded-lg cursor-pointer hover:bg-primary-100 text-sm font-medium flex items-center gap-2">
+                    <Upload className="w-4 h-4" /> {uploading ? '...' : 'Upload'}
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                  </label>
+                </div>
+                {form.coverImage && (
+                  <div className="mt-2 relative w-32 h-20 rounded-lg overflow-hidden border">
+                    <img src={form.coverImage} alt="Cover" className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
+
+              {/* GALLERY IMAGES (Amafoto menshi) */}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Gallery Images (Optional)</label>
+                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-secondary-200 rounded-xl cursor-pointer hover:bg-secondary-50 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <ImageIcon className="w-6 h-6 text-secondary-400 mb-2" />
+                    <p className="text-sm text-secondary-500">Click to upload multiple images</p>
+                  </div>
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                </label>
+                
+                {/* Hano tugaragaza amafoto yose yashyizwe muri gallery */}
+                {form.galleryImages && (
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {form.galleryImages.split(',').filter(url => url.trim() !== '').map((url, i) => (
+                      <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border group">
+                        <img src={url} alt={`Gallery ${i}`} className="w-full h-full object-cover" />
+                        <button 
+                          type="button" 
+                          onClick={() => removeGalleryImage(url)}
+                          className="absolute top-1 right-1 bg-danger text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">SEO Title</label>
                 <input type="text" value={form.seoTitle} onChange={e => setForm({ ...form, seoTitle: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" />
@@ -350,13 +411,7 @@ export default function NewsPage() {
                 <input type="checkbox" checked={form.featured} onChange={e => setForm({ ...form, featured: e.target.checked })} id="feat" />
                 <label htmlFor="feat" className="text-sm">Featured</label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
-                <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm">
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
-                </select>
-              </div>
+              
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setShowModal(false)}>Cancel</Button>
                 <Button type="submit" className="flex-1" isLoading={saving}>{editing ? 'Update' : 'Publish'}</Button>
