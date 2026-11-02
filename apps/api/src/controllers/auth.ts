@@ -213,10 +213,12 @@ export const authController = {
       }
 
       const { OAuth2Client } = require('google-auth-library');
+      
+      // HANO: Twahinduye iyi URL ngo ibe fscholars.online
       const client = new OAuth2Client(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}/api/v1/auth/google/callback`
+        `https://fscholars.online/api/v1/auth/google/callback` 
       );
 
       const { tokens } = await client.getToken(code as string);
@@ -282,7 +284,7 @@ export const authController = {
         path: '/',
       });
 
-      return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}`);
+      return res.redirect(`https://fscholars.online`);
     } catch (error) {
       console.error('GOOGLE CALLBACK ERROR:', error);
       return res.redirect(`${process.env.FRONTEND_URL || 'https://fscholars.online'}/login?error=google_failed`);
