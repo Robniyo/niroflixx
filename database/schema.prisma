@@ -430,6 +430,7 @@ model News {
   summary        String?
   content        String
   coverImage     String?
+  galleryImages  String?  // <--- IYI NI YO WONGEREYEHO
   author         String?
   categoryId     String?
   status         String   @default("DRAFT")

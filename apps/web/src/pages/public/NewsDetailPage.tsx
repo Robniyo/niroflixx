@@ -48,67 +48,72 @@ export default function NewsDetailPage() {
     );
 
   return (
-    <div className="pt-32 pb-16">
-      <div className="container-content max-w-4xl">
+    <div className="pt-32 pb-16 bg-secondary-50/30 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <Link
           to="/news"
-          className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"
+          className="flex items-center gap-2 text-sm font-medium text-secondary-500 hover:text-primary-600 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to News
         </Link>
 
-        <div className="bg-white rounded-2xl border border-secondary-100 p-6 md:p-8">
-          {/* Image at top, full width but constrained */}
+        <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-sm">
+          
+          {/* Ifoto nto iri hejuru gato */}
           {article.coverImage && (
-            <>
-              <button
-                onClick={() => setImageZoomed(true)}
-                className="block w-full mb-6 cursor-zoom-in"
-              >
+            <div className="p-6 pb-0">
+              <div className="relative w-full max-w-sm mx-auto overflow-hidden rounded-xl bg-secondary-50 cursor-zoom-in">
                 <img
                   src={article.coverImage}
                   alt={article.title}
-                  className="w-full max-h-96 object-contain rounded-lg shadow-sm hover:opacity-90 transition-opacity bg-secondary-50"
+                  onClick={() => setImageZoomed(true)}
+                  className="w-full h-auto max-h-[300px] object-contain hover:opacity-90 transition-opacity"
                 />
-              </button>
-              {imageZoomed && (
-                <div
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-                  onClick={() => setImageZoomed(false)}
-                >
-                  <img
-                    src={article.coverImage}
-                    alt={article.title}
-                    className="max-w-full max-h-full object-contain cursor-zoom-out"
-                  />
-                </div>
-              )}
-            </>
+              </div>
+            </div>
           )}
 
-          <span className="text-info font-semibold text-sm">
-            {article.category?.name || 'General'}
-          </span>
-          <h1 className="text-h2 font-bold mt-2 mb-4 break-words">{article.title}</h1>
-
-          <div className="flex flex-wrap items-center gap-4 text-body-sm text-secondary-500 mb-8 pb-8 border-b">
-            {article.author && (
-              <span className="flex items-center gap-1">
-                <User className="w-4 h-4" /> {article.author}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />{' '}
-              {new Date(article.publishedAt || article.createdAt).toLocaleDateString()}
+          <div className="p-6 md:p-8">
+            <span className="text-info font-semibold text-sm">
+              {article.category?.name || 'General'}
             </span>
-          </div>
+            <h1 className="text-2xl md:text-3xl font-bold mt-2 mb-4 leading-tight break-words text-secondary-900">
+              {article.title}
+            </h1>
 
-          <div
-            className="text-secondary-700 leading-relaxed break-words whitespace-pre-line prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
-          />
+            <div className="flex flex-wrap items-center gap-4 text-sm text-secondary-500 mb-8 pb-6 border-b border-secondary-100">
+              {article.author && (
+                <span className="flex items-center gap-1.5">
+                  <User className="w-4 h-4" /> {article.author}
+                </span>
+              )}
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />{' '}
+                {new Date(article.publishedAt || article.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+
+            <div
+              className="text-secondary-700 leading-relaxed break-words prose max-w-none prose-img:rounded-xl prose-img:mx-auto"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Lightbox (Iyo ukanda ku ifoto) */}
+      {imageZoomed && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onClick={() => setImageZoomed(false)}
+        >
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="max-w-full max-h-full object-contain cursor-zoom-out rounded-lg shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   );
 }
