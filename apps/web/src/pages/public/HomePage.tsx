@@ -159,17 +159,24 @@ export default function HomePage() {
          />
       </div>
 
-        {/* FAQs */}
+                {/* FAQs */}
         <section className="max-w-4xl mx-auto pt-8 border-t border-secondary-200">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-2">Frequently Asked Questions</h2>
-            <p className="text-secondary-500 text-sm">Everything you need to know about Future Scholars.</p>
+            <p className="text-secondary-500 text-sm">Everything you need to know about Future Scholars and applying for opportunities.</p>
           </div>
           <div className="space-y-3">
             {[
-              { q: 'What is Future Scholars?', a: 'Future Scholars is a unified education and opportunities platform offering scholarships, jobs, courses, and professional services.' },
-              { q: 'How do I apply for Scholarships?', a: 'Browse our Opportunities page, find a scholarship, and click "Apply Now".' },
-              { q: 'Is Future Scholars free to use?', a: 'Creating an account and browsing opportunities is completely free. Some professional services have a fee.' },
+              { q: 'What is Future Scholars?', a: 'Future Scholars is a unified education and opportunities platform. We help students and professionals find scholarships, jobs, internships, and courses, while also offering professional services like CV writing and web development.' },
+              { q: 'How do I apply for Scholarships?', a: 'Browse our Opportunities page, use the filters to find a scholarship that matches your profile, and click "Apply Now". You may need to create an account or complete your candidate profile before applying.' },
+              { q: 'Who can use Future Scholars?', a: 'Anyone! Whether you are a student looking for scholarships, a professional seeking career services, or a lifelong learner looking for courses, our platform is built for you.' },
+              { q: 'Is Future Scholars free to use?', a: 'Creating an account and browsing opportunities is completely free. Some professional services (like CV writing or web development) and some courses have a fee, which is clearly stated on the service page.' },
+              { q: 'How do I create an account?', a: 'Click the "Get Started" button at the top right of the page. You can register using your email address or sign in with Google.' },
+              { q: 'How do I update my profile information?', a: 'Once logged in, go to your Dashboard and click on "My Profile" or "Settings". There you can update your personal information, academic details, and upload documents.' },
+              { q: 'How do I search for Scholarships?', a: 'Use the search bar on our Homepage or Opportunities page. You can filter by destination (Country), study level (Undergraduate, Masters), or type of opportunity.' },
+              { q: 'Who do I contact if I need help?', a: 'You can reach us through the Contact page, email us at info@fscholars.online, or call our helpline at +250 795 064 502.' },
+              { q: 'Can I apply for multiple scholarships?', a: 'Yes, you can apply for as many scholarships as you qualify for. However, make sure to read the requirements for each opportunity carefully before applying.' },
+              { q: 'How do I know if a scholarship is legitimate?', a: 'Future Scholars verifies opportunities before publishing them. However, always be cautious. We never ask for payment to apply for a scholarship. If a scholarship asks for money, please report it to us immediately.' },
             ].map((faq, index) => (
               <div key={index} className="bg-white border border-secondary-100 rounded-xl overflow-hidden shadow-sm">
                 <button 
