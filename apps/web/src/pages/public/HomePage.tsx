@@ -73,12 +73,17 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { name: 'Rwanda', flag: '🇷🇼' }, { name: 'Canada', flag: '🇨🇦' }, 
-              { name: 'USA', flag: '🇺🇸' }, { name: 'UK', flag: '🇬🇧' }, 
-              { name: 'Asia', flag: '🌏' }, { name: 'Europe', flag: '🇪🇺' },
+              { name: 'Rwanda', code: 'rw' }, { name: 'Canada', code: 'ca' }, 
+              { name: 'USA', code: 'us' }, { name: 'UK', code: 'gb' }, 
+              { name: 'Australia', code: 'au' }, { name: 'Germany', code: 'de' },
             ].map((dest) => (
               <Link key={dest.name} to={`/opportunities?dest=${dest.name}`} className="bg-white border border-secondary-100 p-4 rounded-2xl flex flex-col items-center justify-center hover:shadow-md hover:border-primary-200 transition-all group">
-                <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">{dest.flag}</span>
+                {/* Hano turakoresha ifoto y'ibendera aho gukoresha emoji */}
+                <img 
+                  src={`https://flagcdn.com/w80/${dest.code}.png`} 
+                  alt={`${dest.name} flag`} 
+                  className="w-12 h-8 object-contain mb-3 group-hover:scale-110 transition-transform shadow-sm rounded-sm"
+                />
                 <span className="font-semibold text-secondary-900 text-sm">{dest.name}</span>
               </Link>
             ))}
