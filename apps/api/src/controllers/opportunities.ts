@@ -30,7 +30,7 @@ export const opportunitiesController = {
       const where: any = {};
       if (type) where.type = type;
       if (status) where.status = status;
-      if (country) where.country = country;
+      if (country) where.country = { contains: country as string, mode: 'insensitive' };
       if (educationLevel) where.educationLevel = educationLevel;
       if (search) where.title = { contains: search as string };
 
