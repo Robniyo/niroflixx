@@ -12,22 +12,20 @@ const TYPES = [
 
 export default function OpportunitiesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [allItems, setAllItems] = useState<any[]>([]); // Tuzabitsa byose hano
+  const [allItems, setAllItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
 
-  // Filter states
   const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || '');
   const [countryFilter, setCountryFilter] = useState(searchParams.get('dest') || searchParams.get('country') || '');
   const [educationLevelFilter, setEducationLevelFilter] = useState(searchParams.get('level') || '');
   const [computedStatusFilter, setComputedStatusFilter] = useState(''); 
   const [search, setSearch] = useState(searchParams.get('q') || '');
 
-  // Fetch all data from API (turi gukoresha limit nini kugira ngo tubone byose)
   const fetchOpportunities = async () => {
     setLoading(true);
     try {
-      const params: any = { status: 'PUBLISHED', limit: 100 }; // Fata byose
+      const params: any = { status: 'PUBLISHED', limit: 100 };
       if (typeFilter) params.type = typeFilter;
       if (countryFilter) params.country = countryFilter;
       if (computedStatusFilter) params.computedStatus = computedStatusFilter;
@@ -36,7 +34,6 @@ export default function OpportunitiesPage() {
       const r = await api.get('/opportunities', { params });
       setAllItems(r.data.data || []);
     } catch {
-      // Handle error
     } finally {
       setLoading(false);
     }
@@ -46,16 +43,13 @@ export default function OpportunitiesPage() {
     fetchOpportunities();
   }, [typeFilter, countryFilter, computedStatusFilter, search]);
 
-  // Frontend Filtering (Gushakisha imbere mu buryo bwa "Includes")
   const filteredItems = allItems.filter(item => {
     if (!educationLevelFilter) return true;
     const itemLevel = item.educationLevel || '';
-    // Niba educationLevel irimo ijambo twashakishije (nka "Undergraduate" cyangwa "Masters")
     return itemLevel.toLowerCase().includes(educationLevelFilter.toLowerCase()) || 
            (educationLevelFilter === "Undergraduate" && itemLevel.toLowerCase().includes("bachelor"));
   });
 
-  // Pagination logic (Kuri Frontend)
   const itemsPerPage = 12;
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -80,7 +74,6 @@ export default function OpportunitiesPage() {
   return (
     <div className="bg-secondary-50/30 min-h-screen pb-20 font-sans">
       
-      {/* HEADER */}
       <div className="bg-white border-b border-secondary-100 py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <span className="text-accent-600 font-semibold text-label uppercase tracking-wider block mb-2">
@@ -97,7 +90,6 @@ export default function OpportunitiesPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         
-        {/* FILTER BOX */}
         <div className="bg-white rounded-2xl border border-secondary-100 p-4 sm:p-6 mb-8 shadow-sm">
           
           <div className="relative mb-4">
@@ -131,7 +123,6 @@ export default function OpportunitiesPage() {
               className="w-full px-4 py-2.5 bg-secondary-50 border border-secondary-200 rounded-xl text-sm font-medium text-secondary-700 focus:outline-none focus:border-primary-400"
             />
 
-            {/* STUDY LEVEL - Turi gukoresha "Undergraduate" gusa hano kuko turi gushakisha imbere */}
             <select
               value={educationLevelFilter}
               onChange={(e) => {
@@ -180,7 +171,6 @@ export default function OpportunitiesPage() {
           </div>
         </div>
 
-        {/* RESULTS */}
         {loading ? (
           <div className="text-center py-20">
             <div className="animate-spin w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" />
@@ -273,6 +263,15 @@ export default function OpportunitiesPage() {
                 ))}
               </div>
             )}
+
+            {/* MONETAG IN-PAGE PUSH AD CODE */}
+            <div className="mt-12 flex justify-center w-full">
+               <script 
+                 dangerouslySetInnerHTML={{ 
+                   __html: `(function(s){s.dataset.zone='12178377',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` 
+                 }} 
+               />
+            </div>
           </>
         )}
       </div>
