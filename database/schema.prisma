@@ -328,7 +328,7 @@ model Opportunity {
   benefits        String?
   coverImage      String?
   officialLink    String?
-  youtubeLink     String?  // <--- ADD THIS LINE HERE
+  youtubeLink     String?  // <--- IYI IRI KUMWE NAWE
   contact         String?
   featured        Boolean  @default(false)
   views           Int      @default(0)
