@@ -15,57 +15,60 @@ export default function FeaturedOpportunities() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <section className="section-padding bg-white"><div className="container-page text-center py-16"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div></section>;
+  if (loading) return <div className="text-center py-10"><div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" /></div>;
 
   return (
-    <section className="section-padding bg-white">
-      <div className="container-page">
-        <div className="text-center mb-12">
-          <span className="text-accent-600 font-semibold text-label uppercase tracking-wider">Don't Miss Out</span>
-          <h2 className="section-title mt-2">Featured Opportunities</h2>
-          <p className="section-subtitle">Scholarships, jobs, internships, and admissions curated for you.</p>
+    <div>
+      {items.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-secondary-500">Opportunities coming soon.</p>
         </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {items.map((opp) => (
+            <Link to={`/opportunities/${opp.id}`} key={opp.id} className="group bg-white rounded-2xl border border-secondary-100 overflow-hidden hover:shadow-lg transition-all flex flex-col">
+              
+              {/* Image Section */}
+              <div className="relative h-48 w-full bg-secondary-100 overflow-hidden">
+                {opp.coverImage ? (
+                  <img 
+                    src={opp.coverImage} 
+                    alt={opp.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-secondary-50">
+                    <Briefcase className="w-10 h-10 text-secondary-300" />
+                  </div>
+                )}
+                {/* Badge */}
+                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm">
+                  {opp.type?.replace('_', ' ')}
+                </div>
+              </div>
 
-        {items.length === 0 ? (
-          <div className="max-w-lg mx-auto text-center py-16">
-            <div className="w-20 h-20 bg-accent-50 rounded-2xl shadow-sm border border-accent-100 flex items-center justify-center mx-auto mb-6">
-              <Briefcase className="w-10 h-10 text-accent-400" />
-            </div>
-            <h4 className="text-h4 font-semibold text-secondary-800 mb-3">Opportunities Coming Soon</h4>
-            <p className="text-secondary-500 mb-8">We're gathering the best opportunities for you.</p>
-            <Link to="/opportunities"><Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>View All Opportunities</Button></Link>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-6 mb-10">
-            {items.map((opp) => (
-              <Link to={`/opportunities/${opp.id}`} key={opp.id} className="group">
-                <div className="bg-secondary-50 rounded-xl border border-secondary-100 p-4 h-full flex gap-4 hover:shadow-md transition-all">
-                  {opp.coverImage ? (
-                    <img
-                      src={opp.coverImage}
-                      alt={opp.title}
-                      className="w-16 h-16 object-contain rounded-lg bg-white flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Briefcase className="w-6 h-6 text-accent-600" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="text-caption font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">{opp.type?.replace('_', ' ')}</span>
-                    <h3 className="font-semibold text-secondary-900 mt-1.5 group-hover:text-primary-600 transition-colors truncate">{opp.title}</h3>
-                    <p className="text-body-sm text-secondary-500 mt-0.5 truncate">{opp.organization}</p>
-                    <div className="flex items-center gap-3 mt-3 text-body-sm text-secondary-400">
-                      {opp.country && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {opp.country}</span>}
-                      {opp.deadline && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {new Date(opp.deadline).toLocaleDateString()}</span>}
-                    </div>
+              {/* Content Section */}
+              <div className="p-5 flex flex-col flex-1">
+                <h3 className="font-bold text-lg text-secondary-900 leading-tight group-hover:text-primary-600 transition-colors line-clamp-2 mb-1">
+                  {opp.title}
+                </h3>
+                <p className="text-sm text-secondary-500 mb-4">{opp.organization}</p>
+                
+                <div className="mt-auto pt-4 border-t border-secondary-100 flex items-center justify-between text-xs font-medium text-secondary-600">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-secondary-400" /> 
+                    <span className="truncate max-w-[100px]">{opp.country || 'Global'}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-danger">
+                    <Calendar className="w-4 h-4" /> 
+                    <span>{opp.deadline ? new Date(opp.deadline).toLocaleDateString() : 'Open'}</span>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
