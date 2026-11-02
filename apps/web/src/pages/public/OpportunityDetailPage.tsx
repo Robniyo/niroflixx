@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Briefcase, ArrowLeft, Calendar, MapPin, Globe } from 'lucide-react';
+import { Briefcase, ArrowLeft, Calendar, MapPin, Globe, Users, Youtube, MessageCircle } from 'lucide-react';
 import api from '@/services/api';
 import Button from '@/components/ui/Button';
 import ApplyModal from '@/components/ui/ApplyModal';
@@ -46,8 +46,8 @@ export default function OpportunityDetailPage() {
     : null;
 
   return (
-    <div className="pt-32 pb-16">
-            <style>{`
+    <div className="pt-32 pb-16 bg-secondary-50/30">
+      <style>{`
         .opp-page-wrap {
           width: 100%;
           max-width: 896px;
@@ -64,13 +64,7 @@ export default function OpportunityDetailPage() {
           width: 100%;
           max-width: 100%;
         }
-
-        /* Clearfix wrapper contains the float */
-        .opp-desc-wrap {
-          overflow: hidden;
-        }
-
-        /* Small floating image */
+        .opp-desc-wrap { overflow: hidden; }
         .opp-float-img {
           float: left;
           margin: 0 20px 12px 0;
@@ -96,176 +90,153 @@ export default function OpportunityDetailPage() {
             margin: 0 0 16px 0;
           }
         }
-
-        /* IMPORTANT: no overflow here — text must be a normal block so it wraps beside float */
         .opp-content {
           min-width: 0;
           word-wrap: break-word;
           overflow-wrap: anywhere;
         }
-
-        /* Apply overflow protection only to children, not the container */
-        .opp-content p,
-        .opp-content ul,
-        .opp-content ol,
-        .opp-content h1,
-        .opp-content h2,
-        .opp-content h3,
-        .opp-content h4,
-        .opp-content blockquote,
-        .opp-content pre {
+        .opp-content p, .opp-content ul, .opp-content ol, .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4, .opp-content blockquote, .opp-content pre {
           max-width: 100%;
           word-wrap: break-word;
           overflow-wrap: anywhere;
           word-break: break-word;
         }
-        .opp-content a {
-          word-break: break-all;
-        }
-        .opp-content img {
-          max-width: 100%;
-          height: auto;
-        }
-        .opp-content table {
-          width: 100%;
-          table-layout: fixed;
-        }
-
+        .opp-content a { word-break: break-all; color: #2563EB; text-decoration: underline; }
+        .opp-content img { max-width: 100%; height: auto; }
+        .opp-content table { width: 100%; table-layout: fixed; }
         .opp-content p { margin-bottom: 0.85rem; }
         .opp-content ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.85rem; }
         .opp-content ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.85rem; }
         .opp-content li { margin-bottom: 0.25rem; }
-        .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 {
-          font-weight: 600; margin: 1rem 0 0.5rem 0;
-        }
-        .opp-content a { color: #2563EB; text-decoration: underline; }
+        .opp-content h1, .opp-content h2, .opp-content h3, .opp-content h4 { font-weight: 600; margin: 1rem 0 0.5rem 0; }
         .opp-content strong { font-weight: 600; }
       `}</style>
 
       <div className="opp-page-wrap">
-        <Link
-          to="/opportunities"
-          className="flex items-center gap-2 text-body-sm text-secondary-500 hover:text-primary-600 mb-8"
-        >
+        <Link to="/opportunities" className="flex items-center gap-2 text-sm font-medium text-secondary-500 hover:text-primary-600 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Opportunities
         </Link>
 
-        <div className={`opp-card ${isClosed ? 'opacity-80' : ''}`}>
+        <div className={`opp-card ${isClosed ? 'opacity-90' : ''}`}>
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-primary-600 font-semibold text-sm bg-primary-50 px-3 py-1 rounded-full">
+            <span className="text-primary-700 font-semibold text-xs bg-primary-50 px-3 py-1 rounded-full uppercase tracking-wide">
               {opp.type?.replace('_', ' ')}
             </span>
             {badge && (
-              <span className={`text-sm px-3 py-1 rounded-full font-medium ${badge.color}`}>
+              <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide ${badge.color}`}>
                 {badge.text}
               </span>
             )}
           </div>
 
-          <h1 className="text-h2 font-bold mt-2 mb-2" style={{ wordBreak: 'break-word' }}>
+          <h1 className="text-2xl md:text-3xl font-bold mt-2 mb-2 text-secondary-900 leading-tight" style={{ wordBreak: 'break-word' }}>
             {opp.title}
           </h1>
-          <p className="text-body-lg text-secondary-600 mb-6" style={{ wordBreak: 'break-word' }}>
+          <p className="text-lg text-secondary-600 mb-6" style={{ wordBreak: 'break-word' }}>
             {opp.organization}
           </p>
 
-          <div className="flex flex-wrap gap-4 text-body-sm text-secondary-500 mb-8">
+          <div className="flex flex-wrap gap-4 text-sm text-secondary-500 mb-8 bg-secondary-50 p-4 rounded-xl border border-secondary-100">
             {opp.country && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" /> {opp.country}
-                {opp.city ? `, ${opp.city}` : ''}
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-primary-600" /> {opp.country} {opp.city ? `, ${opp.city}` : ''}
               </span>
             )}
             {opp.deadline && (
-              <span className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" /> Deadline:{' '}
-                {new Date(opp.deadline).toLocaleDateString()}
+              <span className="flex items-center gap-1.5 font-medium text-danger">
+                <Calendar className="w-4 h-4" /> Deadline: {new Date(opp.deadline).toLocaleDateString()}
               </span>
             )}
             {opp.educationLevel && (
-              <span className="flex items-center gap-1">
-                <Briefcase className="w-4 h-4" /> {opp.educationLevel}
+              <span className="flex items-center gap-1.5">
+                <Briefcase className="w-4 h-4 text-primary-600" /> {opp.educationLevel}
               </span>
             )}
           </div>
 
-          {/* Description: float image is OUTSIDE .opp-content */}
+          {/* SOCIAL LINKS (Zitandukanye kandi zifite amabara) */}
+          <div className="mb-8 p-4 bg-white border border-secondary-100 rounded-xl shadow-sm">
+            <h3 className="text-sm font-bold text-secondary-900 mb-3 uppercase tracking-wider">Join our Community</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a href="https://chat.whatsapp.com/IfZ4GF2gkYDCiFWrnuXFgp" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors border border-green-200">
+                <MessageCircle className="w-5 h-5" />
+                <span className="font-semibold text-sm">Join WhatsApp Group</span>
+              </a>
+              <a href="https://whatsapp.com/channel/0029Vb9LzD6Jpe8hOXdMHq2b" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors border border-green-200">
+                <Users className="w-5 h-5" />
+                <span className="font-semibold text-sm">Follow WhatsApp Channel</span>
+              </a>
+              <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors border border-red-200 sm:col-span-2">
+                <Youtube className="w-5 h-5" />
+                <span className="font-semibold text-sm">Subscribe to our YouTube Channel</span>
+              </a>
+            </div>
+          </div>
+
           <div className="mb-8">
-            <h3 className="text-h4 font-semibold mb-3">Description</h3>
+            <h3 className="text-lg font-bold text-secondary-900 mb-3">Description</h3>
             <div className="opp-desc-wrap text-secondary-600">
               {opp.coverImage && (
-                <button
-                  onClick={() => setImageZoomed(true)}
-                  className="opp-float-img"
-                  aria-label="Zoom image"
-                >
+                <button onClick={() => setImageZoomed(true)} className="opp-float-img" aria-label="Zoom image">
                   <img src={opp.coverImage} alt={opp.title} />
                 </button>
               )}
-              <div
-                className="opp-content"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }}
-              />
+              <div className="opp-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.description || '') }} />
             </div>
           </div>
 
           {opp.requirements && (
             <div className="mb-8">
-              <h3 className="text-h4 font-semibold mb-3">Requirements</h3>
-              <div
-                className="opp-content text-secondary-600"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }}
-              />
+              <h3 className="text-lg font-bold text-secondary-900 mb-3">Requirements</h3>
+              <div className="opp-content text-secondary-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.requirements) }} />
             </div>
           )}
 
           {opp.benefits && (
             <div className="mb-8">
-              <h3 className="text-h4 font-semibold mb-3">Benefits</h3>
-              <div
-                className="opp-content text-secondary-600"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }}
-              />
+              <h3 className="text-lg font-bold text-secondary-900 mb-3">Benefits</h3>
+              <div className="opp-content text-secondary-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opp.benefits) }} />
             </div>
           )}
 
-          <div className="mt-8 pt-8 border-t flex flex-wrap gap-3" style={{ clear: 'both' }}>
+          {/* YOUTUBE VIDEO LINK KURI SIDE */}
+          <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <Youtube className="w-5 h-5 text-white" />
+             </div>
+             <div>
+               <h4 className="font-bold text-red-900 text-sm">Watch how to apply</h4>
+               <p className="text-red-700 text-xs mt-1 mb-2">See our step-by-step guide on YouTube before applying.</p>
+               <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-red-700 hover:underline inline-block">
+                 Watch Video &rarr;
+               </a>
+             </div>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-secondary-100 flex flex-wrap gap-3" style={{ clear: 'both' }}>
             {opp.officialLink && (
               <a href={opp.officialLink} target="_blank" rel="noopener noreferrer">
                 <Button rightIcon={<Globe className="w-4 h-4" />}>Official Website</Button>
               </a>
             )}
-            {!isClosed && (
+            {!isClosed ? (
               <Button variant="outline" onClick={() => setShowApply(true)}>
                 Apply Now
               </Button>
-            )}
-            {isClosed && (
-              <span className="text-sm text-red-600 font-medium py-2">This opportunity is closed</span>
+            ) : (
+              <span className="text-sm text-red-600 font-medium py-2 px-4 bg-red-50 rounded-lg">This opportunity is closed</span>
             )}
           </div>
         </div>
       </div>
 
       {imageZoomed && opp.coverImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setImageZoomed(false)}
-        >
-          <img
-            src={opp.coverImage}
-            alt={opp.title}
-            className="max-w-full max-h-full object-contain cursor-zoom-out"
-          />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setImageZoomed(false)}>
+          <img src={opp.coverImage} alt={opp.title} className="max-w-full max-h-full object-contain cursor-zoom-out" />
         </div>
       )}
 
-      <ApplyModal
-        isOpen={showApply}
-        onClose={() => setShowApply(false)}
-        opportunityTitle={opp.title}
-        opportunityId={opp.id}
-      />
+      <ApplyModal isOpen={showApply} onClose={() => setShowApply(false)} opportunityTitle={opp.title} opportunityId={opp.id} />
     </div>
   );
 }
