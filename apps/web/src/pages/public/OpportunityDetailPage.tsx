@@ -166,10 +166,6 @@ export default function OpportunityDetailPage() {
                 <Users className="w-5 h-5" />
                 <span className="font-semibold text-sm">Follow WhatsApp Channel</span>
               </a>
-              <a href="https://www.youtube.com/@FUTURESCHOLAR_S" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors border border-red-200 sm:col-span-2">
-                <Youtube className="w-5 h-5" />
-                <span className="font-semibold text-sm">Subscribe to our YouTube Channel</span>
-              </a>
             </div>
           </div>
 
