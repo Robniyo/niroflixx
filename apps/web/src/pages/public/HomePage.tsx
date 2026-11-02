@@ -57,7 +57,7 @@ export default function HomePage() {
             <Link to="/opportunities?level=Masters" className="px-4 py-1.5 bg-white border border-secondary-200 rounded-full hover:border-primary-400 hover:text-primary-600 transition-colors">Masters</Link>
             <Link to="/opportunities?level=PhD" className="px-4 py-1.5 bg-white border border-secondary-200 rounded-full hover:border-primary-400 hover:text-primary-600 transition-colors">PhD</Link>
             <Link to="/opportunities?dest=Canada" className="px-4 py-1.5 bg-white border border-secondary-200 rounded-full hover:border-primary-400 hover:text-primary-600 transition-colors">Canada</Link>
-            <Link to="/opportunities?dest=USA" className="px-4 py-1.5 bg-white border border-secondary-200 rounded-full hover:border-primary-400 hover:text-primary-600 transition-colors">USA</Link>
+            <Link to="/opportunities?dest=United States of America" className="px-4 py-1.5 bg-white border border-secondary-200 rounded-full hover:border-primary-400 hover:text-primary-600 transition-colors">USA</Link>
           </div>
         </div>
       </section>
@@ -74,10 +74,10 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { name: 'Rwanda', code: 'rw' }, { name: 'Canada', code: 'ca' }, 
-              { name: 'USA', code: 'us' }, { name: 'UK', code: 'gb' }, 
-              { name: 'Australia', code: 'au' }, { name: 'Germany', code: 'de' },
-            ].map((dest) => (
+                { name: 'Rwanda', code: 'rw' }, { name: 'Canada', code: 'ca' }, 
+                { name: 'United States of America', code: 'us' }, { name: 'United Kingdom', code: 'gb' }, 
+                { name: 'Australia', code: 'au' }, { name: 'Germany', code: 'de' },
+              ].map((dest) => (
               <Link key={dest.name} to={`/opportunities?dest=${dest.name}`} className="bg-white border border-secondary-100 p-4 rounded-2xl flex flex-col items-center justify-center hover:shadow-md hover:border-primary-200 transition-all group">
                 {/* Hano turakoresha ifoto y'ibendera aho gukoresha emoji */}
                 <img 
