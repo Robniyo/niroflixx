@@ -154,7 +154,6 @@ export const resourcesController = {
     }
   },
 
-  // HANO: requestPayment function
   requestPayment: async (req: Request, res: Response) => {
     try {
       const { resourceId, name, email, phone, screenshot } = req.body;
@@ -173,7 +172,6 @@ export const resourcesController = {
         },
       });
 
-      // Notify admin (optional)
       const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
       if (admins.length > 0) {
         await prisma.notification.createMany({
@@ -191,6 +189,47 @@ export const resourcesController = {
     } catch (error) {
       console.error('REQUEST PAYMENT ERROR:', error);
       res.status(500).json({ status: 'error', message: 'Failed to submit request', code: 500 });
+    }
+  },
+
+  // HANO: getAllRequests function
+  getAllRequests: async (req: Request, res: Response) => {
+    try {
+      const requests = await prisma.resourceRequest.findMany({
+        include: { resource: true },
+        orderBy: { createdAt: 'desc' },
+      });
+      res.json({ status: 'success', data: requests });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to fetch requests', code: 500 });
+    }
+  },
+
+  // HANO: Approve request
+  approveRequest: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await prisma.resourceRequest.update({
+        where: { id },
+        data: { status: 'APPROVED' },
+      });
+      res.json({ status: 'success', message: 'Request approved' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to approve', code: 500 });
+    }
+  },
+
+  // HANO: Reject request
+  rejectRequest: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await prisma.resourceRequest.update({
+        where: { id },
+        data: { status: 'REJECTED' },
+      });
+      res.json({ status: 'success', message: 'Request rejected' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to reject', code: 500 });
     }
   },
 };

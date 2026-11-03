@@ -19,5 +19,5 @@ router.get('/:id', resourcesController.getById);
 
 // NEW: Resource Request (Payment)
 router.post('/request', resourcesController.requestPayment);
-
+router.get('/requests', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), resourcesController.getAllRequests);
 export default router;
