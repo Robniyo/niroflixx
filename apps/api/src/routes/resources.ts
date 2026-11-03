@@ -6,6 +6,7 @@ const router = Router();
 
 // Public
 router.get('/', resourcesController.getAll);
+router.get('/requests', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), resourcesController.getAllRequests); // <--- IBANZE
 router.get('/:id/preview', resourcesController.previewFile);
 router.get('/:id/download', resourcesController.downloadFile);
 
@@ -19,5 +20,5 @@ router.get('/:id', resourcesController.getById);
 
 // NEW: Resource Request (Payment)
 router.post('/request', resourcesController.requestPayment);
-router.get('/requests', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), resourcesController.getAllRequests);
+
 export default router;

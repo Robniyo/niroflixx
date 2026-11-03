@@ -11,7 +11,7 @@ export default function ResourceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [paymentStep, setPaymentStep] = useState<'choose' | 'ussd' | 'upload'>('choose');
+  const [paymentStep, setPaymentStep] = useState<'choose' | 'mtn' | 'airtel' | 'momo' | 'upload'>('choose');
   const [paymentForm, setPaymentForm] = useState({ name: '', email: '', screenshot: '' });
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [donePayment, setDonePayment] = useState(false);
@@ -140,21 +140,21 @@ export default function ResourceDetailPage() {
                 <h3 className="text-h4 font-semibold mb-2">Choose Payment Method</h3>
                 <p className="text-secondary-500 text-sm mb-6">Amount: <strong>{resource.price.toLocaleString()} RWF</strong></p>
                 <div className="space-y-3">
-                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                  <button onClick={() => { setPaymentStep('mtn'); window.location.href = 'tel:*182*1*1*0795064502#'; }} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
                     <Smartphone className="w-6 h-6 text-yellow-600" />
                     <div className="text-left">
                       <p className="font-semibold text-secondary-900">MTN Mobile Money</p>
                       <p className="text-xs text-secondary-500">Pay via MTN USSD</p>
                     </div>
                   </button>
-                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                  <button onClick={() => { setPaymentStep('airtel'); window.location.href = 'tel:*182*1*1*0729622252#'; }} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
                     <Smartphone className="w-6 h-6 text-red-600" />
                     <div className="text-left">
                       <p className="font-semibold text-secondary-900">Airtel Money</p>
                       <p className="text-xs text-secondary-500">Pay via Airtel USSD</p>
                     </div>
                   </button>
-                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                  <button onClick={() => { setPaymentStep('momo'); window.location.href = 'tel:*182*8*1*1294634#'; }} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
                     <Smartphone className="w-6 h-6 text-blue-600" />
                     <div className="text-left">
                       <p className="font-semibold text-secondary-900">MoMo Pay</p>
@@ -163,12 +163,40 @@ export default function ResourceDetailPage() {
                   </button>
                 </div>
               </>
-            ) : paymentStep === 'ussd' ? (
+            ) : paymentStep === 'mtn' ? (
               <>
-                <h3 className="text-h4 font-semibold mb-2">Payment Instructions</h3>
-                <p className="text-secondary-500 text-sm mb-4">Dial the code below on your phone to pay:</p>
+                <h3 className="text-h4 font-semibold mb-2">MTN Payment</h3>
+                <p className="text-secondary-500 text-sm mb-4">Dial this code on your phone:</p>
                 <div className="bg-secondary-50 p-4 rounded-xl text-center mb-6">
                   <p className="text-lg font-bold text-primary-700 mb-2">*182*1*1*0795064502#</p>
+                  <p className="text-sm text-secondary-600">Name: ROBERT NIYONKURU</p>
+                  <p className="text-sm text-secondary-600">Amount: {resource.price.toLocaleString()} RWF</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" className="flex-1" onClick={() => setPaymentStep('choose')}>Back</Button>
+                  <Button className="flex-1" onClick={() => setPaymentStep('upload')}>I have paid</Button>
+                </div>
+              </>
+            ) : paymentStep === 'airtel' ? (
+              <>
+                <h3 className="text-h4 font-semibold mb-2">Airtel Payment</h3>
+                <p className="text-secondary-500 text-sm mb-4">Dial this code on your phone:</p>
+                <div className="bg-secondary-50 p-4 rounded-xl text-center mb-6">
+                  <p className="text-lg font-bold text-primary-700 mb-2">*182*1*1*0729622252#</p>
+                  <p className="text-sm text-secondary-600">Name: ROBERT NIYONKURU</p>
+                  <p className="text-sm text-secondary-600">Amount: {resource.price.toLocaleString()} RWF</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" className="flex-1" onClick={() => setPaymentStep('choose')}>Back</Button>
+                  <Button className="flex-1" onClick={() => setPaymentStep('upload')}>I have paid</Button>
+                </div>
+              </>
+            ) : paymentStep === 'momo' ? (
+              <>
+                <h3 className="text-h4 font-semibold mb-2">MoMo Pay</h3>
+                <p className="text-secondary-500 text-sm mb-4">Dial this code on your phone:</p>
+                <div className="bg-secondary-50 p-4 rounded-xl text-center mb-6">
+                  <p className="text-lg font-bold text-primary-700 mb-2">*182*8*1*1294634#</p>
                   <p className="text-sm text-secondary-600">Name: ROBERT NIYONKURU</p>
                   <p className="text-sm text-secondary-600">Amount: {resource.price.toLocaleString()} RWF</p>
                 </div>
@@ -210,7 +238,7 @@ export default function ResourceDetailPage() {
                     {paymentForm.screenshot && <span className="text-xs text-success">Uploaded ✓</span>}
                   </div>
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="outline" className="flex-1" onClick={() => setPaymentStep('ussd')}>Back</Button>
+                    <Button type="button" variant="outline" className="flex-1" onClick={() => setPaymentStep('choose')}>Back</Button>
                     <Button type="submit" className="flex-1" isLoading={submittingPayment}>Submit</Button>
                   </div>
                 </form>
