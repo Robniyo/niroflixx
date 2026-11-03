@@ -24,6 +24,7 @@ model User {
   lastLogin      DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  resourceRequests ResourceRequest[]
 
   profile        Profile?
   candidate      Candidate?
@@ -385,6 +386,7 @@ model Resource {
   publishedAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  requests ResourceRequest[]
 
   category          Category?    @relation(fields: [categoryId], references: [id])
   tags              Tag[]
@@ -394,6 +396,23 @@ model Resource {
   @@map("resources")
 }
 
+model ResourceRequest {
+  id         String   @id @default(uuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name       String
+  email      String
+  phone      String?
+  screenshot String?
+  status     String   @default("PENDING")
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("resource_requests")
+}
 model Download {
   id           String   @id @default(uuid())
   userId       String

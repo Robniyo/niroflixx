@@ -17,4 +17,7 @@ router.delete('/:id', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), resources
 // Public single
 router.get('/:id', resourcesController.getById);
 
+// NEW: Resource Request (Payment)
+router.post('/request', resourcesController.requestPayment);
+
 export default router;

@@ -11,7 +11,6 @@ const cleanData = (data: any) => {
   return cleaned;
 };
 
-// Helper to resolve file URL (handles relative /uploads)
 function resolveFileUrl(url: string) {
   return url.startsWith('http') ? url : `${process.env.BACKEND_URL || 'https://niroflixx.onrender.com'}${url.startsWith('/') ? url : '/' + url}`;
 }
@@ -89,8 +88,7 @@ export const resourcesController = {
     }
   },
 
-  // Preview file inline (for PDF/images)
-     previewFile: async (req: Request, res: Response) => {
+  previewFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       if (!resource || !resource.fileUrl) {
@@ -111,7 +109,6 @@ export const resourcesController = {
       filename = filename.replace(/[^a-zA-Z0-9]+/g, '_');
       if (isPdf) filename += '.pdf';
 
-      // Allow iframe embedding from Vercel (fixes 'refused to connect')
       res.removeHeader('X-Frame-Options');
       res.setHeader('Content-Security-Policy', "frame-ancestors https://fscholars.online");
 
@@ -123,8 +120,7 @@ export const resourcesController = {
     }
   },
 
-  // Download file (forces attachment)
-    downloadFile: async (req: Request, res: Response) => {
+  downloadFile: async (req: Request, res: Response) => {
     try {
       const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
       if (!resource || !resource.fileUrl) {
@@ -155,6 +151,46 @@ export const resourcesController = {
       res.send(Buffer.from(buffer));
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Download failed', code: 500 });
+    }
+  },
+
+  // HANO: requestPayment function
+  requestPayment: async (req: Request, res: Response) => {
+    try {
+      const { resourceId, name, email, phone, screenshot } = req.body;
+      if (!resourceId || !name || !email) {
+        return res.status(400).json({ status: 'error', message: 'Missing required fields', code: 400 });
+      }
+
+      const request = await prisma.resourceRequest.create({
+        data: {
+          resourceId,
+          name,
+          email,
+          phone: phone || null,
+          screenshot: screenshot || null,
+          status: 'PENDING',
+        },
+      });
+
+      // Notify admin (optional)
+      const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
+      if (admins.length > 0) {
+        await prisma.notification.createMany({
+          data: admins.map(a => ({
+            userId: a.id,
+            title: 'New Resource Request',
+            message: `${name} requested to download ${resourceId}`,
+            link: '/admin/resource-requests',
+            type: 'RESOURCE_REQUEST',
+          })),
+        });
+      }
+
+      res.status(201).json({ status: 'success', message: 'Request submitted', data: request });
+    } catch (error) {
+      console.error('REQUEST PAYMENT ERROR:', error);
+      res.status(500).json({ status: 'error', message: 'Failed to submit request', code: 500 });
     }
   },
 };
