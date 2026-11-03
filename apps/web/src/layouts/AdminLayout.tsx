@@ -24,6 +24,7 @@ const allLinks = [
   { label: 'Subscribers', href: '/admin/subscribers', icon: Bell, roles: ['SUPER_ADMIN', 'ADMIN'] },
   { label: 'Reports', href: '/admin/reports', icon: Calendar, roles: ['SUPER_ADMIN', 'ADMIN'] },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['SUPER_ADMIN'] },
+  { label: 'Resource Requests', href: '/admin/resource-requests', icon: FileText, roles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
 ];
 
 export default function AdminLayout() {

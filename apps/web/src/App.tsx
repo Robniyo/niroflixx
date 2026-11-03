@@ -25,6 +25,7 @@ import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
 import NewsDetailPage from './pages/public/NewsDetailPage';
 import ServiceDetailPage from './pages/public/ServiceDetailPage';
 import MaintenancePage from './pages/public/MaintenancePage';
+import ResourceRequestsPage from './pages/admin/ResourceRequestsPage';
 
 import AuthPage from './pages/auth/AuthPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -177,6 +178,7 @@ export default function App() {
           <Route path="subscribers" element={<SubscribersPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="resource-requests" element={<ResourceRequestsPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
