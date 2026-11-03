@@ -10,13 +10,11 @@ export const paymentsController = {
         return res.status(400).json({ status: 'error', message: 'Missing required fields', code: 400 });
       }
 
-      // 1. Reba niba Resource ibaho
       const resource = await prisma.resource.findUnique({ where: { id: resourceId } });
       if (!resource) {
         return res.status(404).json({ status: 'error', message: 'Resource not found', code: 404 });
       }
 
-      // 2. Create a payment record in database (status PENDING)
       const payment = await prisma.resourceRequest.create({
         data: {
           resourceId,
@@ -28,20 +26,22 @@ export const paymentsController = {
         },
       });
 
-      // 3. Call PawaPay API (Sandbox)
       const PAWAPAY_TOKEN = process.env.PAWAPAY_API_TOKEN;
       if (!PAWAPAY_TOKEN) {
         return res.status(500).json({ status: 'error', message: 'Payment gateway not configured', code: 500 });
       }
 
+      // HANO: Koresha v2/deposits n'uburyo bushya bwa PawaPay
       const payload = {
-        amount: amount,
+        depositId: payment.id, // Koresha ID ya database nka depositId
+        amount: String(amount),
         currency: 'RWF',
         correspondent: provider,
         payer: {
           type: 'MMO',
-          address: {
-            value: phoneNumber,
+          accountDetails: { // <--- KORESHA accountDetails AHO KUBA address
+            phoneNumber: phoneNumber,
+            provider: provider,
           },
         },
         customerTimestamp: new Date().toISOString(),
@@ -49,9 +49,9 @@ export const paymentsController = {
         callbackUrl: 'https://niroflixx.onrender.com/api/v1/payments/pawapay/callback',
       };
 
-      console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload)); // Kugira ngo tubone ibyo twohereje
+      console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload));
 
-      const response = await fetch('https://api.sandbox.pawapay.io/v1/payments', {
+      const response = await fetch('https://api.sandbox.pawapay.io/v2/deposits', { // <--- KORESHA v2/deposits
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${PAWAPAY_TOKEN}`,
@@ -69,17 +69,16 @@ export const paymentsController = {
 
       const data = JSON.parse(text);
 
-      // 4. Update payment record with PawaPay reference
       await prisma.resourceRequest.update({
         where: { id: payment.id },
         data: {
           name: 'PawaPay User',
           email: 'user@fscholars.online',
-          paymentId: data.paymentId,
+          paymentId: data.depositId || payment.id,
         },
       });
 
-      res.json({ status: 'success', message: 'Payment initiated', data: { paymentId: data.paymentId } });
+      res.json({ status: 'success', message: 'Payment initiated', data: { paymentId: data.depositId } });
     } catch (error: any) {
       console.error('PAWAPAY ERROR:', error);
       res.status(500).json({ status: 'error', message: error.message || 'Payment failed', code: 500 });
@@ -88,13 +87,13 @@ export const paymentsController = {
 
   handleCallback: async (req: Request, res: Response) => {
     try {
-      const { paymentId, status } = req.body;
-      if (!paymentId || !status) {
+      const { depositId, status } = req.body;
+      if (!depositId || !status) {
         return res.status(400).json({ status: 'error', message: 'Invalid callback', code: 400 });
       }
 
       const request = await prisma.resourceRequest.findFirst({
-        where: { paymentId: paymentId },
+        where: { paymentId: depositId },
       });
 
       if (request) {
