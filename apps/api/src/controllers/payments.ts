@@ -33,19 +33,19 @@ export const paymentsController = {
 
       const payload = {
         depositId: payment.id,
-        amount: String(amount), // <--- AMOUNT NKA STRING
+        amount: String(amount),
         currency: 'RWF',
         correspondent: provider,
         payer: {
           type: 'MMO',
-          accountDetails: { // <--- accountDetails AHO KUBA address
+          accountDetails: {
             phoneNumber: phoneNumber,
             provider: provider,
           },
         },
         customerTimestamp: new Date().toISOString(),
-        customerMessage: 'Future Scholars', // <--- customerMessage AHO KUBA statementDescription (4-22 chars)
-        callbackUrl: 'https://niroflixx.onrender.com/api/v1/payments/pawapay/callback',
+        customerMessage: 'Future Scholars', // 4-22 chars
+        // callbackUrl: '...' // <--- KURAho IYI (ntiyemewe muri v2/deposits)
       };
 
       console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload));
