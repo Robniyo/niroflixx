@@ -5,5 +5,16 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://niroflixx.onrender.com/sitemap.xml" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "index, follow"
+        }
+      ]
+    }
   ]
 }

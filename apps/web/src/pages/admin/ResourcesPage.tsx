@@ -77,6 +77,7 @@ export default function ResourcesPage() {
                 <span className={`px-2 py-0.5 rounded-full text-caption font-medium ${r.status==='PUBLISHED'?'bg-success-light text-success-dark':'bg-secondary-100 text-secondary-600'}`}>{r.status}</span>
               </div>
               <p className="text-body-sm text-secondary-500">Downloads: {r.downloadCount||0}</p>
+              <p className="text-body-sm text-secondary-500">Price: {r.price === 0 ? 'Free' : `${r.price} RWF`}</p>
               {r.fileUrl && <a href={`https://niroflixx.onrender.com/api/v1/resources/${r.id}/file`} target="_blank" className="text-xs text-primary-600 hover:underline mt-1 inline-block">View / Download File</a>}
               <div className="flex gap-3 mt-3 pt-3 border-t border-secondary-100">
                 <button onClick={()=>openEdit(r.id)} className="text-xs text-primary-600 hover:underline flex items-center gap-1"><Edit className="w-3 h-3"/> Edit</button>
@@ -95,6 +96,21 @@ export default function ResourcesPage() {
             <form onSubmit={handleSave} className="p-5 space-y-4">
               <div><label className="block text-sm font-medium text-secondary-700 mb-1">Title *</label><input type="text" required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="e.g. JavaScript Cheat Sheet" className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm"/></div>
               <div><label className="block text-sm font-medium text-secondary-700 mb-1">Description</label><textarea rows={2} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm resize-none"/></div>
+              
+              {/* PRICE INPUT */}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Price (RWF)</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  value={form.price} 
+                  onChange={e=>setForm({...form, price: Number(e.target.value)})} 
+                  className="w-full px-3 py-2.5 bg-secondary-50 border rounded-lg text-sm" 
+                  placeholder="0 for Free"
+                />
+                <span className="text-xs text-secondary-500 mt-1 block">Set to 0 for free download, or e.g. 50 for 50 RWF.</span>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Upload File</label>
                 <label className="flex items-center gap-2 px-4 py-2.5 bg-secondary-50 border rounded-lg cursor-pointer hover:bg-secondary-100 text-sm">
