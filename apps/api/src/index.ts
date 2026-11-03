@@ -28,6 +28,7 @@ import reportsRoutes from './routes/reports';
 import statsRoutes from './routes/stats';
 import contactRoutes from './routes/contact';
 import notificationsRoutes from './routes/notifications';
+import paymentsRoutes from './routes/payments'; // <--- ONGERAHO IYI
 import { sitemapController } from './controllers/sitemap';
 
 const app = express();
@@ -54,7 +55,6 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Temporary fix endpoint to regenerate Prisma client on the server
 app.get('/api/v1/fix', async (_req, res) => {
   try {
     const { execSync } = require('child_process');
@@ -89,8 +89,8 @@ app.use('/api/v1/reports', reportsRoutes);
 app.use('/api/v1/stats', statsRoutes);
 app.use('/api/v1/contact', contactRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
+app.use('/api/v1/payments', paymentsRoutes); // <--- ONGERAHO IYI
 
-// Dynamic sitemap (served at root so it's accessible as /sitemap.xml via Vercel rewrite)
 app.get('/sitemap.xml', sitemapController.get);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

@@ -402,10 +402,11 @@ model ResourceRequest {
   resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   userId     String?
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  name       String
-  email      String
+  name       String?  // <--- HINDURA (Yari String)
+  email      String?  // <--- HINDURA (Yari String)
   phone      String?
   screenshot String?
+  paymentId  String?  // <--- ONGERAHO IYI
   status     String   @default("PENDING")
   notes      String?
   createdAt  DateTime @default(now())
