@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, FileText, User, Mail, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, User, Mail, Calendar, X } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
 export default function ResourceRequestsPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -73,9 +74,20 @@ export default function ResourceRequestsPage() {
                 </span>
               </div>
               <p className="text-sm text-secondary-600 mb-2">Resource: <strong>{req.resource?.title}</strong></p>
+              
+              {/* SCREENSHOT - Iyo uyikandije irafunguka */}
               {req.screenshot && (
-                <img src={req.screenshot} alt="Proof" className="w-32 h-20 object-cover rounded-lg border mb-3" />
+                <div className="mb-3">
+                  <p className="text-xs text-secondary-500 mb-1">Payment Proof (Click to enlarge):</p>
+                  <img 
+                    src={req.screenshot} 
+                    alt="Proof" 
+                    className="w-32 h-20 object-cover rounded-lg border cursor-zoom-in hover:opacity-80 transition-opacity" 
+                    onClick={() => setZoomedImage(req.screenshot)}
+                  />
+                </div>
               )}
+
               <div className="flex gap-3">
                 {req.status === 'PENDING' && (
                   <>
@@ -90,6 +102,22 @@ export default function ResourceRequestsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Lightbox (Zoom) */}
+      {zoomedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" 
+          onClick={() => setZoomedImage(null)}
+        >
+          <img src={zoomedImage} alt="Zoomed Proof" className="max-w-full max-h-full object-contain cursor-zoom-out rounded-lg shadow-2xl" />
+          <button 
+            className="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full transition-colors"
+            onClick={() => setZoomedImage(null)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
       )}
     </div>
