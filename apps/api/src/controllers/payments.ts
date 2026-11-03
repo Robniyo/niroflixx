@@ -31,27 +31,26 @@ export const paymentsController = {
         return res.status(500).json({ status: 'error', message: 'Payment gateway not configured', code: 500 });
       }
 
-      // HANO: Koresha v2/deposits n'uburyo bushya bwa PawaPay
       const payload = {
-        depositId: payment.id, // Koresha ID ya database nka depositId
-        amount: String(amount),
+        depositId: payment.id,
+        amount: String(amount), // <--- AMOUNT NKA STRING
         currency: 'RWF',
         correspondent: provider,
         payer: {
           type: 'MMO',
-          accountDetails: { // <--- KORESHA accountDetails AHO KUBA address
+          accountDetails: { // <--- accountDetails AHO KUBA address
             phoneNumber: phoneNumber,
             provider: provider,
           },
         },
         customerTimestamp: new Date().toISOString(),
-        statementDescription: 'Future Scholars Payment',
+        customerMessage: 'Future Scholars', // <--- customerMessage AHO KUBA statementDescription (4-22 chars)
         callbackUrl: 'https://niroflixx.onrender.com/api/v1/payments/pawapay/callback',
       };
 
       console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload));
 
-      const response = await fetch('https://api.sandbox.pawapay.io/v2/deposits', { // <--- KORESHA v2/deposits
+      const response = await fetch('https://api.sandbox.pawapay.io/v2/deposits', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${PAWAPAY_TOKEN}`,
