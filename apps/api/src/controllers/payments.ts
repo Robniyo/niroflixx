@@ -32,21 +32,19 @@ export const paymentsController = {
       }
 
       const payload = {
-        depositId: payment.id,
-        amount: String(amount),
-        currency: 'RWF',
-        correspondent: provider,
-        payer: {
-          type: 'MMO',
-          accountDetails: {
-            phoneNumber: phoneNumber,
-            provider: provider,
-          },
-        },
-        customerTimestamp: new Date().toISOString(),
-        customerMessage: 'Future Scholars', // 4-22 chars
-        // callbackUrl: '...' // <--- KURAho IYI (ntiyemewe muri v2/deposits)
-      };
+  depositId: payment.id,
+  amount: String(amount),
+  currency: 'RWF',
+  correspondent: provider,
+  payer: {
+    type: 'MMO',
+    accountDetails: {
+      phoneNumber: phoneNumber,
+      provider: provider,
+    },
+  },
+  customerMessage: 'Future Scholars',
+};
 
       console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload));
 
