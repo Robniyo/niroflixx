@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, ArrowLeft, Download, Eye, LinkIcon, X, Send, User, Mail } from 'lucide-react';
+import { BookOpen, ArrowLeft, Download, Eye, LinkIcon, X, Send, User, Mail, Smartphone } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
@@ -11,6 +11,7 @@ export default function ResourceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [paymentStep, setPaymentStep] = useState<'choose' | 'ussd' | 'upload'>('choose');
   const [paymentForm, setPaymentForm] = useState({ name: '', email: '', screenshot: '' });
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [donePayment, setDonePayment] = useState(false);
@@ -34,7 +35,7 @@ export default function ResourceDetailPage() {
         screenshot: paymentForm.screenshot,
       });
       setDonePayment(true);
-      setTimeout(() => { setShowPayment(false); setDonePayment(false); setPaymentForm({ name: '', email: '', screenshot: '' }); }, 3000);
+      setTimeout(() => { setShowPayment(false); setDonePayment(false); setPaymentForm({ name: '', email: '', screenshot: '' }); setPaymentStep('choose'); }, 3000);
     } catch {
       toast.error('Failed to send request');
     } finally {
@@ -134,10 +135,51 @@ export default function ResourceDetailPage() {
                 <h3 className="text-h4 font-semibold mb-2">Request Sent!</h3>
                 <p className="text-secondary-500">We will verify your payment and send you the download link via email.</p>
               </div>
+            ) : paymentStep === 'choose' ? (
+              <>
+                <h3 className="text-h4 font-semibold mb-2">Choose Payment Method</h3>
+                <p className="text-secondary-500 text-sm mb-6">Amount: <strong>{resource.price.toLocaleString()} RWF</strong></p>
+                <div className="space-y-3">
+                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                    <Smartphone className="w-6 h-6 text-yellow-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-secondary-900">MTN Mobile Money</p>
+                      <p className="text-xs text-secondary-500">Pay via MTN USSD</p>
+                    </div>
+                  </button>
+                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                    <Smartphone className="w-6 h-6 text-red-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-secondary-900">Airtel Money</p>
+                      <p className="text-xs text-secondary-500">Pay via Airtel USSD</p>
+                    </div>
+                  </button>
+                  <button onClick={() => setPaymentStep('ussd')} className="w-full flex items-center gap-3 p-4 border rounded-xl hover:bg-secondary-50 transition-colors">
+                    <Smartphone className="w-6 h-6 text-blue-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-secondary-900">MoMo Pay</p>
+                      <p className="text-xs text-secondary-500">Pay via MoMo Pay USSD</p>
+                    </div>
+                  </button>
+                </div>
+              </>
+            ) : paymentStep === 'ussd' ? (
+              <>
+                <h3 className="text-h4 font-semibold mb-2">Payment Instructions</h3>
+                <p className="text-secondary-500 text-sm mb-4">Dial the code below on your phone to pay:</p>
+                <div className="bg-secondary-50 p-4 rounded-xl text-center mb-6">
+                  <p className="text-lg font-bold text-primary-700 mb-2">*182*1*1*0795064502#</p>
+                  <p className="text-sm text-secondary-600">Name: ROBERT NIYONKURU</p>
+                  <p className="text-sm text-secondary-600">Amount: {resource.price.toLocaleString()} RWF</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" className="flex-1" onClick={() => setPaymentStep('choose')}>Back</Button>
+                  <Button className="flex-1" onClick={() => setPaymentStep('upload')}>I have paid</Button>
+                </div>
+              </>
             ) : (
               <>
-                <h3 className="text-h4 font-semibold mb-2">Pay for: {resource.title}</h3>
-                <p className="text-secondary-500 text-sm mb-6">Amount: <strong>{resource.price.toLocaleString()} RWF</strong></p>
+                <h3 className="text-h4 font-semibold mb-2">Upload Payment Proof</h3>
                 <form onSubmit={handlePayment} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Name *</label>
@@ -168,8 +210,8 @@ export default function ResourceDetailPage() {
                     {paymentForm.screenshot && <span className="text-xs text-success">Uploaded ✓</span>}
                   </div>
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="outline" className="flex-1" onClick={() => setShowPayment(false)}>Cancel</Button>
-                    <Button type="submit" className="flex-1" isLoading={submittingPayment}>Send Request</Button>
+                    <Button type="button" variant="outline" className="flex-1" onClick={() => setPaymentStep('ussd')}>Back</Button>
+                    <Button type="submit" className="flex-1" isLoading={submittingPayment}>Submit</Button>
                   </div>
                 </form>
               </>
