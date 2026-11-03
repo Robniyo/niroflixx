@@ -10,7 +10,13 @@ export const paymentsController = {
         return res.status(400).json({ status: 'error', message: 'Missing required fields', code: 400 });
       }
 
-      // 1. Create a payment record in database (status PENDING)
+      // 1. Reba niba Resource ibaho
+      const resource = await prisma.resource.findUnique({ where: { id: resourceId } });
+      if (!resource) {
+        return res.status(404).json({ status: 'error', message: 'Resource not found', code: 404 });
+      }
+
+      // 2. Create a payment record in database (status PENDING)
       const payment = await prisma.resourceRequest.create({
         data: {
           resourceId,
@@ -22,7 +28,7 @@ export const paymentsController = {
         },
       });
 
-      // 2. Call PawaPay API (Sandbox)
+      // 3. Call PawaPay API (Sandbox)
       const PAWAPAY_TOKEN = process.env.PAWAPAY_API_TOKEN;
       if (!PAWAPAY_TOKEN) {
         return res.status(500).json({ status: 'error', message: 'Payment gateway not configured', code: 500 });
@@ -43,6 +49,8 @@ export const paymentsController = {
         callbackUrl: 'https://niroflixx.onrender.com/api/v1/payments/pawapay/callback',
       };
 
+      console.log('PAWAPAY PAYLOAD:', JSON.stringify(payload)); // Kugira ngo tubone ibyo twohereje
+
       const response = await fetch('https://api.sandbox.pawapay.io/v1/payments', {
         method: 'POST',
         headers: {
@@ -52,19 +60,22 @@ export const paymentsController = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log('PAWAPAY RESPONSE:', text);
 
       if (!response.ok) {
-        return res.status(response.status).json({ status: 'error', message: data.message || 'PawaPay error', code: response.status });
+        return res.status(response.status).json({ status: 'error', message: text || 'PawaPay error', code: response.status });
       }
 
-      // 3. Update payment record with PawaPay reference
+      const data = JSON.parse(text);
+
+      // 4. Update payment record with PawaPay reference
       await prisma.resourceRequest.update({
         where: { id: payment.id },
         data: {
           name: 'PawaPay User',
           email: 'user@fscholars.online',
-          paymentId: data.paymentId, // <--- KORESHA paymentId AHO KUBA notes
+          paymentId: data.paymentId,
         },
       });
 
@@ -82,9 +93,8 @@ export const paymentsController = {
         return res.status(400).json({ status: 'error', message: 'Invalid callback', code: 400 });
       }
 
-      // Find the request by paymentId
       const request = await prisma.resourceRequest.findFirst({
-        where: { paymentId: paymentId }, // <--- KORESHA paymentId AHO KUBA notes
+        where: { paymentId: paymentId },
       });
 
       if (request) {
